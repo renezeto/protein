@@ -1,0 +1,24 @@
+\begin{thebibliography}{1}
+
+\bibitem{huang2003dynamic}
+K.C. Huang, Y.~Meir, and N.S. Wingreen.
+\newblock Dynamic structures in escherichia coli: spontaneous formation of mine
+  rings and mind polar zones.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  100(22):12724--12728, 2003.
+
+\bibitem{mannik2012robustness}
+J.~M{\"a}nnik, F.~Wu, F.J.H. Hol, P.~Bisicchia, D.J. Sherratt, J.E. Keymer, and
+  C.~Dekker.
+\newblock Robustness and accuracy of cell division in escherichia coli in
+  diverse cell shapes.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  109(18):6957--6962, 2012.
+
+\bibitem{huang2006curvature}
+K.C. Huang, R.~Mukhopadhyay, and N.S. Wingreen.
+\newblock A curvature-mediated mechanism for localization of lipids to
+  bacterial poles.
+\newblock {\em PLoS computational biology}, 2(11):e151, 2006.
+
+\end{thebibliography}
