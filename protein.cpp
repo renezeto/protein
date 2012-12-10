@@ -134,30 +134,11 @@ double mem_f(double x, double y, double z) {
   }
 }
 
-
 //runs simulations
 int main (int argc, char *argv[]) {
-  const int nrolls=10000;  // number of experiments
-  const int nstars=100;    // maximum number of stars to distribute
-  
-  std::default_random_engine generator;
-  std::normal_distribution<double> distribution(5.0,2.0);
-  
-  int p[10]={};
-  
-  for (int i=0; i<nrolls; ++i) {
-    double number = distribution(generator);
-    if ((number>=0.0)&&(number<=10.0)) ++p[int(number)];
+  if (argc != 2){
+    printf("usage: %s mem_f_shape\n", argv[0]);
   }
-  
-  std::cout << "normal_distribution (5.0,2.0):" << std::endl;
-  
-  for (int i=0; i<10; ++i) {
-    std::cout << i << "-" << (i+1) << ": ";
-    std::cout << std::string(p[i]*nstars/nrolls,'*') << std::endl;
-  }
-  
-  return 0;
   mem_f_shape = argv[1];
   int A =1;
   int B =1;
@@ -242,7 +223,7 @@ int main (int argc, char *argv[]) {
         }
       }
     }
-      
+
     if (i%iter_at_five_sec == 0) {
       for (int j=0;j<10;j++){
         int k = i/iter_at_five_sec;
@@ -264,7 +245,7 @@ int main (int argc, char *argv[]) {
         sprintf(outfilenameE, "ne%03d.dat", k);
         FILE *nEfile = fopen((const char *)outfilenameE,"w");
         delete[] outfilenameE;
-        for (int a=0;a<Ny;a++){ 
+        for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
             fprintf(nEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           }
@@ -274,7 +255,7 @@ int main (int argc, char *argv[]) {
       }
     }
   }
-    
+
   for (int i=0;i<Nx*Ny*Nz;i++){
     total_NATP += nATP[i]*dx*dx*dx;
     total_NADP += nADP[i]*dx*dx*dx;
@@ -612,6 +593,60 @@ double ran(){
 }
 
 
+//density intializer
+int set_density(double *nATP, double *nE, double *mem_A){
+  int count_inside = 0;
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          count_inside++; // counts # of inside gridpoints
+        }
+      }
+    }
+  }
+  double NE_per_cell = 1000*dx*dx*dx;
+  double NATP_per_cell = 350*dx*dx*dx;
+  double NE_variance = .15*NE_per_cell/(dx*dx*dx);
+  double NATP_variance = .15*NATP_per_cell/(dx*dx*dx);
+  printf("total inside = %d\nTotal nE should be = %f\nE_per_cell = %f\n", count_inside,
+  count_inside*NE_per_cell, NE_per_cell);
+  double r2,U,V;
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          do{
+            double U = 2*ran() - 1;
+            double V = 2*ran() - 1;
+            double r2X = U*U + V*V;
+          } while (r2 >= 1 || r2 == 0);
+          double fac = sqrt(-2*log(r2)/r2);
+          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_variance*(U*fac);
+          printf("nATP for cell %d %d %d is %f\n", i,j,k, nATP[i*Ny*Nz+j*Nz+k]);
+        }
+      }
+    }
+  }
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          do{
+            double U = 2*ran() - 1;
+            double V = 2*ran() - 1;
+            double r2X = U*U + V*V;
+          } while (r2 >= 1 || r2 == 0);
+          double fac = sqrt(-2*log(r2)/r2);
+          nE[i*Ny*Nz+j*Nz+k] = NE_per_cell/(dx*dx*dx) + NE_variance*(U*fac);
+          printf("nE for cell %d %d %d is %f\n", i,j,k, nE[i*Ny*Nz+j*Nz+k]);
+        }
+      }
+    }
+  }
+  return 0;
+}
+/*
 Vector3d ran3(){
   double x, y, r2;
   do{
@@ -629,55 +664,4 @@ Vector3d ran3(){
   fac = sqrt(-2*log(r2)/r2);
   out[2]=x*fac;
   return out;
-}
-//
-
-
-//random # generator
-double ran(){
-	const long unsigned int x=0;
-	static MTRand my_mtrand(x); // always use the same random number generator (for debugging)!
-	return my_mtrand.randExc(); // which is the range of [0,1)
-}
-
-
-//density intializer
-int set_density(double *nATP, double *nE, double *mem_A){
-  int count_inside = 0; 
-  for (int i=0;i<Nx;i++){
-    for (int j=0;j<Ny;j++){
-      for (int k=0;k<Nz;k++){
-        if (inside(i,j,k)){
-          count_inside++; // counts # of inside gridpoints
-        }
-      }
-    } 
-  }
-
-  double NE_per_cell = 1000*dx*dx*dx;
-  double NATP_per_cell = 350*dx*dx*dx;
-  double NE_variance = .15*NE_per_cell/(dx*dx*dx);
-  double NATP_variance = .15*NATP_per_cell/(dx*dx*dx);
-
-  printf("total inside = %d\nTotal nE should be = %f\nE_per_cell = %f\n", count_inside,
-  count_inside*NE_per_cell, NE_per_cell);
-    
-  for (int i=0;i<Nx;i++){
-    for (int j=0;j<Ny;j++){ 
-      for (int k=0;k<Nz;k++){
-        if (inside(i,j,k)){
-          double U = ran();
-          double V = ran();
-          double X = sqrt(-2*log(U))*cos(2*(22/7)*V //) error;
-          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_variance*(X));
-          nE[i*Ny*Nz+j*Nz+k] = NE_per_cell/(dx*dx*dx) + NE_variance*(X);
-          printf("nATP for cell %d %d %d is %f\n", i,j,k, nATP[i*Ny*Nz+j*Nz+k]);
-        }
-      }
-    }
-  }
-	return 0;
-}
-  
-
-
+*/
