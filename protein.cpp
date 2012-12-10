@@ -28,9 +28,9 @@ const int iter_at_five_sec = int(5.0/time_step)+1;
 
 double x, y, z;
 
-int Nx = 15; // x=0 to x=0.75
-int Ny = 15; // y=0 to y=0.75
-int Nz = 25; // z=0 to z=1.25
+int Nx = 15; 
+int Ny = 15; 
+int Nz = 25; 
 
 double *nATP = new double[Nx*Ny*Nz];
 double *nADP = new double[Nx*Ny*Nz];
@@ -46,86 +46,95 @@ double *f_mem = new double[Nx*Ny*Nz];
 //change to first letter, 3 dimensions after
 
 string mem_f_shape;
+double A;
+double B;
+double C;
 
 //determines shape of cell
 double mem_f(double x, double y, double z) {
   if (mem_f_shape=="p"){ //pill
-    double C = .025;
+    //A = length, B = radius of endcap and cylinder, C = ???
     double f;
-    	if (z < 0.35) {
-        f = sqrt((x-0.35)*(x-0.35)+(y-0.35)*(y-0.35)+(z-0.35)*(z-0.35))-C;
+    double a = (1-A)/2;
+    double b = (A+(1-A)/2);
+    	if (z < a) {
+        f = sqrt((x-a)*(x-a)+(y-a)*(y-a)+(z-a)*(z-a)-B);
       }
-      else if (z > 0.85) {
-        f = sqrt((x-0.35)*(x-0.35)+(y-0.35)*(y-0.35)+(z-0.85)*(z-0.85))-C;
+      else if (z > b) {
+        f = sqrt((x-a)*(x-a)+(y-a)*(y-a)+(z-b)*(z-b))-B;
       }
       else {
-        f = sqrt((x-0.35)*(x-0.35)+(y-0.35)*(y-0.35))-C;
+        f = sqrt((x-a)*(x-a)+(y-a)*(y-a))-B;
       }
   return f;
   }
   if (mem_f_shape=="b"){ //box
+    //A,B,C lengths
     double f;
-    if ((x>=-.5) && (x<=.5)){
-  	if ((z>=.4) && (z <= .8)){
-    if ((y>=.1) && (y <= .5)){ f = -1; }
-    else { f = 1;} }
-    else { f = 1;} }
+    double x1=0;
+    double y1=0;
+    double z1=0;
+    if ((x>=-A+x1) && (x<=+x1)){
+  		if ((z>=-B+z1) && (z <= B+z1)){
+    		if ((y>=-C+y1) && (y <= C+y1)){ f = -1; }
+    		else { f = 1;} }
+    	else { f = 1;} }
     else { f=1;}
     return f;
   }
   if (mem_f_shape=="c"){ //cone
-		double C = 0.5;
+    //A = length of cone, B = radius of base, C = ???
     double f;
-    double a = .5;
-    double b = .5;
-    if (z > .25 && z<.85){
-    	f = sqrt(((x-.75/2)*(x-.75/2) + (y-.75/2)*(y-.75/2)))/(z-.25) - C;
+    double a = (1-A)/2;
+    double b = (A+(1-A)/2);
+    double x1=.75/2;
+    double y1=.75/2;
+    double z1=.25;
+    if ((z > a) && (z < b)){
+    	f = sqrt(((x-x1)*(x-x1) + (y-y1)*(y-y1)))/(z-z1) - B;
     }
     else { f = 1; }
     return f;
 	}
 	if (mem_f_shape=="s"){ //stadium
-    double R = .75;
+    //A = length, B = width, C = radius of cap
+    double d = C/10;
     double f;
-    double d = .1;
-    double L = sqrt(abs(d*d - 2*R*d));
-    double az = 1;
-    double bz = 1.1;
-    double ax = -1;
-    double bx = 1;
-    if (ax <= x && x <= bx){
-    	if (z < az){
-    		f = sqrt((z-R)*(z-R) + (y-L)*(y-L)) - R;
+    double L = sqrt(abs(d*d - 2*C*d));
+    double a = (1-A)/2;
+    double b = (A+(1-A)/2);
+    double x1=0;
+    double y1=0; //nyi
+    double z1=0;
+    if ((-B/2+x1) <= x && x <= (B/2+x1)){
+    	if (z < a+z1){
+    		f = sqrt((z-C)*(z-C) + (y-L)*(y-L)) - C;
     	}
-    	if (az <=z <= bz){
+    	if ((a+z1) <= z && z <= (b+z1)){
     		f = y-(2*L);
     	}
-    	if (z > bz){
-    		f = sqrt((z-(bz+R))*(z-(bz+R)) + (y-L)*(y-L)) - R;
+    	if (z > (b+z1)){
+    		f = sqrt((z-b)*(z-b) + (y-L)*(y-L)) - C;
     	}
     	else { f = 1; }
       }
     return f;
 	}
   if (mem_f_shape=="sp"){ //sphere
-    double C = .5;
+    // A = radius, B = ???, C = ???
     double x1 = 0;
     double y1 = .75/2;
 		double z1 = 1.25/2;
     double f;
-    f = sqrt((x-x1)*(x-x1) + (y-y1)*(y-y1) + (z-z1)*(z-z1)) - C;
+    f = sqrt((x-x1)*(x-x1) + (y-y1)*(y-y1) + (z-z1)*(z-z1)) - A;
     return f;
   }
 	if (mem_f_shape=="e"){ //ellipsoid
-    double C = .5;
-    double a = 1;
-    double b = 1;
-    double c = 1;
+    //A, B scale factors for ellipse
     double x1 = 0;
     double y1 = .75/2;
     double z1 = 1.25/2;
-    double f;
-    f = sqrt((x-x1)*(x-x1)/(a*a) + (y-y1)*(y-y1)/(b*b) + (z-z1)*(z-z1)/(c*c)) - C;
+    double f = sqrt( (x-x1)*(x-x1)/(A*A) + (y-y1)*(y-y1)/(B*B) + (z-z1)*(z-z1) ) - C;
     return f;
   }
   else {
@@ -137,6 +146,7 @@ double mem_f(double x, double y, double z) {
 
 //runs simulations
 int main (int argc, char *argv[]) {
+  /*
   const int nrolls=10000;  // number of experiments
   const int nstars=100;    // maximum number of stars to distribute
   
@@ -158,10 +168,11 @@ int main (int argc, char *argv[]) {
   }
   
   return 0;
+  */
   mem_f_shape = argv[1];
-  int A =1;
-  int B =1;
-  int C =1;
+  double A = atof(argv[2]);
+  double B = atof(argv[3]);
+  double C = atof(argv[4]);
   printf("For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
          dx, tot_time, time_step, iter, iter_at_five_sec);
   double *JxATP = new double[Nx*Ny*Nz];
@@ -604,14 +615,8 @@ int get_next_density(double *mem_A, bool *insideArr, double *nATP, double *nADP,
   return 0;
 }
 
-//new stuff
-double ran(){
-  const long unsigned int x =0;
-  static MTRand my_mtrand(x); // always use the same random number generator (for debugging)!
-  return my_mtrand.randExc(); // which is the range of [0,1)
-}
 
-
+/*
 Vector3d ran3(){
   double x, y, r2;
   do{
@@ -630,7 +635,7 @@ Vector3d ran3(){
   out[2]=x*fac;
   return out;
 }
-//
+*/
 
 
 //random # generator
@@ -668,8 +673,8 @@ int set_density(double *nATP, double *nE, double *mem_A){
         if (inside(i,j,k)){
           double U = ran();
           double V = ran();
-          double X = sqrt(-2*log(U))*cos(2*(22/7)*V //) error;
-          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_variance*(X));
+          double X = sqrt(-2*log(U))*cos(2*(22/7)*V); 
+          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_variance*(X);
           nE[i*Ny*Nz+j*Nz+k] = NE_per_cell/(dx*dx*dx) + NE_variance*(X);
           printf("nATP for cell %d %d %d is %f\n", i,j,k, nATP[i*Ny*Nz+j*Nz+k]);
         }
