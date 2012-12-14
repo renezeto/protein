@@ -53,7 +53,7 @@ double mem_f(double x, double y, double z) {
     double Z = Nz*dx;
     double z1 = (Z-A)/2;
     double z2 = (A+(Z-A)/2);
-    double x1 = X/2;
+    double x1 = 0;
     double y1 = Y/2;
     	if (z < z1) {
         f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)+(z-z1)*(z-z1))-B;
@@ -66,15 +66,15 @@ double mem_f(double x, double y, double z) {
       }
   return f;
   }
-  if (mem_f_shape=="b"){ //box, has issues
-    //A,B,C lengths
+  if (mem_f_shape=="b"){ 
+    //A (x),B (z),C (y) lengths
     double f;
-    double x1=0;
-    double y1=0;
-    double z1=0;
-    if ((x>=-A+x1) && (x<=+x1)){
-  		if ((z>=-B+z1) && (z <= B+z1)){
-    		if ((y>=-C+y1) && (y <= C+y1)){ f = -1; }
+    double X = Nx*dx;
+    double Y = Ny*dx;
+    double Z = Nz*dx;
+    if ((x>=(X-A)/2) && (x<=A+(X-A)/2)){
+  		if ((z>=(Z-B)/2) && (z <= B+(Z-B)/2)){
+    		if ((y>=(Y-C)/2) && (y <= C+(Y-C)/2)){ f = -1; }
     		else { f = 1;} }
     	else { f = 1;} }
     else { f=1;}
@@ -83,57 +83,59 @@ double mem_f(double x, double y, double z) {
   if (mem_f_shape=="c"){ //cone
     //A = length of cone, B = radius of base, C = ???
     double f;
-    double L = Nz*dx;
-    double a = (L-A)/2;
-    double b = (A+(L-A)/2);
-    double x1=.75/2;
-    double y1=.75/2;
-    double z1=.25;
-    if ((z > a) && (z < b)){
+    double X = Nx*dx;
+    double Y = Ny*dx;
+    double Z = Nz*dx;
+    double x1=X/2;
+    double y1=Y/2;
+    double z1=Z/2;
+    if ((z > (Z-A)/2) && (z < A+(Z-A)/2)){
     	f = sqrt(((x-x1)*(x-x1) + (y-y1)*(y-y1)))/(z-z1) - B;
     }
     else { f = 1; }
     return f;
 	}
-  if (mem_f_shape=="s"){ //stadium
-    //A = length, B = width, C = radius of cap
-    double d = C/10;
+  if (mem_f_shape=="st"){
+    //A = length, B = radius of endcap and cylinder, C = scaling along zy
     double f;
-    double L = sqrt(abs(d*d - 2*C*d));
-    double a = (1-A)/2;
-    double b = (A+(1-A)/2);
-    double x1=0;
-    double y1=0; //nyi
-    double z1=0;
-    if ((-B/2+x1) <= x && x <= (B/2+x1)){
-    	if (z < a+z1){
-    		f = sqrt((z-C)*(z-C) + (y-L)*(y-L)) - C;
-    	}
-    	if ((a+z1) <= z && z <= (b+z1)){
-    		f = y-(2*L);
-    	}
-    	if (z > (b+z1)){
-    		f = sqrt((z-b)*(z-b) + (y-L)*(y-L)) - C;
-    	}
-    	else { f = 1; }
-      }
-    return f;
+    double X = Nx*dx;
+    double Y = Ny*dx;
+    double Z = Nz*dx;
+    double z1 = (Z-A)/2;
+    double z2 = (A+(Z-A)/2);
+    double x1 = X/2;
+    double y1 = Y/2;
+    if (z < z1) {
+      f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)/(C*C)+(z-z1)*(z-z1)/(C*C))-1;
+    }
+    if (z > z2) {
+      f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)/(C*C)+(z-z2)*(z-z2)/(C*C))-1;
+    }
+    else {
+      f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)/(C*C))-1;
+    }
+      return f;
 	}
   if (mem_f_shape=="sp"){ //sphere
     // A = radius, B = ???, C = ???
-    double x1 = 0;
-    double y1 = .75/2;
-		double z1 = 1.25/2;
+    double X = Nx*dx;
+    double Y = Ny*dx;
+    double Z = Nz*dx;
+    double x1 = X/2;
+    double y1 = Y/2;
+		double z1 = Z/2;
     double f;
     f = sqrt((x-x1)*(x-x1) + (y-y1)*(y-y1) + (z-z1)*(z-z1)) - A;
     return f;
   }
 	if (mem_f_shape=="e"){ //ellipsoid
-    //A, B scale factors for ellipse
-    double x1 = 0;
-    double y1 = .75/2;
-    double z1 = 1.25/2;
-    double f = sqrt( (x-x1)*(x-x1)/(A*A) + (y-y1)*(y-y1)/(B*B) + (z-z1)*(z-z1) ) - C;
+    double X = Nx*dx;
+    double Y = Ny*dx;
+    double Z = Nz*dx;
+    double x1 = X/2;
+    double y1 = Y/2;
+    double z1 = Z/2;
+    double f = sqrt( (x-x1)*(x-x1) + (y-y1)*(y-y1)/(A*A)+ (z-z1)*(z-z1)/(B*B) ) - 1;
     return f;
   }
   else {
@@ -154,6 +156,31 @@ int main (int argc, char *argv[]) {
     Nx = ceil(2*B/dx) + 4; //ceil() returns int
     Ny = ceil(2*B/dx) + 4;
     Nz = ceil((A + 2*B)/dx) + 4;
+  }
+  if (mem_f_shape=="b") {
+    Nx = ceil(A/dx) + 4;
+    Ny = ceil(C/dx) + 4;
+    Nz = ceil(B/dx) + 4;
+  }
+  if (mem_f_shape=="c") {
+    Nx = ceil(A/dx) + 4;
+    Ny = ceil(2*B/dx) + 4;
+    Nz = ceil(2*B/dx) + 4;
+  }
+  if (mem_f_shape=="st") {
+    Nx = ceil(1/dx) + 4;
+    Ny = ceil(2*C/dx) + 4;
+    Nz = ceil(2*C/dx) + 4;
+  }
+  if (mem_f_shape=="sp") {
+    Nx = ceil(2*A) + 4;
+    Ny = ceil(2*A) + 4;
+    Nz = ceil(2*A) + 4;
+  }
+  if (mem_f_shape=="e") {
+    Nx = ceil(1/dx) + 4;
+    Ny = ceil(2*A) + 4;
+    Nz = ceil(2*B) + 4;
   }
   printf("Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
   printf("For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
