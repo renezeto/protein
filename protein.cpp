@@ -6,7 +6,7 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include "test.h"
-#include "protein.h" 
+#include "protein.h"
 #include "MersenneTwister.h"
 #include <cassert>
 
@@ -69,15 +69,10 @@ double mem_f(double x, double y, double z) {
   if (mem_f_shape=="b"){ //box, has issues
     //A,B,C lengths
     double f;
-    double x1=0;
-    double y1=0;
-    double z1=0;
-    if ((x>=-A+x1) && (x<=+x1)){
-  		if ((z>=-B+z1) && (z <= B+z1)){
-    		if ((y>=-C+y1) && (y <= C+y1)){ f = -1; }
-    		else { f = 1;} }
-    	else { f = 1;} }
-    else { f=1;}
+    if ((z >= 2*dx) && (z <= A+2*dx) && (x >= 2*dx) && (x <= B+2*dx) && (y >= 2*dx) && (y <= C+2*dx))
+      { f = -1; }
+    else
+      { f = 1;}
     return f;
   }
   if (mem_f_shape=="c"){ //cone
