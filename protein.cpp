@@ -20,7 +20,7 @@ double rate_E = .093;
 
 const int n = 706;
 
-const double dx=0.05;//microns
+const double dx=0.05;
 const double tot_time = 86;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
@@ -28,9 +28,9 @@ const int iter_at_five_sec = int(5.0/time_step)+1;
 
 double x, y, z;
 
-int Nx = 15; 
-int Ny = 15; 
-int Nz = 25; 
+int Nx;
+int Ny;
+int Nz;
 
 double *nATP = new double[Nx*Ny*Nz];
 double *nADP = new double[Nx*Ny*Nz];
@@ -39,36 +39,34 @@ double *Nd = new double[Nx*Ny*Nz];
 double *Nde = new double[Nx*Ny*Nz];
 double *f_mem = new double[Nx*Ny*Nz];
 
-//grid size determined by cell shape
-//dx size (and thus resolution) determined by variable
-//total NE and NATP conserved with resolution changes
-
-//change to first letter, 3 dimensions after
-
 string mem_f_shape;
 double A;
 double B;
 double C;
 
-//determines shape of cell
 double mem_f(double x, double y, double z) {
   if (mem_f_shape=="p"){ //pill
     //A = length, B = radius of endcap and cylinder, C = ???
     double f;
-    double a = (1-A)/2;
-    double b = (A+(1-A)/2);
-    	if (z < a) {
-        f = sqrt((x-a)*(x-a)+(y-a)*(y-a)+(z-a)*(z-a)-B);
+    double X = Nx*dx;
+    double Y = Ny*dx;
+    double Z = Nz*dx;
+    double z1 = (Z-A)/2;
+    double z2 = (A+(Z-A)/2);
+    double x1 = X/2;
+    double y1 = Y/2;
+    	if (z < z1) {
+        f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)+(z-z1)*(z-z1))-B;
       }
-      else if (z > b) {
-        f = sqrt((x-a)*(x-a)+(y-a)*(y-a)+(z-b)*(z-b))-B;
+      if (z > z2) {
+        f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)+(z-z2)*(z-z2))-B;
       }
       else {
-        f = sqrt((x-a)*(x-a)+(y-a)*(y-a))-B;
+        f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1))-B;
       }
   return f;
   }
-  if (mem_f_shape=="b"){ //box
+  if (mem_f_shape=="b"){ //box, has issues
     //A,B,C lengths
     double f;
     double x1=0;
@@ -85,8 +83,9 @@ double mem_f(double x, double y, double z) {
   if (mem_f_shape=="c"){ //cone
     //A = length of cone, B = radius of base, C = ???
     double f;
-    double a = (1-A)/2;
-    double b = (A+(1-A)/2);
+    double L = Nz*dx;
+    double a = (L-A)/2;
+    double b = (A+(L-A)/2);
     double x1=.75/2;
     double y1=.75/2;
     double z1=.25;
@@ -96,7 +95,7 @@ double mem_f(double x, double y, double z) {
     else { f = 1; }
     return f;
 	}
-	if (mem_f_shape=="s"){ //stadium
+  if (mem_f_shape=="s"){ //stadium
     //A = length, B = width, C = radius of cap
     double d = C/10;
     double f;
@@ -143,7 +142,6 @@ double mem_f(double x, double y, double z) {
   }
 }
 
-//runs simulations
 int main (int argc, char *argv[]) {
   if (argc != 2){
     printf("usage: %s mem_f_shape\n", argv[0]);
@@ -152,10 +150,16 @@ int main (int argc, char *argv[]) {
   double A = atof(argv[2]);
   double B = atof(argv[3]);
   double C = atof(argv[4]);
+  if (mem_f_shape=="p") {
+    Nx = ceil(2*B/dx) + 4; //ceil() returns int
+    Ny = ceil(2*B/dx) + 4;
+    Nz = ceil((A + 2*B)/dx) + 4;
+  }
+  printf("Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
   printf("For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
          dx, tot_time, time_step, iter, iter_at_five_sec);
   double *JxATP = new double[Nx*Ny*Nz];
-  double *JyATP = new double[Nx*Ny*Nz];
+  double *JyATP = new double[Nx*Ny*Nz];  
   double *JzATP = new double[Nx*Ny*Nz];
   double *JxADP = new double[Nx*Ny*Nz];
   double *JyADP = new double[Nx*Ny*Nz];
@@ -195,7 +199,7 @@ int main (int argc, char *argv[]) {
 	FILE *out = fopen((const char *)outfilename,"w");
   double marker;
   double inmarker;
-  for (int j=0;j<Ny;j++){
+  for (int j=0;j<Ny;j++){ // possible source of membrane.dat problem? 
     for (int i=0;i<Nz;i++){
       if (insideArr[(int(Nx/2))*Ny*Nz+j*Nz+i]==true) {inmarker = 1;}
       else {inmarker = 0;}
@@ -208,6 +212,7 @@ int main (int argc, char *argv[]) {
   fflush(stdout);
   fclose(out);
   //end of membrane
+  printf("\nMEMBRANE FILE PRINTED\n");
   int percent = int(iter/100);
   double time_for_percent;
   bool check = true;
@@ -632,7 +637,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
             double r2X = U*U + V*V;
           } while (r2 >= 1 || r2 == 0);
           double fac = sqrt(-2*log(r2)/r2);
-          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_variance*(U*fac);
+          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_variance*(U*fac)/(dx*dx*dx);
           printf("nATP for cell %d %d %d is %f\n", i,j,k, nATP[i*Ny*Nz+j*Nz+k]);
         }
       }
@@ -648,7 +653,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
             double r2X = U*U + V*V;
           } while (r2 >= 1 || r2 == 0);
           double fac = sqrt(-2*log(r2)/r2);
-          nE[i*Ny*Nz+j*Nz+k] = NE_per_cell/(dx*dx*dx) + NE_variance*(U*fac);
+          nE[i*Ny*Nz+j*Nz+k] = NE_per_cell/(dx*dx*dx) + NE_variance*(U*fac)/(dx*dx*dx);
           printf("nE for cell %d %d %d is %f\n", i,j,k, nE[i*Ny*Nz+j*Nz+k]);
         }
       }
