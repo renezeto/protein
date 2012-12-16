@@ -6,7 +6,7 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include "test.h"
-#include "protein.h" 
+#include "protein.h"
 #include "MersenneTwister.h"
 #include <cassert>
 
@@ -32,12 +32,12 @@ int Nx;
 int Ny;
 int Nz;
 
-double *nATP = new double[Nx*Ny*Nz];
-double *nADP = new double[Nx*Ny*Nz];
-double *nE = new double[Nx*Ny*Nz];
-double *Nd = new double[Nx*Ny*Nz];
-double *Nde = new double[Nx*Ny*Nz];
-double *f_mem = new double[Nx*Ny*Nz];
+double *nATP;
+double *nADP;
+double *nE;
+double *Nd;
+double *Nde;
+double *f_mem;
 
 string mem_f_shape;
 double A;
@@ -52,32 +52,31 @@ double mem_f(double x, double y, double z) {
     double Y = Ny*dx;
     double Z = Nz*dx;
     double z1 = (Z-A)/2;
+    //printf("z1 = %f and Z = %f and A = %f and B = %f\n",z1,Z,A,B);
     double z2 = (A+(Z-A)/2);
-    double x1 = 0;
+    double x1 = X/2;
     double y1 = Y/2;
-    	if (z < z1) {
-        f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)+(z-z1)*(z-z1))-B;
-      }
-      if (z > z2) {
-        f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)+(z-z2)*(z-z2))-B;
-      }
-      else {
-        f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1))-B;
-      }
-  return f;
+    f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1))-B;
+    if (z < 1.2) {
+      f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)+(z-z1)*(z-z1))-B;
+    }
+    if (z > z2) {
+      f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)+(z-z2)*(z-z2))-B;
+    }
+    return f;
   }
-  if (mem_f_shape=="b"){ 
+  if (mem_f_shape=="b"){
     //A (x),B (z),C (y) lengths
     double f;
     double X = Nx*dx;
     double Y = Ny*dx;
     double Z = Nz*dx;
-    if ((x>=(X-A)/2) && (x<=A+(X-A)/2)){
-  		if ((z>=(Z-B)/2) && (z <= B+(Z-B)/2)){
-    		if ((y>=(Y-C)/2) && (y <= C+(Y-C)/2)){ f = -1; }
-    		else { f = 1;} }
-    	else { f = 1;} }
-    else { f=1;}
+    if ( (x >= (X-A)/2) && (x <= A+(X-A)/2) && (z >= (Z-B)/2) && (z <= B+(Z-B)/2) && (y >= (Y-C)/2) && (y <= C+(Y-C)/2)) {
+      f = -1;
+      }
+    else {
+      f = 1;
+      }
     return f;
   }
   if (mem_f_shape=="c"){ //cone
@@ -88,9 +87,10 @@ double mem_f(double x, double y, double z) {
     double Z = Nz*dx;
     double x1=X/2;
     double y1=Y/2;
-    double z1=Z/2;
-    if ((z > (Z-A)/2) && (z < A+(Z-A)/2)){
-    	f = sqrt(((x-x1)*(x-x1) + (y-y1)*(y-y1)))/(z-z1) - B;
+    double z1=(Z-A)/2;
+    double z2=(A+(Z-A)/2);
+    if ((z > z1) && (z < z2)){
+    	f = sqrt((x-x1)*(x-x1) + (y-y1)*(y-y1))/(z-z1) - B/(z2-z1);
     }
     else { f = 1; }
     return f;
@@ -135,7 +135,7 @@ double mem_f(double x, double y, double z) {
     double x1 = X/2;
     double y1 = Y/2;
     double z1 = Z/2;
-    double f = sqrt( (x-x1)*(x-x1) + (y-y1)*(y-y1)/(A*A)+ (z-z1)*(z-z1)/(B*B) ) - 1;
+    double f = sqrt( (x-x1)*(x-x1)/(A*A) + (y-y1)*(y-y1)/(A*A)+ (z-z1)*(z-z1)/(B*B) ) - 1;
     return f;
   }
   else {
@@ -149,9 +149,9 @@ int main (int argc, char *argv[]) {
     printf("usage: %s mem_f_shape\n", argv[0]);
   }
   mem_f_shape = argv[1];
-  double A = atof(argv[2]);
-  double B = atof(argv[3]);
-  double C = atof(argv[4]);
+  A = atof(argv[2]);
+  B = atof(argv[3]);
+  C = atof(argv[4]);
   if (mem_f_shape=="p") {
     Nx = ceil(2*B/dx) + 4; //ceil() returns int
     Ny = ceil(2*B/dx) + 4;
@@ -163,9 +163,9 @@ int main (int argc, char *argv[]) {
     Nz = ceil(B/dx) + 4;
   }
   if (mem_f_shape=="c") {
-    Nx = ceil(A/dx) + 4;
+    Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*B/dx) + 4;
-    Nz = ceil(2*B/dx) + 4;
+    Nz = ceil(A/dx) + 4;
   }
   if (mem_f_shape=="st") {
     Nx = ceil(1/dx) + 4;
@@ -173,20 +173,26 @@ int main (int argc, char *argv[]) {
     Nz = ceil(2*C/dx) + 4;
   }
   if (mem_f_shape=="sp") {
-    Nx = ceil(2*A) + 4;
-    Ny = ceil(2*A) + 4;
-    Nz = ceil(2*A) + 4;
+    Nx = ceil(2*A/dx) + 4;
+    Ny = ceil(2*A/dx) + 4;
+    Nz = ceil(2*A/dx) + 4;
   }
   if (mem_f_shape=="e") {
     Nx = ceil(1/dx) + 4;
-    Ny = ceil(2*A) + 4;
-    Nz = ceil(2*B) + 4;
+    Ny = ceil(2*A/dx) + 4;
+    Nz = ceil(2*B/dx) + 4;
   }
   printf("Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
+  nATP = new double[Nx*Ny*Nz];
+  nADP = new double[Nx*Ny*Nz];
+  nE = new double[Nx*Ny*Nz];
+  Nd = new double[Nx*Ny*Nz];
+  Nde = new double[Nx*Ny*Nz];
+  f_mem = new double[Nx*Ny*Nz];
   printf("For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
          dx, tot_time, time_step, iter, iter_at_five_sec);
   double *JxATP = new double[Nx*Ny*Nz];
-  double *JyATP = new double[Nx*Ny*Nz];  
+  double *JyATP = new double[Nx*Ny*Nz];
   double *JzATP = new double[Nx*Ny*Nz];
   double *JxADP = new double[Nx*Ny*Nz];
   double *JyADP = new double[Nx*Ny*Nz];
@@ -197,10 +203,18 @@ int main (int argc, char *argv[]) {
   double *mem_A = new double[Nx*Ny*Nz]; //area of membrane in each cube
   bool *insideArr = new bool[Nx*Ny*Nz]; //whether each cube is inside at all
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
+  printf("here\n");
   set_membrane(mem_f, mem_A);
+  printf ("jheretwo\n");
   set_insideArr(insideArr);
+  printf("herethree\n");
   set_density(nATP,nE, mem_A);
-  printf ("membrane set with density in it!");
+  for (int a=0;a<Ny;a++){
+    for (int b=0;b<Nz;b++){
+      //printf("nATP starts as %g\n", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+    }
+  }
+  printf ("membrane set with density in it!\n");
   double bef_total_NATP=0;
   double bef_total_NADP=0;
   double bef_total_NE=0;
@@ -213,6 +227,7 @@ int main (int argc, char *argv[]) {
   double total_Nde=0;
   double total_Nd=0;
   double total_N=0;
+  printf("herefive\n");
   for (int i=0;i<Nx*Ny*Nz;i++){
     bef_total_NATP += nATP[i]*dx*dx*dx;
     bef_total_NADP += nADP[i]*dx*dx*dx;
@@ -220,19 +235,25 @@ int main (int argc, char *argv[]) {
     bef_total_Nde += Nde[i];
     bef_total_Nd += Nd[i];
   }
+  printf("heresix\n");
   bef_total_N = bef_total_NATP*2 + bef_total_NADP*2 + bef_total_NE + bef_total_Nde*3 + bef_total_Nd*2;
   //moved membrane
+  printf("herefour\n");
   const char* outfilename = "membrane.dat";
 	FILE *out = fopen((const char *)outfilename,"w");
   double marker;
   double inmarker;
-  for (int j=0;j<Ny;j++){ // possible source of membrane.dat problem? 
+  double zt = A/2; double yt = B/2; double xt = C/2;
+  double ft = mem_f(zt,yt,xt);
+  printf("in the box has mem_f function = %f\n",ft);
+  printf("what is Nx/2 = %f\n",Nz/2.0);
+  for (int j=0;j<Ny;j++){ // possible source of membrane.dat problem?
     for (int i=0;i<Nz;i++){
       if (insideArr[(int(Nx/2))*Ny*Nz+j*Nz+i]==true) {inmarker = 1;}
       else {inmarker = 0;}
       if (mem_A[(int(Nx/2))*Ny*Nz+j*Nz+i]!=0) {marker = 1;}
       else {marker = 0;}
-      fprintf(out, "%g  ", marker);
+      fprintf(out, "%g  ", inmarker);
     }
     fprintf(out, "\n");
   }
@@ -240,6 +261,18 @@ int main (int argc, char *argv[]) {
   fclose(out);
   //end of membrane
   printf("\nMEMBRANE FILE PRINTED\n");
+  char *outfilenameStart = new char[1000];
+  sprintf(outfilenameStart, "starting_natp.dat");
+  FILE *nATPStartfile = fopen((const char *)outfilenameStart,"w");
+  delete[] outfilenameStart;
+  for (int a=0;a<Ny;a++){
+    for (int b=0;b<Nz;b++){
+      //printf("nATP is %g\n", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+      fprintf(nATPStartfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+    }
+    fprintf(nATPStartfile, "\n");
+  }
+  fclose(nATPStartfile);
   int percent = int(iter/100);
   double time_for_percent;
   bool check = true;
@@ -266,37 +299,34 @@ int main (int argc, char *argv[]) {
     }
 
     if (i%iter_at_five_sec == 0) {
-      for (int j=0;j<10;j++){
-        int k = i/iter_at_five_sec;
-        char *outfilenameATP = new char[1000];
-        sprintf(outfilenameATP, "natp%03d.dat", k);
-        FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
-        delete[] outfilenameATP;
-        for (int a=0;a<Ny;a++){
-          for (int b=0;b<Nz;b++){
-            fprintf(nATPfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-          }
-          fprintf(nATPfile, "\n");
+      int k = i/iter_at_five_sec;
+      char *outfilenameATP = new char[1000];
+      sprintf(outfilenameATP, "natp%03d.dat", k);
+      FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
+      delete[] outfilenameATP;
+      for (int a=0;a<Ny;a++){
+        for (int b=0;b<Nz;b++){
+          //printf("nATP is %g\n", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          fprintf(nATPfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
         }
-        fclose(nATPfile);
+        fprintf(nATPfile, "\n");
       }
-      for (int j=0;j<10;j++){
-        int k = i/iter_at_five_sec;
-        char *outfilenameE = new char[1000];
-        sprintf(outfilenameE, "ne%03d.dat", k);
-        FILE *nEfile = fopen((const char *)outfilenameE,"w");
-        delete[] outfilenameE;
-        for (int a=0;a<Ny;a++){
-          for (int b=0;b<Nz;b++){
-            fprintf(nEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-          }
-          fprintf(nEfile, "\n");
+      fclose(nATPfile);
+      printf("printed out new file = natp%03d.dat\n",k);
+      char *outfilenameE = new char[1000];
+      sprintf(outfilenameE, "ne%03d.dat", k);
+      FILE *nEfile = fopen((const char *)outfilenameE,"w");
+      delete[] outfilenameE;
+      for (int a=0;a<Ny;a++){
+        for (int b=0;b<Nz;b++){
+          fprintf(nEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
         }
-        fclose(nEfile);
+        fprintf(nEfile, "\n");
       }
+      fclose(nEfile);
+      printf("printed out new file = ne%03d.dat\n",k);
     }
   }
-
   for (int i=0;i<Nx*Ny*Nz;i++){
     total_NATP += nATP[i]*dx*dx*dx;
     total_NADP += nADP[i]*dx*dx*dx;
@@ -351,6 +381,9 @@ double find_intersection(const double fXYZ, const double fXYz, const double fXyZ
   double *ptsx = new double[8];
   double *ptsy = new double[8];
   double *ptsz = new double[8];
+  for (int i=0;i<8;i++) ptsx[i] = 0;
+  for (int i=0;i<8;i++) ptsy[i] = 0;
+  for (int i=0;i<8;i++) ptsz[i] = 0;
   int np = 0;
   double df_dx = (fXYZ + fXYz + fXyZ + fXyz - fxYZ - fxyZ - fxYz - fxyz)/(4*dx);
   double df_dy = (fXYZ + fXYz + fxYZ + fxYz - fXyZ - fxyZ - fXyz - fxyz)/(4*dx);
@@ -391,7 +424,11 @@ double find_intersection(const double fXYZ, const double fXYz, const double fXyZ
   double *ptx = new double[8];
   double *pty = new double[8];
   double *ptz = new double[8];
+  for (int i=0;i<8;i++) ptx[i] = 0;
+  for (int i=0;i<8;i++) pty[i] = 0;
+  for (int i=0;i<8;i++) ptz[i] = 0;
   double *line = new double[8];
+  for (int i=0;i<8;i++) line[i] = 0;
   double *cos = new double[8];
   double cos_max = -2;
   int as=0;
@@ -518,7 +555,7 @@ void set_insideArr(bool *insideArr){
 }
 
 //checks midddle of each gridpoint to see if it is inside the cell or not
-bool inside (double xi, double yi, double zi){
+bool inside (int xi, int yi, int zi){
   if (mem_f((xi-0.5)*dx,(yi-0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
   if (mem_f((xi+0.5)*dx,(yi-0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
   if (mem_f((xi-0.5)*dx,(yi+0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
@@ -649,8 +686,9 @@ int set_density(double *nATP, double *nE, double *mem_A){
   }
   double NE_per_cell = 1000*dx*dx*dx;
   double NATP_per_cell = 350*dx*dx*dx;
-  double NE_variance = .15*NE_per_cell/(dx*dx*dx);
-  double NATP_variance = .15*NATP_per_cell/(dx*dx*dx);
+  double NE_stdev = sqrt(NE_per_cell);
+  double NATP_stdev = sqrt(NATP_per_cell);
+  printf("NATP_per_cell = %g and NATP_stdev = %g\n", NATP_per_cell, NATP_stdev);
   printf("total inside = %d\nTotal nE should be = %f\nE_per_cell = %f\n", count_inside,
   count_inside*NE_per_cell, NE_per_cell);
   double r2,U,V;
@@ -658,15 +696,26 @@ int set_density(double *nATP, double *nE, double *mem_A){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          do{
-            double U = 2*ran() - 1;
-            double V = 2*ran() - 1;
-            double r2X = U*U + V*V;
+          if (NATP_per_cell <= 1){
+            if (ran() <= NATP_per_cell){
+              nATP[i*Ny*Nz+j*Nz+k] = 1/(dx*dx*dx);
+            }
+            else {
+              nATP[i*Ny*Nz+j*Nz+k] = 0;
+            }
+          }
+        }
+          /*do{
+            U = 2*ran() - 1;
+            V = 2*ran() - 1;
+            r2 = U*U + V*V;
           } while (r2 >= 1 || r2 == 0);
           double fac = sqrt(-2*log(r2)/r2);
-          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_variance*(U*fac)/(dx*dx*dx);
-          printf("nATP for cell %d %d %d is %f\n", i,j,k, nATP[i*Ny*Nz+j*Nz+k]);
-        }
+          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_stdev*(U*fac)/(dx*dx*dx);
+          //printf("nATP for cell %d %d %d is %f\n", i,j,k, nATP[i*Ny*Nz+j*Nz+k]);
+        } else {
+          nATP[i*Ny*Nz+j*Nz+k] = 0;
+          }*/
       }
     }
   }
@@ -674,17 +723,33 @@ int set_density(double *nATP, double *nE, double *mem_A){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          do{
-            double U = 2*ran() - 1;
-            double V = 2*ran() - 1;
-            double r2X = U*U + V*V;
+         if (NE_per_cell <= 1){
+            if (ran() <= NATP_per_cell){
+              nE[i*Ny*Nz+j*Nz+k] = 1/(dx*dx*dx);
+            }
+            else {
+              nE[i*Ny*Nz+j*Nz+k] = 0;
+            }
+          }
+        }
+          /*do{
+            U = 2*ran() - 1;
+            V = 2*ran() - 1;
+            r2 = U*U + V*V;
           } while (r2 >= 1 || r2 == 0);
           double fac = sqrt(-2*log(r2)/r2);
-          nE[i*Ny*Nz+j*Nz+k] = NE_per_cell/(dx*dx*dx) + NE_variance*(U*fac)/(dx*dx*dx);
-          printf("nE for cell %d %d %d is %f\n", i,j,k, nE[i*Ny*Nz+j*Nz+k]);
-        }
+          nE[i*Ny*Nz+j*Nz+k] = NE_per_cell/(dx*dx*dx) + NE_stdev*(U*fac)/(dx*dx*dx);
+          //printf("nE for cell %d %d %d is %f\n", i,j,k, nE[i*Ny*Nz+j*Nz+k]);
+        } else {
+          nE[i*Ny*Nz+j*Nz+k] = 0;
+          }*/
       }
     }
+  }
+  for (int i=0;i<Nx*Ny*Nz;i++) {
+    nADP[i] = 0;
+    Nd[i] = 0;
+    Nde[i] = 0;
   }
   return 0;
 }
