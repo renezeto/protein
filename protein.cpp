@@ -75,8 +75,8 @@ double mem_f(double x, double y, double z) {
     if ((x>=(X-A)/2) && (x<=A+(X-A)/2)){
   		if ((z>=(Z-B)/2) && (z <= B+(Z-B)/2)){
     		if ((y>=(Y-C)/2) && (y <= C+(Y-C)/2)){ f = -1; }
-    		else { f = 1;} }
-    	else { f = 1;} }
+      }
+    }
     else { f=1;}
     return f;
   }
@@ -153,7 +153,7 @@ int main (int argc, char *argv[]) {
   double B = atof(argv[3]);
   double C = atof(argv[4]);
   if (mem_f_shape=="p") {
-    Nx = ceil(2*B/dx) + 4; //ceil() returns int
+    Nx = ceil(2*B/dx) + 4; 
     Ny = ceil(2*B/dx) + 4;
     Nz = ceil((A + 2*B)/dx) + 4;
   }
