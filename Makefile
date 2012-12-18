@@ -1,5 +1,5 @@
 #CXXFLAGS = -g -O3
-CXXFLAGS = -G
+CXXFLAGS = -g -Wall -Werror
 
 #OBJECTS = grid.h showDensity.
 
@@ -11,7 +11,7 @@ clean:
 #protein: test.o #foo.o
 
 protein: protein.cpp protein.h
-	g++ protein.cpp protein.h -o protein -I /usr/include/eigen2 -fpermissive
+	g++ -g protein.cpp protein.h -o protein -I /usr/include/eigen2 -fpermissive
 test.o: test.h
 
 #foo.o: protein.h
