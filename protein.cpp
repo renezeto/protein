@@ -43,6 +43,7 @@ string mem_f_shape;
 double A;
 double B;
 double C;
+double D;
 
 double mem_f(double x, double y, double z) {
   if (mem_f_shape=="p"){ //pill
@@ -57,7 +58,7 @@ double mem_f(double x, double y, double z) {
     double x1 = X/2;
     double y1 = Y/2;
     f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1))-B;
-    if (z < 1.2) {
+    if (z < z1) {
       f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)+(z-z1)*(z-z1))-B;
     }
     if (z > z2) {
@@ -96,7 +97,7 @@ double mem_f(double x, double y, double z) {
     return f;
 	}
   if (mem_f_shape=="st"){
-    //A = length, B = radius of endcap and cylinder, C = scaling along zy
+    //A = length, B = x axis radius radius, C = y axis radius radius, D = z axis radius radius
     double f;
     double X = Nx*dx;
     double Y = Ny*dx;
@@ -105,16 +106,14 @@ double mem_f(double x, double y, double z) {
     double z2 = (A+(Z-A)/2);
     double x1 = X/2;
     double y1 = Y/2;
+    f = sqrt((x-x1)*(x-x1)/(B*B)+(y-y1)*(y-y1)/(C*C))-1;
     if (z < z1) {
-      f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)/(C*C)+(z-z1)*(z-z1)/(C*C))-1;
+      f = sqrt((x-x1)*(x-x1)/(B*B)+(y-y1)*(y-y1)/(C*C)+(z-z1)*(z-z1)/(D*D))-1;
     }
     if (z > z2) {
-      f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)/(C*C)+(z-z2)*(z-z2)/(C*C))-1;
+      f = sqrt((x-x1)*(x-x1)/(B*B)+(y-y1)*(y-y1)/(C*C)+(z-z2)*(z-z2)/(D*D))-1;
     }
-    else {
-      f = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)/(C*C))-1;
-    }
-      return f;
+    return f;
 	}
   if (mem_f_shape=="sp"){ //sphere
     // A = radius, B = ???, C = ???
@@ -128,14 +127,14 @@ double mem_f(double x, double y, double z) {
     f = sqrt((x-x1)*(x-x1) + (y-y1)*(y-y1) + (z-z1)*(z-z1)) - A;
     return f;
   }
-	if (mem_f_shape=="e"){ //ellipsoid
+	if (mem_f_shape=="e"){ //ellipsoid B = x axis radius radius, C = y axis radius radius, A = z axis radius radius
     double X = Nx*dx;
     double Y = Ny*dx;
     double Z = Nz*dx;
     double x1 = X/2;
     double y1 = Y/2;
     double z1 = Z/2;
-    double f = sqrt( (x-x1)*(x-x1)/(A*A) + (y-y1)*(y-y1)/(A*A)+ (z-z1)*(z-z1)/(B*B) ) - 1;
+    double f = sqrt( (x-x1)*(x-x1)/(B*B) + (y-y1)*(y-y1)/(C*C)+ (z-z1)*(z-z1)/(A*A) ) - 1;
     return f;
   }
   else {
@@ -152,6 +151,7 @@ int main (int argc, char *argv[]) {
   A = atof(argv[2]);
   B = atof(argv[3]);
   C = atof(argv[4]);
+  D = atof(argv[5]);
   if (mem_f_shape=="p") {
     Nx = ceil(2*B/dx) + 4; //ceil() returns int
     Ny = ceil(2*B/dx) + 4;
@@ -168,9 +168,9 @@ int main (int argc, char *argv[]) {
     Nz = ceil(A/dx) + 4;
   }
   if (mem_f_shape=="st") {
-    Nx = ceil(1/dx) + 4;
+    Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*C/dx) + 4;
-    Nz = ceil(2*C/dx) + 4;
+    Nz = ceil((A+2*D)/dx) + 4;
   }
   if (mem_f_shape=="sp") {
     Nx = ceil(2*A/dx) + 4;
@@ -301,7 +301,7 @@ int main (int argc, char *argv[]) {
     if (i%iter_at_five_sec == 0) {
       int k = i/iter_at_five_sec;
       char *outfilenameATP = new char[1000];
-      sprintf(outfilenameATP, "natp%03d.dat", k);
+      sprintf(outfilenameATP, "shape-%s/natp-%s-%02g-%02g-%02g-%02g-%03d.dat", argv[1],argv[1],A,B,C,D,k);
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
       for (int a=0;a<Ny;a++){
@@ -312,9 +312,9 @@ int main (int argc, char *argv[]) {
         fprintf(nATPfile, "\n");
       }
       fclose(nATPfile);
-      printf("printed out new file = natp%03d.dat\n",k);
+      printf("printed out new file = natp\n");
       char *outfilenameE = new char[1000];
-      sprintf(outfilenameE, "ne%03d.dat", k);
+      sprintf(outfilenameE, "shape-%s/ne-%s-%02g-%02g-%02g-%02g-%03d.dat", argv[1],argv[1],A,B,C,D,k);
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
       for (int a=0;a<Ny;a++){
@@ -324,7 +324,31 @@ int main (int argc, char *argv[]) {
         fprintf(nEfile, "\n");
       }
       fclose(nEfile);
-      printf("printed out new file = ne%03d.dat\n",k);
+      printf("printed out new file = nadp\n");
+      char *outfilenameADP = new char[1000];
+      sprintf(outfilenameADP, "shape-%s/nadp-%s-%02g-%02g-%02g-%02g-%03d.dat", argv[1],argv[1],A,B,C,D,k);
+      FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
+      delete[] outfilenameADP;
+      for (int a=0;a<Ny;a++){
+        for (int b=0;b<Nz;b++){
+          fprintf(nADPfile, "%1.2f ", nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+        }
+        fprintf(nADPfile, "\n");
+      }
+      fclose(nADPfile);
+      printf("printed out new file = nadp\n");
+      char *outfilenameD = new char[1000];
+      sprintf(outfilenameD, "shape-%s/nd-%s-%02g-%02g-%02g-%02g-%03d.dat", argv[1],argv[1],A,B,C,D,k);
+      FILE *nDfile = fopen((const char *)outfilenameD,"w");
+      delete[] outfilenameD;
+      for (int a=0;a<Ny;a++){
+        for (int b=0;b<Nz;b++){
+          fprintf(nDfile, "%1.2f ", Nd[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+        }
+        fprintf(nDfile, "\n");
+      }
+      fclose(nDfile);
+      printf("printed out new file = nd\n");
     }
   }
   for (int i=0;i<Nx*Ny*Nz;i++){
@@ -703,7 +727,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
             else {
               nATP[i*Ny*Nz+j*Nz+k] = 0;
             }
-          }
+          } else {exit(1);}
         }
           /*do{
             U = 2*ran() - 1;
