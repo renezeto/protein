@@ -7,38 +7,38 @@ import sys
 
 t_steps = 18
 cellshape = sys.argv[2]
-dimA = 4#sys.argv[3]
-dimB = 1#sys.argv[4]
-dimC =1#sys.argv[5]
-dimD =1#sys.argv[6]
+dimA = sys.argv[3]
+dimB = sys.argv[4]
+dimC =sys.argv[5]
+dimD =sys.argv[6]
 
 nATP = ['natp']*(t_steps)
-for n in range(0,t_steps): #change -p- to '+repr(cellshape)+' on diff comp
+for n in range(0,t_steps): #change '+repr(cellshape)+' to '+repr(cellshape)+' on diff comp
     if n < 10:
-        nATP[n] = 'natp-p-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-00'+repr(n)+'.dat'
+        nATP[n] = 'natp-'+repr(cellshape)+'-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-00'+repr(n)+'.dat'
     else:
-        nATP[n] = 'natp-p-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-0'+repr(n)+'.dat'
+        nATP[n] = 'natp-'+repr(cellshape)+'-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-0'+repr(n)+'.dat'
 
 ne = ['ne']*(t_steps)
 for n in range(0,t_steps):
     if n < 10:
-        ne[n] = 'ne-p-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-00'+repr(n)+'.dat'
+        ne[n] = 'ne-'+repr(cellshape)+'-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-00'+repr(n)+'.dat'
     else:
-        ne[n] = 'ne-p-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-0'+repr(n)+'.dat'
+        ne[n] = 'ne-'+repr(cellshape)+'-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-0'+repr(n)+'.dat'
 
 nADP = ['nADP']*(t_steps)
 for n in range(0,t_steps):
   if n < 10:
-    nADP[n] = 'nadp-p-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-00'+repr(n)+'.dat'
+    nADP[n] = 'nadp-'+repr(cellshape)+'-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-00'+repr(n)+'.dat'
   else:
-    nADP[n] = 'nadp-p-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-0'+repr(n)+'.dat'
+    nADP[n] = 'nadp-'+repr(cellshape)+'-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-0'+repr(n)+'.dat'
 
 nd = ['nd']*(t_steps)
 for n in range(0,t_steps):
   if n < 10:
-    ne[n] = 'nd-p-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-00'+repr(n)+'.dat'
+    ne[n] = 'nd-'+repr(cellshape)+'-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-00'+repr(n)+'.dat'
   else:
-    ne[n] = 'nd-p-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-0'+repr(n)+'.dat'
+    ne[n] = 'nd-'+repr(cellshape)+'-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-0'+repr(n)+'.dat'
 
 def maxnum(A,ylen):
     Z = [0]*ylen
@@ -85,12 +85,11 @@ def contourplt(B):
     close()
     
 contourplt(nATP)
-'''
 contourplt(nADP)
 contourplt(ne)
 contourplt(nd)
 
-
+'''
 
 
 
