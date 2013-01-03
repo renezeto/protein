@@ -36,9 +36,9 @@ for n in range(0,t_steps):
 nd = ['nd']*(t_steps)
 for n in range(0,t_steps):
   if n < 10:
-    ne[n] = 'shape-'+sys.argv[1]+'/nd-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-00'+repr(n)+'.dat'
+    nd[n] = 'shape-'+sys.argv[1]+'/nd-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-00'+repr(n)+'.dat'
   else:
-    ne[n] = 'shape-'+sys.argv[1]+'/nd-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-0'+repr(n)+'.dat'
+    nd[n] = 'shape-'+sys.argv[1]+'/nd-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-0'+repr(n)+'.dat'
 
 def maxnum(A,ylen):
     Z = [0]*ylen
@@ -89,33 +89,4 @@ contourplt(nADP)
 contourplt(ne)
 contourplt(nd)
 
-'''
 
-
-
-def animate_circles(B):
-  pylab.ion()
-  for k in range(0,len(B)):
-    A = numpy.loadtxt(B[k])
-    ylen = A.shape[0]
-    zlen = A.shape[1]
-    ax = subplot(111, autoscale_on=True, aspect='equal')
-    ax.set_xbound(0,zlen)
-    ax.set_ybound(0,ylen)
-    pylab.ylabel('Y axis position')
-    pylab.xlabel('Z axis position')
-    pylab.title('relative density at time: '+repr(5*(k+1))+'s')
-    for i in range(zlen):
-      for j in range(ylen):
-        if (A[j][i] < 1):#minnum(A,ylen)):
-          rad = 0
-        else:
-          rad = .5*(A[j][i]/20)#maxnum(A,ylen))
-        cir = plt.Circle((i,j), radius= rad,  fc='y')
-        ax.add_patch(cir)
-    pylab.draw()
-    clf()
-  print('graph done')
-  close()
-
-'''

@@ -298,15 +298,14 @@ int main (int argc, char *argv[]) {
       }
     }
 
-    if (i%iter_at_five_sec == 0) {
+    if (i%iter_at_five_sec == 0 || ((i*5)%iter_at_five_sec == 0 && i<iter_at_five_sec)) {
       int k = i/iter_at_five_sec;
       char *outfilenameATP = new char[1000];
-      sprintf(outfilenameATP, "shape-%s/natp-%s-%02g-%02g-%02g-%02g-%03d.dat", argv[1],argv[1],A,B,C,D,k);
+      sprintf(outfilenameATP, "shape-%s/natp-%s-%03.1f-%03.1f-%03.1f-%03.1f-%03d.dat", argv[1],argv[1],A,B,C,D,k);
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
       for (int a=0;a<Ny;a++){
         for (int b=0;b<Nz;b++){
-          //printf("nATP is %g\n", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           fprintf(nATPfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
         }
         fprintf(nATPfile, "\n");
