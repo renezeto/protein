@@ -729,17 +729,6 @@ int set_density(double *nATP, double *nE, double *mem_A){
             }
           } else {exit(1);}
         }
-          /*do{
-            U = 2*ran() - 1;
-            V = 2*ran() - 1;
-            r2 = U*U + V*V;
-          } while (r2 >= 1 || r2 == 0);
-          double fac = sqrt(-2*log(r2)/r2);
-          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_stdev*(U*fac)/(dx*dx*dx);
-          //printf("nATP for cell %d %d %d is %f\n", i,j,k, nATP[i*Ny*Nz+j*Nz+k]);
-        } else {
-          nATP[i*Ny*Nz+j*Nz+k] = 0;
-          }*/
       }
     }
   }
@@ -756,17 +745,6 @@ int set_density(double *nATP, double *nE, double *mem_A){
             }
           }
         }
-          /*do{
-            U = 2*ran() - 1;
-            V = 2*ran() - 1;
-            r2 = U*U + V*V;
-          } while (r2 >= 1 || r2 == 0);
-          double fac = sqrt(-2*log(r2)/r2);
-          nE[i*Ny*Nz+j*Nz+k] = NE_per_cell/(dx*dx*dx) + NE_stdev*(U*fac)/(dx*dx*dx);
-          //printf("nE for cell %d %d %d is %f\n", i,j,k, nE[i*Ny*Nz+j*Nz+k]);
-        } else {
-          nE[i*Ny*Nz+j*Nz+k] = 0;
-          }*/
       }
     }
   }

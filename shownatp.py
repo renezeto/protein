@@ -13,7 +13,7 @@ dimC =sys.argv[5]
 dimD =sys.argv[6]
 
 nATP = ['natp']*(t_steps)
-for n in range(0,t_steps): #change '+repr(cellshape)+' to '+repr(cellshape)+' on diff comp
+for n in range(0,t_steps): 
     if n < 10:
         nATP[n] = 'natp-'+repr(cellshape)+'-0'+repr(dimA)+'-0'+repr(dimB)+'-0'+repr(dimC)+'-0'+repr(dimD)+'-00'+repr(n)+'.dat'
     else:
