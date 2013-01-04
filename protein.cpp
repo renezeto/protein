@@ -298,15 +298,14 @@ int main (int argc, char *argv[]) {
       }
     }
 
-    if (i%iter_at_five_sec == 0) {
+    if (i%iter_at_five_sec == 0 || ((i*5)%iter_at_five_sec == 0 && i<iter_at_five_sec)) {
       int k = i/iter_at_five_sec;
       char *outfilenameATP = new char[1000];
-      sprintf(outfilenameATP, "shape-%s/natp-%s-%02g-%02g-%02g-%02g-%03d.dat", argv[1],argv[1],A,B,C,D,k);
+      sprintf(outfilenameATP, "shape-%s/natp-%s-%03.1f-%03.1f-%03.1f-%03.1f-%03d.dat", argv[1],argv[1],A,B,C,D,k);
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
       for (int a=0;a<Ny;a++){
         for (int b=0;b<Nz;b++){
-          //printf("nATP is %g\n", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           fprintf(nATPfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
         }
         fprintf(nATPfile, "\n");
@@ -314,7 +313,7 @@ int main (int argc, char *argv[]) {
       fclose(nATPfile);
       printf("printed out new file = natp\n");
       char *outfilenameE = new char[1000];
-      sprintf(outfilenameE, "shape-%s/ne-%s-%02g-%02g-%02g-%02g-%03d.dat", argv[1],argv[1],A,B,C,D,k);
+      sprintf(outfilenameE, "shape-%s/ne-%s-%03.1f-%03.1f-%03.1f-%03.1f-%03d.dat", argv[1],argv[1],A,B,C,D,k);
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
       for (int a=0;a<Ny;a++){
@@ -326,7 +325,7 @@ int main (int argc, char *argv[]) {
       fclose(nEfile);
       printf("printed out new file = nadp\n");
       char *outfilenameADP = new char[1000];
-      sprintf(outfilenameADP, "shape-%s/nadp-%s-%02g-%02g-%02g-%02g-%03d.dat", argv[1],argv[1],A,B,C,D,k);
+      sprintf(outfilenameADP, "shape-%s/nadp-%s-%03.1f-%03.1f-%03.1f-%03.1f-%03d.dat", argv[1],argv[1],A,B,C,D,k);
       FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
       delete[] outfilenameADP;
       for (int a=0;a<Ny;a++){
@@ -338,7 +337,7 @@ int main (int argc, char *argv[]) {
       fclose(nADPfile);
       printf("printed out new file = nadp\n");
       char *outfilenameD = new char[1000];
-      sprintf(outfilenameD, "shape-%s/nd-%s-%02g-%02g-%02g-%02g-%03d.dat", argv[1],argv[1],A,B,C,D,k);
+      sprintf(outfilenameD, "shape-%s/nd-%s-%03.1f-%03.1f-%03.1f-%03.1f-%03d.dat", argv[1],argv[1],A,B,C,D,k);
       FILE *nDfile = fopen((const char *)outfilenameD,"w");
       delete[] outfilenameD;
       for (int a=0;a<Ny;a++){
@@ -727,19 +726,16 @@ int set_density(double *nATP, double *nE, double *mem_A){
             else {
               nATP[i*Ny*Nz+j*Nz+k] = 0;
             }
+            if(k>2*Nz/3){
+              if (ran() <= 2.5*NATP_per_cell){
+                nATP[i*Ny*Nz+j*Nz+k] = 1/(dx*dx*dx);
+              }
+              else {
+                nATP[i*Ny*Nz+j*Nz+k] = 0;
+              }
+            }
           } else {exit(1);}
         }
-          /*do{
-            U = 2*ran() - 1;
-            V = 2*ran() - 1;
-            r2 = U*U + V*V;
-          } while (r2 >= 1 || r2 == 0);
-          double fac = sqrt(-2*log(r2)/r2);
-          nATP[i*Ny*Nz+j*Nz+k] = NATP_per_cell/(dx*dx*dx) + NATP_stdev*(U*fac)/(dx*dx*dx);
-          //printf("nATP for cell %d %d %d is %f\n", i,j,k, nATP[i*Ny*Nz+j*Nz+k]);
-        } else {
-          nATP[i*Ny*Nz+j*Nz+k] = 0;
-          }*/
       }
     }
   }
@@ -748,25 +744,22 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
          if (NE_per_cell <= 1){
-            if (ran() <= NATP_per_cell){
+            if (ran() <= NE_per_cell){
               nE[i*Ny*Nz+j*Nz+k] = 1/(dx*dx*dx);
             }
             else {
               nE[i*Ny*Nz+j*Nz+k] = 0;
             }
-          }
+            if(k>2*Nz/3){
+              if (ran() <= 2.5*NE_per_cell){
+                nE[i*Ny*Nz+j*Nz+k] = 1/(dx*dx*dx);
+              }
+              else {
+                nE[i*Ny*Nz+j*Nz+k] = 0;
+              }
+            }
+         }
         }
-          /*do{
-            U = 2*ran() - 1;
-            V = 2*ran() - 1;
-            r2 = U*U + V*V;
-          } while (r2 >= 1 || r2 == 0);
-          double fac = sqrt(-2*log(r2)/r2);
-          nE[i*Ny*Nz+j*Nz+k] = NE_per_cell/(dx*dx*dx) + NE_stdev*(U*fac)/(dx*dx*dx);
-          //printf("nE for cell %d %d %d is %f\n", i,j,k, nE[i*Ny*Nz+j*Nz+k]);
-        } else {
-          nE[i*Ny*Nz+j*Nz+k] = 0;
-          }*/
       }
     }
   }
