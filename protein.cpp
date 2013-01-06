@@ -278,6 +278,7 @@ int main (int argc, char *argv[]) {
   bool check = true;
   clock_t newtime;
   clock_t start = clock();
+  int k=0;
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
           JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
@@ -297,9 +298,13 @@ int main (int argc, char *argv[]) {
         }
       }
     }
-
-    if (i%iter_at_five_sec == 0 || ((i*5)%iter_at_five_sec == 0 && i<iter_at_five_sec)) {
-      int k = i/iter_at_five_sec;
+    if (i%iter_at_five_sec == 0){printf("did this work????????????????? = %d\n",i);}
+    //printf("iter_at_five_sec = %d\n\n",iter_at_five_sec);
+    if (i%iter_at_five_sec == 0 || ((i*125)%iter_at_five_sec == 0 && i<iter_at_five_sec)) {
+      printf("******this is printing at iteration number = %d\n\n",i);
+      fflush(stdout);
+      //if(i>30){exit(1);}
+      //int k = i/iter_at_five_sec;
       char *outfilenameATP = new char[1000];
       sprintf(outfilenameATP, "shape-%s/natp-%s-%03.1f-%03.1f-%03.1f-%03.1f-%03d.dat", argv[1],argv[1],A,B,C,D,k);
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
@@ -348,6 +353,7 @@ int main (int argc, char *argv[]) {
       }
       fclose(nDfile);
       printf("printed out new file = nd\n");
+      k++;
     }
   }
   for (int i=0;i<Nx*Ny*Nz;i++){
