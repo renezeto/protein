@@ -8,7 +8,9 @@ foreach $dp ([1.0,0.5]) {
     my $scriptname = "protein-p-$len_cyl-$rad_endcap.tmp.sh";
     open(SCRIPT, ">$scriptname") or die $!;
     print SCRIPT "#!/bin/sh
-    ./protein p $len_cyl $rad_endcap 0.0 0.0";
+#SBATCH --output protein-p-$len_cyl-$rad_endcap.out
+#SBATCH --mem-per-cpu=30
+./protein p $len_cyl $rad_endcap 0.0 0.0";
     close SCRIPT;
     system("sbatch",$scriptname);
 }
@@ -22,7 +24,9 @@ foreach $dc ([1.0,1.0]) {
 
     open SCRIPT, ">$scriptname" or die $!;
     print SCRIPT "#!/bin/sh
-    ./protein c $len $rad 0.0 0.0";
+#SBATCH --output protein-c-$len-$rad.out
+#SBATCH --mem-per-cpu=30
+./protein c $len $rad 0.0 0.0";
     close SCRIPT;
     system("sbatch",$scriptname);
 }
@@ -37,7 +41,9 @@ foreach $db ([0.5,1.0,0.5]) {
 
     open SCRIPT, ">$scriptname" or die $!;
     print SCRIPT "#!/bin/sh
-    ./protein b $len_x $len_y $len_z 0.0";
+#SBATCH --output protein-b-$len_x-$len_y-$len_z.out
+#SBATCH --mem-per-cpu=30
+./protein b $len_x $len_y $len_z 0.0";
     close SCRIPT;
     system("sbatch",$scriptname);
 
@@ -54,7 +60,9 @@ foreach $dst ([0.5,1.0,0.5,0.5]) {
 
     open SCRIPT, ">$scriptname" or die $!;
     print SCRIPT "#!/bin/sh
-    ./protein st $len $rad_x $rad_y $rad_z";
+#SBATCH --output protein-st-$len-$rad_x-$rad_y-$rad_z.out
+#SBATCH --mem-per-cpu=30
+./protein st $len $rad_x $rad_y $rad_z";
     close SCRIPT;
     system("sbatch",$scriptname);
 }
@@ -67,7 +75,9 @@ foreach $dsp ([1.0]) {
 
     open SCRIPT, ">$scriptname" or die $!;
     print SCRIPT "#!/bin/sh
-    ./protein b $rad 0.0 0.0 0.0";
+#SBATCH --output protein-sp-$rad.out
+#SBATCH --mem-per-cpu=30
+./protein b $rad 0.0 0.0 0.0";
     close SCRIPT;
     system("sbatch",$scriptname);
 }
@@ -83,7 +93,9 @@ foreach $de ([0.5,1.0,0.5]) {
 
     open SCRIPT, ">$scriptname" or die $!;
     print SCRIPT "#!/bin/sh
-    ./protein b $len_x $len_y $len_z 0.0";
+#SBATCH --output protein-e-$len_x-$len_y-$len_z.out
+#SBATCH --mem-per-cpu=30
+./protein b $len_x $len_y $len_z 0.0";
     close SCRIPT;
     system("sbatch",$scriptname);
 }
