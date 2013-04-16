@@ -25,7 +25,7 @@ const double dx=0.05;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
-const int iter_at_five_sec = int(5.0/time_step)+1;
+const int iter_at_five_sec = int(5.0/time_step)+1; 
 
 double x, y, z;
 
