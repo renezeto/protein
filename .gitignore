@@ -1,0 +1,6 @@
+*.out
+.\#*
+\#*
+*.dat
+*.tmp.sh
+protein
