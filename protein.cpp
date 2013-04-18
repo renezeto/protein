@@ -25,8 +25,7 @@ const double dx=0.05;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
-const int iter_at_five_sec = int(5.0/time_step)+1; 
-
+const int iter_at_five_sec = int(5.0/time_step)+1;
 double x, y, z;
 
 int Nx;
@@ -46,7 +45,58 @@ double B;
 double C;
 double D;
 
+const int num_guassians=23;
+double guass[3*num_guassians];//stores y,z, and sigma for each guassian when creating random cell wall
+int rand_seed;//=14; at this point I have this passed in from the command line as the D argument
+double Norm = 15.0;//This is the height of the guassians that make the cell wall
+
+double rand_dis(double d0,double d_fac,int i) {
+  int fac = 1;
+  srand(i+rand_seed);
+  double x = (rand()%1000);
+  x = x/1000.0;
+  if ( (rand()%1000) < 500) fac = -1;
+  return d0*(1 + fac*(-d_fac*log(1-x)));
+}
+
+void randomize_cell_wall(double guass[]){
+  double X = Nx*dx; double Y = Ny*dx; double Z = Nz*dx;
+  guass[0]=Y/2.0;
+  guass[1]=Z/2.0;
+  guass[2] = rand_dis(0.2,.13,2);
+  for (int i = 1; i<num_guassians; i++){
+    srand(i+rand_seed);
+    double sigma = rand_dis(0.2,.13,i);
+    guass[3*i+2]=sigma;
+    double d = rand_dis(0.4,.13,i);
+    double theta = fmod(rand(),2*M_PI);
+    double y_change = d*sin(theta);
+    double z_change = d*cos(theta);
+    guass[i*3] = guass[(i-1)*3]+y_change;
+    guass[i*3+1] = guass[(i-1)*3+1]+z_change;
+  }
+}
+
+//void get_dis_from_wall(double x, double y, ) {
+
+
 double mem_f(double x, double y, double z) {
+  if(mem_f_shape=="randst"){
+    double f = 0;
+    double X = Nx*dx;
+    double x1 = (X-A)/2.0;
+    double x2 = (X+A)/2.0;
+    if (x< x2 && x > x1){
+      for (int i = 0; i<num_guassians; i++){
+        double arg = ((y-guass[3*i])*(y-guass[3*i]) + (z-guass[3*i+1])*(z-guass[3*i+1]))/(guass[3*i+2]*guass[3*i+2]);
+        double fi = -((Norm*exp(-arg))-exp(-1.0));
+        f+=fi;
+      }
+    } else {
+      f = 0.1;
+    }
+    return f;
+  }
   if (mem_f_shape=="p"){ //pill
     //A = length, B = radius of endcap and cylinder, C = ???
     double f;
@@ -154,7 +204,7 @@ int main (int argc, char *argv[]) {
   C = atof(argv[4]);
   D = atof(argv[5]);
   if (mem_f_shape=="p") {
-    Nx = ceil(2*B/dx) + 4; 
+    Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*B/dx) + 4;
     Nz = ceil((A + 2*B)/dx) + 4;
   }
@@ -167,6 +217,15 @@ int main (int argc, char *argv[]) {
     Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*B/dx) + 4;
     Nz = ceil(A/dx) + 4;
+  }
+  if (mem_f_shape=="randst") {
+    Nx = ceil(A/dx) + 4;
+    Ny = ceil(B/dx) + 4;
+    Nz = ceil(C/dx) + 4;
+    rand_seed = int(D);
+    if (D != round(D)) {
+      printf("WARNING!!! When using randst the last argument, the rand_seed, should be an integer!  For now I've truncated it!!!\n");
+    }
   }
   if (mem_f_shape=="st") {
     Nx = ceil(2*B/dx) + 4;
@@ -184,6 +243,16 @@ int main (int argc, char *argv[]) {
     Nz = ceil(2*B/dx) + 4;
   }
   printf("Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
+  randomize_cell_wall(guass);
+  printf("guass = %g, %g, %g, %g, %g, %g, %g\n",guass[0],guass[1],guass[2],guass[3],guass[4],guass[5],guass[6]);
+  for (double x=0.5;x<0.6;x+=.1) {
+    for (double y=0.15;y<0.45;y+=.1) {
+      for (double z=0.15;z<0.45;z+=.1) {
+        printf("f at %g,%g,%g is = %g\t",x,y,z,mem_f(x,y,z));
+      }
+    }
+  }
+  //exit(0);
   nATP = new double[Nx*Ny*Nz];
   nADP = new double[Nx*Ny*Nz];
   nE = new double[Nx*Ny*Nz];
@@ -729,7 +798,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
           if(k>2*Nz/3){
             nATP[i*Ny*Nz+j*Nz+k] =extra_dens*1000;
           }
-          else { 
+          else {
             nATP[i*Ny*Nz+j*Nz+k] = extra_dens*200;
           }
         }
