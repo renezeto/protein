@@ -92,8 +92,39 @@ double mem_f(double x, double y, double z) {
         double fi = -((Norm*exp(-arg))-exp(-1.0));
         f+=fi;
       }
-    } else {
-      f = 0.1;
+      if (f<=0) {
+        f = 2*(x-(X/2))/A - 1;
+        return f;
+      }
+      if (f>0) {
+        double final_f0; double final_y0; double final_z0;
+        for (double y0 = y-A; y0<y+A; y0+=dx/10.0) {
+          for (double z0 = z-A; z0<z+A; z0+=dx/10.0) {
+            double f0 = 0.0;
+            for (int i = 0; i<num_guassians; i++){
+              double arg0 = ((y0-guass[3*i])*(y0-guass[3*i]) + (z0-guass[3*i+1])*(z0-guass[3*i+1]))/(guass[3*i+2]*guass[3*i+2]);
+              double fi0 = -((Norm*exp(-arg0))-exp(-1.0));
+              f0 += fi0;
+            }
+            if (f0 <= 0) {
+              if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-final_y0)*(y-final_y0)+(z-final_z0)*(z-final_z0) ) {
+                final_y0 = y0;
+                final_z0 = z0;
+                final_f0 = f0;
+              }
+            }
+          }
+        }
+        double dis = (y-final_y0)*(y-final_y0) + (z-final_z0)*(z-final_z0) + (x-X/2.0)*(x-X/2.0);
+        if (dis <= A) {
+          f = 2*(dis/A-.5);
+        }
+      }
+    } else if (x >= x2) {
+      f = 2*(x-x2)/A;
+    }
+    else {
+      f = 2*(x1-x)/A;
     }
     return f;
   }
@@ -245,13 +276,21 @@ int main (int argc, char *argv[]) {
   printf("Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
   randomize_cell_wall(guass);
   printf("guass = %g, %g, %g, %g, %g, %g, %g\n",guass[0],guass[1],guass[2],guass[3],guass[4],guass[5],guass[6]);
-  for (double x=0.5;x<0.6;x+=.1) {
-    for (double y=0.15;y<0.45;y+=.1) {
-      for (double z=0.15;z<0.45;z+=.1) {
-        printf("f at %g,%g,%g is = %g\t",x,y,z,mem_f(x,y,z));
-      }
+  printf("Hello??\n");
+  fflush(stdout);
+  const char *f_file_name = "f_membrane.dat";
+  FILE *f_file = fopen((const char *)f_file_name,"w");
+  //delete[] f_file_name;
+  //for (double x=0.0;x<A;x+=.1) {
+  double x = Nx/2.0*dx;
+  for (double y=0.1;y<2.5;y+=.1) {
+    for (double z=0.1;z<2.5;z+=.1) {
+      fprintf(f_file,"%g\t%g\t%g\n",y,z,mem_f(x,y,z));
     }
   }
+  fclose(f_file);
+  printf("hello!\n");
+  fflush(stdout);
   //exit(0);
   nATP = new double[Nx*Ny*Nz];
   nADP = new double[Nx*Ny*Nz];
@@ -261,6 +300,7 @@ int main (int argc, char *argv[]) {
   f_mem = new double[Nx*Ny*Nz];
   printf("For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
          dx, tot_time, time_step, iter, iter_at_five_sec);
+  fflush(stdout);
   double *JxATP = new double[Nx*Ny*Nz];
   double *JyATP = new double[Nx*Ny*Nz];
   double *JzATP = new double[Nx*Ny*Nz];
@@ -275,9 +315,11 @@ int main (int argc, char *argv[]) {
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
   printf("here\n");
   set_membrane(mem_f, mem_A);
+  fflush(stdout);
   printf ("jheretwo\n");
   set_insideArr(insideArr);
   printf("herethree\n");
+  fflush(stdout);
   set_density(nATP,nE, mem_A);
   for (int a=0;a<Ny;a++){
     for (int b=0;b<Nz;b++){
@@ -306,6 +348,7 @@ int main (int argc, char *argv[]) {
     bef_total_Nd += Nd[i];
   }
   printf("heresix\n");
+  fflush(stdout);
   bef_total_N = bef_total_NATP*2 + bef_total_NADP*2 + bef_total_NE + bef_total_Nde*3 + bef_total_Nd*2;
   //moved membrane
   printf("herefour\n");
@@ -317,13 +360,14 @@ int main (int argc, char *argv[]) {
   double ft = mem_f(zt,yt,xt);
   printf("in the box has mem_f function = %f\n",ft);
   printf("what is Nx/2 = %f\n",Nz/2.0);
+  fflush(stdout);
   for (int j=0;j<Ny;j++){ // possible source of membrane.dat problem?
     for (int i=0;i<Nz;i++){
       if (insideArr[(int(Nx/2))*Ny*Nz+j*Nz+i]==true) {inmarker = 1;}
       else {inmarker = 0;}
       if (mem_A[(int(Nx/2))*Ny*Nz+j*Nz+i]!=0) {marker = 1;}
       else {marker = 0;}
-      fprintf(out, "%g  ", inmarker);
+      fprintf(out, "%g  ", marker);
     }
     fprintf(out, "\n");
   }
@@ -454,7 +498,12 @@ int main (int argc, char *argv[]) {
 //checks corners of each gridpoint, creates mem_A
 void set_membrane(double (*mem_f)(double x, double y, double z),
 		 double mem_A[]) {
+  clock_t old_time = clock();
   for(int xi=0;xi<Nx;xi++){
+    clock_t time = clock();
+    printf("x row %d in set_membrane took %4.02f seconds",xi, (time-old_time)/double(CLOCKS_PER_SEC));
+    fflush(stdout);
+    old_time = time;
     for(int yi=0;yi<Ny;yi++){
       for(int zi=0;zi<Nz;zi++){
         double fXYZ = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
