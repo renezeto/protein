@@ -11,6 +11,7 @@ using namespace std;
 #include <cassert>
 
 
+
 double difD = 2.5; double difE = 2.5;
 double rate_ADP_ATP = 1;
 double rate_D = .025;
@@ -21,7 +22,7 @@ double extra_dens = 10;
 
 const int n = 706;
 
-const double dx=0.05;
+const double dx=0.025;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
@@ -45,7 +46,7 @@ double B;
 double C;
 double D;
 
-const int num_guassians=23;
+const int num_guassians=5;
 double guass[3*num_guassians];//stores y,z, and sigma for each guassian when creating random cell wall
 int rand_seed;//=14; at this point I have this passed in from the command line as the D argument
 double Norm = 15.0;//This is the height of the guassians that make the cell wall
@@ -93,13 +94,13 @@ double mem_f(double x, double y, double z) {
         f+=fi;
       }
       if (f<=0) {
-        f = 2*(x-(X/2))/A - 1;
+        f = abs(2*(x-(X/2))/A) - 1;
         return f;
       }
       if (f>0) {
-        double final_f0; double final_y0; double final_z0;
-        for (double y0 = y-A; y0<y+A; y0+=dx/10.0) {
-          for (double z0 = z-A; z0<z+A; z0+=dx/10.0) {
+        double closest_y0 = -100.0; double closest_z0 = -100.0; bool there_is_closest_point=0;
+        for (double y0 = y-A; y0<y+A; y0+=dx) {
+          for (double z0 = z-A; z0<z+A; z0+=dx) {
             double f0 = 0.0;
             for (int i = 0; i<num_guassians; i++){
               double arg0 = ((y0-guass[3*i])*(y0-guass[3*i]) + (z0-guass[3*i+1])*(z0-guass[3*i+1]))/(guass[3*i+2]*guass[3*i+2]);
@@ -107,26 +108,29 @@ double mem_f(double x, double y, double z) {
               f0 += fi0;
             }
             if (f0 <= 0) {
-              if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-final_y0)*(y-final_y0)+(z-final_z0)*(z-final_z0) ) {
-                final_y0 = y0;
-                final_z0 = z0;
-                final_f0 = f0;
+              there_is_closest_point = 1;
+              if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-closest_y0)*(y-closest_y0)+(z-closest_z0)*(z-closest_z0) ) {
+                closest_y0 = y0;
+                closest_z0 = z0;
               }
             }
           }
         }
-        double dis = (y-final_y0)*(y-final_y0) + (z-final_z0)*(z-final_z0) + (x-X/2.0)*(x-X/2.0);
+        double dis = sqrt((y-closest_y0)*(y-closest_y0) + (z-closest_z0)*(z-closest_z0) + (x-X/2.0)*(x-X/2.0));
         if (dis <= A) {
           f = 2*(dis/A-.5);
+          return f;
+        } else {
+          return 1;
         }
       }
     } else if (x >= x2) {
       f = 2*(x-x2)/A;
-    }
-    else {
+      return f;
+    } else {
       f = 2*(x1-x)/A;
+      return f;
     }
-    return f;
   }
   if (mem_f_shape=="p"){ //pill
     //A = length, B = radius of endcap and cylinder, C = ???
@@ -278,19 +282,6 @@ int main (int argc, char *argv[]) {
   printf("guass = %g, %g, %g, %g, %g, %g, %g\n",guass[0],guass[1],guass[2],guass[3],guass[4],guass[5],guass[6]);
   printf("Hello??\n");
   fflush(stdout);
-  const char *f_file_name = "f_membrane.dat";
-  FILE *f_file = fopen((const char *)f_file_name,"w");
-  //delete[] f_file_name;
-  //for (double x=0.0;x<A;x+=.1) {
-  double x = Nx/2.0*dx;
-  for (double y=0.1;y<2.5;y+=.1) {
-    for (double z=0.1;z<2.5;z+=.1) {
-      fprintf(f_file,"%g\t%g\t%g\n",y,z,mem_f(x,y,z));
-    }
-  }
-  fclose(f_file);
-  printf("hello!\n");
-  fflush(stdout);
   //exit(0);
   nATP = new double[Nx*Ny*Nz];
   nADP = new double[Nx*Ny*Nz];
@@ -314,19 +305,83 @@ int main (int argc, char *argv[]) {
   bool *insideArr = new bool[Nx*Ny*Nz]; //whether each cube is inside at all
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
   printf("here\n");
-  set_membrane(mem_f, mem_A);
-  fflush(stdout);
-  printf ("jheretwo\n");
-  set_insideArr(insideArr);
-  printf("herethree\n");
-  fflush(stdout);
-  set_density(nATP,nE, mem_A);
-  for (int a=0;a<Ny;a++){
-    for (int b=0;b<Nz;b++){
-      //printf("nATP starts as %g\n", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+  bool force_to_generate_new_memA = true;
+  if (mem_f_shape=="randst") {
+    char* memA_name = new char[1024];
+    sprintf(memA_name,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,num_guassians,rand_seed);
+    FILE *memAin = fopen(memA_name,"r");
+    if (!memAin || force_to_generate_new_memA) {
+      if (memAin && force_to_generate_new_memA) fclose(memAin);
+      printf("There is evidently no file called %s,\n so we're going to create are own and fill it with memA information for future use\n",memA_name);
+      fflush(stdout);
+      set_membrane(mem_f, mem_A);
+      printf ("Finished with set_membrane function now we have a mem_A\n");
+      fflush(stdout);
+      char* memA_out = new char[1024];
+      sprintf(memA_out,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,num_guassians,rand_seed);
+      FILE *memAout = fopen((const char *)memA_out,"w");
+      for (int i=0;i<Nx*Ny*Nz;i++) {
+        fprintf(memAout, "%g\t",mem_A[i]);
+      }
+      fclose(memAout);
+      delete[] memA_out;
+      printf("finished printing the memA file, now we're moving on with simulation\n");
+      fflush(stdout);
+    } else {
+      printf("We're taking the memA info from a file that already exists\n");
+      for (int i=0;i<Nx*Ny*Nz;i++) {
+        if (fscanf(memAin, "%lg\t",&mem_A[i])!=1) {
+            printf("There was a problem in trying to read into the mem_A array! RUN!!!!\n");
+            exit(1);
+        }
+      }
     }
   }
+  set_insideArr(insideArr);
+  printf("Finished with inside Arr function\n");
+  fflush(stdout);
+  char* outfilename = new char[1024];
+  if (mem_f_shape == "randst") {
+    sprintf(outfilename,"membrane-%4.02f-%4.02f-%4.02f-%d.dat",A,B,C,rand_seed);
+  } else {
+    sprintf(outfilename,"membrane.dat");
+  }
+  FILE *out = fopen((const char *)outfilename,"w");
+  double marker;
+  double inmarker;
+  double zt = A/2; double yt = B/2; double xt = C/2;
+  double ft = mem_f(zt,yt,xt);
+  fflush(stdout);
+  for (int j=0;j<Ny;j++){ // possible source of membrane.dat problem?
+    for (int i=0;i<Nz;i++){
+      if (insideArr[(int(Nx/2))*Ny*Nz+j*Nz+i]==true) inmarker = 1;
+      else inmarker = 0;
+      if (mem_A[(int(Nx/2))*Ny*Nz+j*Nz+i]!=0) marker = 1;
+      else marker = 0;
+      fprintf(out, "%g  ", marker);
+    }
+    fprintf(out, "\n");
+  }
+  fflush(stdout);
+  fclose(out);
+  //end of membrane
+  printf("\nMEMBRANE FILE PRINTED\n");
+  if (mem_f_shape == "randst") {
+    char *f_file_name = new char[1024];
+    sprintf(f_file_name,"shape-randst/f_membrane-%4.02f-%4.02f-%4.02f-%d.dat", A,B,C,rand_seed);
+    FILE *f_file = fopen((const char *)f_file_name,"w");
+    double x = Nx/2.0*dx;
+    for (int i=0;i<Ny;i++) {
+      for (int j=0;j<Nz;j++) {
+        fprintf(f_file,"%g\t%g\t%g\n",i*dx,j*dx,mem_f(x,i*dx,j*dx));
+      }
+    }
+    fclose(f_file);
+    printf("Finished printing out the mem_f_shape function!\n");
+    fflush(stdout);
+  }
   printf ("membrane set with density in it!\n");
+  set_density(nATP,nE, mem_A);
   double bef_total_NATP=0;
   double bef_total_NADP=0;
   double bef_total_NE=0;
@@ -352,29 +407,6 @@ int main (int argc, char *argv[]) {
   bef_total_N = bef_total_NATP*2 + bef_total_NADP*2 + bef_total_NE + bef_total_Nde*3 + bef_total_Nd*2;
   //moved membrane
   printf("herefour\n");
-  const char* outfilename = "membrane.dat";
-	FILE *out = fopen((const char *)outfilename,"w");
-  double marker;
-  double inmarker;
-  double zt = A/2; double yt = B/2; double xt = C/2;
-  double ft = mem_f(zt,yt,xt);
-  printf("in the box has mem_f function = %f\n",ft);
-  printf("what is Nx/2 = %f\n",Nz/2.0);
-  fflush(stdout);
-  for (int j=0;j<Ny;j++){ // possible source of membrane.dat problem?
-    for (int i=0;i<Nz;i++){
-      if (insideArr[(int(Nx/2))*Ny*Nz+j*Nz+i]==true) {inmarker = 1;}
-      else {inmarker = 0;}
-      if (mem_A[(int(Nx/2))*Ny*Nz+j*Nz+i]!=0) {marker = 1;}
-      else {marker = 0;}
-      fprintf(out, "%g  ", marker);
-    }
-    fprintf(out, "\n");
-  }
-  fflush(stdout);
-  fclose(out);
-  //end of membrane
-  printf("\nMEMBRANE FILE PRINTED\n");
   char *outfilenameStart = new char[1000];
   sprintf(outfilenameStart, "starting_natp.dat");
   FILE *nATPStartfile = fopen((const char *)outfilenameStart,"w");
@@ -516,6 +548,8 @@ void set_membrane(double (*mem_f)(double x, double y, double z),
         double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
         double f = mem_f(xi*dx, yi*dx, zi*dx);
         mem_A[xi*Ny*Nz+yi*Nz+zi] = find_intersection(fXYZ, fXYz, fXyZ, fXyz, fxYZ, fxYz, fxyZ, fxyz, f);
+        //printf(" x =%g y = %g z = %g f = %g\n",xi*dx,yi*dx,zi*dx,f);
+        //fflush(stdout);
       }
     }
   }
