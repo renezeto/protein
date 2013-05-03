@@ -22,7 +22,7 @@ double extra_dens = 10;
 
 const int n = 706;
 
-const double dx=0.025;
+const double dx=0.05;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
@@ -874,11 +874,28 @@ int set_density(double *nATP, double *nE, double *mem_A){
   printf("total inside = %d\nTotal nE should be = %f\nE_per_cell = %f\n", count_inside,
   count_inside*NE_per_cell, NE_per_cell);
   double r2,U,V;
+  int right_most_point=0;
+  int left_most_point=Nz;
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(k>2*Nz/3){
+          if (k>right_most_point){
+            right_most_point = k;
+          }
+          if(k<left_most_point){
+            left_most_point = k;
+          }
+        }
+      }
+    }
+  }
+  int density_divider = int(right_most_point - (right_most_point - left_most_point)/3);
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          if(k>density_divider){
             nATP[i*Ny*Nz+j*Nz+k] =extra_dens*1000;
           }
           else {
