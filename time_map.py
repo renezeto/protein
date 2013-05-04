@@ -3,28 +3,35 @@ from matplotlib.pyplot import *
 from numpy import *
 from time import *
 from random import *
+import glob
+
+f_shape = sys.argv[1]
+f_param1 = sys.argv[2]
+f_param2 = sys.argv[3]
+f_param3 = sys.argv[4]
+f_param4 = sys.argv[5]
+#f_density = sys.argv[6]
+f_seed = sys.argv[6]
+
+dat_filenames = []
+for fn in glob.iglob('shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_seed+'*.dat'):
+        dat_filenames.append(fn)
+t_steps = len(dat_filenames)
+data_natp_set = array([np.loadtxt(dat_filenames[i]) for i in range(t_steps)])
+
+print data_natp_set[0]
 
 dx = .05 #microns
-data = zeros((40,40,40),dtype='float') 
+data = data_natp_set[0] #retrieves data format.
 data_shape = [data.shape[n] for n in range(len(data.shape))]
 data_size = [data.shape[n]*dx for n in range(len(data.shape))]
 axis = [arange(0,data_size[n],dx) for n in range(len(data.shape))]
-tsteps = 20 
-data_set = [0 for t in range(tsteps)]
 
-#randomize some data
-for t in range(tsteps):
-    for n in range(data.shape[0]):
-        for m in range(data.shape[1]):
-            for o in range(data.shape[2]):
-                data[n][m][o] = random() #loadtxt('filename.dat',delimiter=',')
-    data_set[t] = data
+def average_location(): #this function only works with a plane of data right now
+    tsum = zeros_like(data_natp_set[0])
+    for t in range(t_steps):
+        tsum += data_natp_set[t]
+    return tsum/t_steps
 
-def average_location(page):
-    tsum = zeros_like(data_set[0][page])
-    for t in range(tsteps):
-        tsum += data_set[t][page]
-    return tsum/tsteps
-
-contourf(axis[1],axis[2],average_location(2),500)
+contourf(axis[0],axis[1],average_location(),500)
 show()

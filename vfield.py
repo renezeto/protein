@@ -2,21 +2,32 @@ from __future__ import division
 from numpy import *
 from matplotlib import *
 from pylab import *
-from random import *
-from inspect import *
+import sys
+import glob
+from matplotlib.widgets import Slider, RadioButtons
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+f_shape = sys.argv[1]
+f_param1 = sys.argv[2]
+f_param2 = sys.argv[3]
+f_param3 = sys.argv[4]
+f_param4 = sys.argv[5]
+#f_density = sys.argv[6]
+f_seed = sys.argv[6]
+
+dat_filenames = []
+for fn in glob.iglob('shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_seed+'*.dat'):
+        dat_filenames.append(fn)
+t_steps = len(dat_filenames)
+data_natp_set = array([np.loadtxt(dat_filenames[i]) for i in range(t_steps)])
+
+print data_natp_set[0]
 
 dx = .05 #microns
-data = zeros((20,20),dtype='float') #loadtxt('filename.dat',delimiter=',')
+data = data_natp_set[0] #retrieves data format.
 data_shape = [data.shape[n] for n in range(len(data.shape))]
 data_size = [data.shape[n]*dx for n in range(len(data.shape))]
 axis = [arange(0,data_size[n],dx) for n in range(len(data.shape))]
-
-
-
-#generate fake 2d data - works for 3d too.
-for i in range(data_shape[0]):
-	for j in range(data_shape[1]):
-		data[i][j] = axis[1][i] + axis[0][j]
 
 
 def gradient(data):
@@ -57,8 +68,32 @@ def mapping(data, page): #kind of like meshgrid(X,Y) for separating the partials
 				x3_component[i][j] = gradf[page][i][j][1]
 	return x2_component, x3_component
 
+t0 = 0
+x0 = 0
+Q = quiver(axis[0],axis[1],mapping(data_natp_set[0],x0)[0],mapping(data_natp_set[0],x0)[1])
 
-X1, X2 = meshgrid(axis[0],axis[1])
-quiver(X1,X2,mapping(data,1)[0],mapping(data,1)[1])
+#this is the time slider
+t0_ax = axes([0.25, 0, 0.5, 0.03], axisbg='slategray')
+t0_slider = Slider(t0_ax, 'time step', 0, t_steps, valinit = 0, valfmt='%0.0f')
+
+def update_time(val):
+        global t0
+        t0 = round(t0_slider.val)
+        Q.set_UVC(mapping(data_natp_set[t0],x0)[0],mapping(data_natp_set[t0],x0)[1])
+
+t0_slider.on_changed(update_time)
+
+
+#this would be used for going through 3d data along the x axis
+depth_ax = axes([0.25, 0.03, 0.5, 0.03], axisbg='slategray')
+depth_slider = Slider(depth_ax, 'depth', 0, data_shape[0], valinit = 0, valfmt='%0.1f')
+
+def update_depth(val):
+        global x0
+        x0 = depth_slider.val
+        vector_plot()
+
+depth_slider.on_changed(update_depth)
+
 show()
 
