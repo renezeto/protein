@@ -5,7 +5,7 @@ from pylab import *
 import sys
 import glob
 from matplotlib.widgets import Slider, RadioButtons
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 
 f_shape = sys.argv[1]
 f_param1 = sys.argv[2]
@@ -54,11 +54,17 @@ def mapping(data, page): #kind of like meshgrid(X,Y) for separating the partials
 		x2_component = zeros_like(data)
 		x3_component = zeros_like(data)
 		gradf = gradient(data)
-		for i in range(data_shape[1]-2):
+              	for i in range(data_shape[1]-2):
 			for j in range(data_shape[0]-2):
 				x2_component[i][j] = gradf[i][j][0]
 				x3_component[i][j] = gradf[i][j][1]
-	else:
+                                if (abs(x3_component[i][j])>1000 or abs(x2_component[i][j])>1000):
+                                        x2_component[i][j]=0
+                                        x3_component[i][j]=0
+                                print x2_component[i][j]
+                return x2_component, x3_component
+
+        else:
 		x2_component = zeros_like(data[page])
 		x3_component = zeros_like(data[page])
 		gradf = gradient(data)
@@ -66,7 +72,7 @@ def mapping(data, page): #kind of like meshgrid(X,Y) for separating the partials
     			for j in range(data_shape[0]-2):
         			x2_component[i][j] = gradf[page][i][j][0]
 				x3_component[i][j] = gradf[page][i][j][1]
-	return x2_component, x3_component
+        return x2_component, x3_component
 
 t0 = 0
 x0 = 0

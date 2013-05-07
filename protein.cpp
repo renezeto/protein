@@ -278,7 +278,19 @@ int main (int argc, char *argv[]) {
     Nz = ceil(2*B/dx) + 4;
   }
   printf("Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
-  randomize_cell_wall(guass);
+  double guass99[] = {1.0,1.1,.25,1.5,1.5,.25,2.0,1.8,.25,1.5,2.1,.25,1.0,2.5,.25};
+  double guass98[] = {1.0,1.0,.15,1.5,1.5,.3,2.1,1.7,.15,2.3,2.3,.3,1.7,2.8,.3};
+  if (rand_seed == 99){
+    for (int i=0;i<3*num_guassians;i++){
+      guass[i]=guass99[i];
+    }
+  } else if (rand_seed == 98){
+    for (int i=0;i<3*num_guassians;i++){
+      guass[i]=guass98[i];
+    }
+  } else {
+    randomize_cell_wall(guass);
+  }
   printf("guass = %g, %g, %g, %g, %g, %g, %g\n",guass[0],guass[1],guass[2],guass[3],guass[4],guass[5],guass[6]);
   printf("Hello??\n");
   fflush(stdout);
@@ -896,7 +908,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider){
-            nATP[i*Ny*Nz+j*Nz+k] =extra_dens*1000;
+            nATP[i*Ny*Nz+j*Nz+k] =extra_dens*500;
           }
           else {
             nATP[i*Ny*Nz+j*Nz+k] = extra_dens*200;
@@ -910,7 +922,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>2*Nz/3){
-            nE[i*Ny*Nz+j*Nz+k] = extra_dens*400;
+            nE[i*Ny*Nz+j*Nz+k] = extra_dens*200;
           }
           else {
             nE[i*Ny*Nz+j*Nz+k] = extra_dens*100;
