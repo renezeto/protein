@@ -7,7 +7,7 @@ import sys
 #f_membrane-%4.02f-%4.02f-%4.02f-%d.dat", A,B,C,rand_seed
 #print sys.argv[1]
 
-fname = "shape-randst/f_membrane-" + str(sys.argv[1]) + "-" + str(sys.argv[2]) + "-" + str(sys.argv[3]) + "-" + str(sys.argv[4]) + ".dat"
+fname = "shape-randst/f_membrane-" + str(sys.argv[2]) + "-" + str(sys.argv[3]) + "-" + str(sys.argv[4]) + "-" + str(sys.argv[5]) + ".dat"
 print fname
 A = np.loadtxt(fname, dtype = float)
 width = int(sqrt(len(A)))
