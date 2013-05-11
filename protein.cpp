@@ -46,9 +46,10 @@ double B;
 double C;
 double D;
 
-const int num_guassians=5;
-double guass[3*num_guassians];//stores y,z, and sigma for each guassian when creating random cell wall
-int rand_seed;//=14; at this point I have this passed in from the command line as the D argument
+const int starting_num_guassians=20;
+double guass[3*starting_num_guassians];//stores y,z, and sigma for each guassian when creating random cell wall
+const int random_num_guassians=5;
+int rand_seed=0;//=14; at this point I have this passed in from the command line as the D argument
 double Norm = 15.0;//This is the height of the guassians that make the cell wall
 
 double rand_dis(double d0,double d_fac,int i) {
@@ -65,7 +66,7 @@ void randomize_cell_wall(double guass[]){
   guass[0]=Y/2.0;
   guass[1]=Z/2.0;
   guass[2] = rand_dis(0.2,.13,2);
-  for (int i = 1; i<num_guassians; i++){
+  for (int i = 1; random_num_guassians; i++){
     srand(i+rand_seed);
     double sigma = rand_dis(0.2,.13,i);
     guass[3*i+2]=sigma;
@@ -80,18 +81,50 @@ void randomize_cell_wall(double guass[]){
 
 //void get_dis_from_wall(double x, double y, ) {
 
+double f_2D_TIE_fighter(double y, double z){
+  double f = 0;
+  double Y = Ny*dx;
+  double Z = Nz*dx;
+  double f1 = (z-Z/2.0)*(z-Z/2.0)/4 + (y-1.5)*(y-1.5)/1;
+  double f2 = (z-Z/2.0)*(z-Z/2.0)/4 + (y-(Y-1.5))*(y-(Y-1.5))/1;
+  double f3 = (z-Z/2.0)-.5;
+  f = f1+f2+f3;
+  return f;
+}
+
+//double traingle(double y, double z){
+//  double f = 0;
+
+
+double f_2D_randst(double y, double z){
+  int num_guassians = 0;
+  for(int i=0;i<starting_num_guassians;i++){
+    if (guass[i*3]!=0.0 || guass[i*3+1]!=0.0 || guass[i*3+2]!=0.0){
+      num_guassians++;
+    }
+  }
+  double f=0;
+  for (int i = 0; i<num_guassians; i++){
+    double arg = ((y-guass[3*i])*(y-guass[3*i]) + (z-guass[3*i+1])*(z-guass[3*i+1]))/(guass[3*i+2]*guass[3*i+2]);
+    double fi = -((Norm*exp(-arg))-exp(-1.0));
+    f+=fi;
+  }
+  return f;
+}
 
 double mem_f(double x, double y, double z) {
-  if(mem_f_shape=="randst"){
+  if(mem_f_shape=="randst" || mem_f_shape=="TIE_fighter"){
     double f = 0;
+    double f0 = 0;
     double X = Nx*dx;
     double x1 = (X-A)/2.0;
     double x2 = (X+A)/2.0;
     if (x< x2 && x > x1){
-      for (int i = 0; i<num_guassians; i++){
-        double arg = ((y-guass[3*i])*(y-guass[3*i]) + (z-guass[3*i+1])*(z-guass[3*i+1]))/(guass[3*i+2]*guass[3*i+2]);
-        double fi = -((Norm*exp(-arg))-exp(-1.0));
-        f+=fi;
+      if(mem_f_shape=="randst") f = f_2D_randst(y,z);
+      else if(mem_f_shape=="TIE_fighter") f0 = f_2D_TIE_fighter(y,z);
+      else {
+        printf("somethings wrong with the shape argument!!!");
+        exit(1);
       }
       if (f<=0) {
         f = abs(2*(x-(X/2))/A) - 1;
@@ -101,12 +134,8 @@ double mem_f(double x, double y, double z) {
         double closest_y0 = -100.0; double closest_z0 = -100.0; bool there_is_closest_point=0;
         for (double y0 = y-A; y0<y+A; y0+=dx) {
           for (double z0 = z-A; z0<z+A; z0+=dx) {
-            double f0 = 0.0;
-            for (int i = 0; i<num_guassians; i++){
-              double arg0 = ((y0-guass[3*i])*(y0-guass[3*i]) + (z0-guass[3*i+1])*(z0-guass[3*i+1]))/(guass[3*i+2]*guass[3*i+2]);
-              double fi0 = -((Norm*exp(-arg0))-exp(-1.0));
-              f0 += fi0;
-            }
+            if(mem_f_shape=="randst") f0 = f_2D_randst(y0,z0);
+            if(mem_f_shape=="TIE_fighter") f0 = f_2D_TIE_fighter(y0,z0);
             if (f0 <= 0) {
               there_is_closest_point = 1;
               if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-closest_y0)*(y-closest_y0)+(z-closest_z0)*(z-closest_z0) ) {
@@ -262,6 +291,11 @@ int main (int argc, char *argv[]) {
       printf("WARNING!!! When using randst the last argument, the rand_seed, should be an integer!  For now I've truncated it!!!\n");
     }
   }
+  if (mem_f_shape=="TIE_fighter") {
+    Nx = ceil(A/dx) + 4;
+    Ny = ceil(B/dx) + 4;
+    Nz = ceil(C/dx) + 4;
+  }
   if (mem_f_shape=="st") {
     Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*C/dx) + 4;
@@ -278,23 +312,37 @@ int main (int argc, char *argv[]) {
     Nz = ceil(2*B/dx) + 4;
   }
   printf("Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
-  double guass99[] = {1.0,1.1,.25,1.5,1.5,.25,2.0,1.8,.25,1.5,2.1,.25,1.0,2.5,.25};
-  double guass98[] = {1.0,1.0,.15,1.5,1.5,.3,2.1,1.7,.15,2.3,2.3,.3,1.7,2.8,.3};
+  for (int i;i<3*starting_num_guassians;i++){
+    guass[i]=0;
+  }
+  double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
+  //double guass98[] = {1.0,1.0,.15,1.5,1.5,.3,2.1,1.7,.15,2.3,2.3,.3,1.7,2.8,.3};
+  //double guass97[] = {.7,1.5,.2,.9,1.5,.2,1.1,1.5,.2,1.3,1.5,.2,1.5,1.5,.2,1.7,1.5,.2,
+  //                    1.9,1.5,.2,2.1,1.5,.2,2.3,1.5,.2,2.5,1.5,.2,2.7,1.5,.2,1.7,1.9,.3};
+  double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
+  double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
+                      3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.8,.6};
+  double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
+                      4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
   if (rand_seed == 99){
-    for (int i=0;i<3*num_guassians;i++){
+    for (int i=0;i<3*5;i++){
       guass[i]=guass99[i];
     }
   } else if (rand_seed == 98){
-    for (int i=0;i<3*num_guassians;i++){
+    for (int i=0;i<3*5;i++){
       guass[i]=guass98[i];
+    }
+  } else if (rand_seed == 97){
+    for (int i=0;i<3*12;i++){
+      guass[i]=guass97[i];
+    }
+  } else if (rand_seed == 96){
+    for (int i=0;i<3*16;i++){
+      guass[i]=guass96[i];
     }
   } else {
     randomize_cell_wall(guass);
   }
-  printf("guass = %g, %g, %g, %g, %g, %g, %g\n",guass[0],guass[1],guass[2],guass[3],guass[4],guass[5],guass[6]);
-  printf("Hello??\n");
-  fflush(stdout);
-  //exit(0);
   nATP = new double[Nx*Ny*Nz];
   nADP = new double[Nx*Ny*Nz];
   nE = new double[Nx*Ny*Nz];
@@ -320,7 +368,7 @@ int main (int argc, char *argv[]) {
   bool force_to_generate_new_memA = true;
   if (mem_f_shape=="randst") {
     char* memA_name = new char[1024];
-    sprintf(memA_name,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,num_guassians,rand_seed);
+    sprintf(memA_name,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,random_num_guassians,rand_seed);
     FILE *memAin = fopen(memA_name,"r");
     if (!memAin || force_to_generate_new_memA) {
       if (memAin && force_to_generate_new_memA) fclose(memAin);
@@ -330,7 +378,7 @@ int main (int argc, char *argv[]) {
       printf ("Finished with set_membrane function now we have a mem_A\n");
       fflush(stdout);
       char* memA_out = new char[1024];
-      sprintf(memA_out,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,num_guassians,rand_seed);
+      sprintf(memA_out,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,random_num_guassians,rand_seed);
       FILE *memAout = fopen((const char *)memA_out,"w");
       for (int i=0;i<Nx*Ny*Nz;i++) {
         fprintf(memAout, "%g\t",mem_A[i]);
@@ -378,9 +426,9 @@ int main (int argc, char *argv[]) {
   fclose(out);
   //end of membrane
   printf("\nMEMBRANE FILE PRINTED\n");
-  if (mem_f_shape == "randst") {
+  if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
     char *f_file_name = new char[1024];
-    sprintf(f_file_name,"shape-randst/f_membrane-%4.02f-%4.02f-%4.02f-%d.dat", A,B,C,rand_seed);
+    sprintf(f_file_name,"shape-%s/f_membrane-%4.02f-%4.02f-%4.02f-%d.dat", mem_f_shape.c_str(),A,B,C,rand_seed);
     FILE *f_file = fopen((const char *)f_file_name,"w");
     double x = Nx/2.0*dx;
     for (int i=0;i<Ny;i++) {
