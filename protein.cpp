@@ -424,10 +424,8 @@ int main (int argc, char *argv[]) {
     if (!memAin || force_to_generate_new_memA) {
       if (memAin && force_to_generate_new_memA) fclose(memAin);
       fprintf(out_file,"There is evidently no file called %s,\n so we're going to create are own and fill it with memA information for future use\n",memA_name);
-      fflush(stdout);
       set_membrane(mem_f, mem_A);
       fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A\n");
-      fflush(stdout);
       char* memA_out = new char[1024];
       sprintf(memA_out,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,random_num_guassians,rand_seed);
       FILE *memAout = fopen((const char *)memA_out,"w");
@@ -1005,25 +1003,21 @@ int set_density(double *nATP, double *nE, double *mem_A){
             right_most_point_y = j;
           }
           if (j<left_most_point_y){
-            right_most_point_y = j;
+            left_most_point_y = j;
           }
         }
       }
     }
   }
   int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
-  int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/3);
+  int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/2);
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(k>density_divider_z){
+          if(k>density_divider_z && j>density_divider_y){
             nATP[i*Ny*Nz+j*Nz+k] =extra_dens*700;
-          }
-          if(j>density_divider_y){
-            nATP[i*Ny*Nz+j*Nz+k] =extra_dens*700;
-          }
-          else {
+          } else {
             nATP[i*Ny*Nz+j*Nz+k] = extra_dens*200;
           }
         }
