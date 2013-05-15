@@ -1,0 +1,59 @@
+pill - .02/25 sec interval
+contsim 4.0 0.5 (extra density = 100) - showed an oscillation for natp
+contsim 4.0 3.0 (extra density = 100) - broken
+[above two might have been 1 sec intervals]
+
+randomsim 1.0 0.5 (extra density = 12) - boring
+randomsim 4.0 0.5 (extra density = 1) - nothing
+
+smallcontsim 4.0 0.5 (extra density = 12) - no oscillations, and natp disappeared
+
+smallrandsim 1.0 0.5 (extra density = 4.0) - no oscillations natp gone
+smallrandsim 0.5 0.5 (extra density = 4.0) - same
+
+
+pill - 5 sec interval
+randomsim 4.0 0.5 (extra density = 20) - nothing
+randomsim 4.0 0.25 (extra density = 20) - nothing
+
+contsim 4.0 0.5 (extra density = 20) - oscillations
+contsim 4.0 0.25 (extra density = 20) - oscillations
+
+contsim 4.0 0.5 (extra density = 70) - oscillations
+contsim 4.0 0.25 (extra density = 70) - oscillations
+
+contsim 4.0 0.25 (extra density = 10) - oscillation
+contsim 4.0 0.5 (extra density = 10) - oscillation
+
+contsim 4.0 0.25 (extra density = 3) - minor oscillation  
+contsim 4.0 0.5 (extra density = 3)  - minor oscillation
+
+randomsim 4.0 0.5 (extra density = 10) - nothing
+randomsim 4.0 0.25 (extra density = 10) - nothing
+
+contsim 4.0 1.0 
+contsim 1.0 0.5 
+contsim 1.5 1.5 
+contsim 2.0 2.0 
+contsim 2.2 0.75 
+contsim 2.5 1.25
+
+stadium - 5 sec interval 
+contsim 4.0 0.1 0.5 0.25 (extra density = 70) - oscillations
+contsim 4.0 0.1 0.15 0.25 (extra density = 70) - oscillations
+contsim 4.0 0.1 0.5 0.5 (extra density = 70) - oscillations
+contsim 4.0 0.1 0.5 0.25 (extra density = 10) - oscillations
+contsim 4.0 0.1 0.1 0.25 (extra density = 10) - oscillations 
+contsim 4.0 0.1 0.5 0.25 
+contsim 1.0 0.1 0.5 2.0
+contsim 1.5 0.1 0.5 0.75
+contsim 2.0 0.1 0.5 1.0 
+contsim 2.2 0.1 0.5 0.5 
+contsim 2.5 0.1 0.5 1.5
+
+randsim 4.0 0.1 0.5 0.25 (extra density = 70) - nothing
+randsim 4.0 0.1 0.15 0.25 (extra density = 70) - nothing 
+randsim 4.0 0.1 0.5 0.5 (extra density = 70) - nothing
+
+cone
+4.0 1.0 (extra density = 10)
