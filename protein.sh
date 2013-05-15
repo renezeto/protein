@@ -1,13 +1,11 @@
 #!/bin/bash
-srun -p debian ./protein randst 0.5 3.5 3.5 12 &
-srun -p debian ./protein randst 0.5 3.5 3.5 13 &
-srun -p debian ./protein randst 0.5 3.5 3.5 14 &
-srun -p debian ./protein randst 0.5 3.5 3.5 15 &
-srun -p debian ./protein randst 0.5 3.5 3.5 16 &
-srun -p debian ./protein randst 0.5 3.5 3.5 17 &
-srun -p debian ./protein randst 0.5 3.5 3.5 18 &
-srun -p debian ./protein randst 0.5 3.5 3.5 19 &
+#for d in 99 98 97 96; do
+#srun -p debian ./protein randst 0.5 6.0 6.0 $d 
+#done
 
-
+srun ./protein randst 0.5 6.0 6.0 99 &
+srun ./protein randst 0.5 6.0 6.0 98 &
+srun ./protein randst 0.5 6.0 6.0 97 &
+srun ./protein randst 0.5 6.0 6.0 96 &
 
 
