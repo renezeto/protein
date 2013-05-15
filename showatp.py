@@ -5,7 +5,7 @@ import numpy as np
 import time
 import sys
 
-t_steps = 30
+t_steps = 14
 cellshape = sys.argv[1]
 dimA = sys.argv[2]
 dimB = sys.argv[3]

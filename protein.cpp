@@ -9,6 +9,9 @@ using namespace std;
 #include "protein.h"
 #include "MersenneTwister.h"
 #include <cassert>
+//  #include <ctime>
+
+
 
 
 
@@ -82,18 +85,42 @@ void randomize_cell_wall(double guass[]){
 //void get_dis_from_wall(double x, double y, ) {
 
 double f_2D_TIE_fighter(double y, double z){
-  double f = 0;
+  double f = 0;double f1 = 0;double f2 = 0;double f3 = 0;
   double Y = Ny*dx;
   double Z = Nz*dx;
-  double f1 = (z-Z/2.0)*(z-Z/2.0)/4 + (y-1.5)*(y-1.5)/1;
-  double f2 = (z-Z/2.0)*(z-Z/2.0)/4 + (y-(Y-1.5))*(y-(Y-1.5))/1;
-  double f3 = (z-Z/2.0)-.5;
+  if (y<2.6){
+    f1 = (z-Z/2.0)*(z-Z/2.0)/4 + (y-1.5)*(y-1.5)/0.6 - 1.0;
+  } else {f1 = 0.1;}
+  if (Y-y < 2.6){
+    f2 = (z-Z/2.0)*(z-Z/2.0)/4 + (y-(Y-1.5))*(y-(Y-1.5))/0.6 - 1.0;
+  } else {f2 = 0.1;}
+  if (abs(z-Z/2.0) < 0.8 && abs(y-Y/2.0) < 2.0){
+    f3 = abs(z-Z/2.0)-.5;
+  } else {f3 = 0.1;}
   f = f1+f2+f3;
+  //printf("y = %g, z = %g, f = %g\n",y,z,f);
   return f;
 }
 
-//double traingle(double y, double z){
-//  double f = 0;
+double f_2D_triangle(double y, double z){
+  double f = 0; double Y = Ny*dx; double Z = Nz*dx;
+  double y1 = A + 2*dx; double z1 = A + 2*dx;
+  double y2 = Y-A-2*dx; double z2 = z1;
+  double y3 = Y/2.0; double z3 = Z-A-2*dx;
+  double b1 = (z3-z1)/(y3-y1); double a1 = z1 - b1*y1;
+  double b3 = (z2-z3)/(y2-y3); double a3 = z3 - b3*y3;
+  double zl1 = b1*y +a1;
+  double zl3 = b3*y +a3;
+  double rad = D*sqrt(3.0)*B/6.0;
+  double y_circle = Y/2.0; double z_circle = z1 + rad;
+  if (z < zl1 && z < zl3 && z > z1 && ((z-z_circle)*(z-z_circle) + (y-y_circle)*(y-y_circle)) < rad*rad){
+    //printf("rad = %g \n",rad);
+    f = -0.1;
+  } else {
+    f = 0.1;
+  }
+  return f;
+}
 
 
 double f_2D_randst(double y, double z){
@@ -113,7 +140,7 @@ double f_2D_randst(double y, double z){
 }
 
 double mem_f(double x, double y, double z) {
-  if(mem_f_shape=="randst" || mem_f_shape=="TIE_fighter"){
+  if(mem_f_shape=="randst" || mem_f_shape=="TIE_fighter" || mem_f_shape=="triangle"){
     double f = 0;
     double f0 = 0;
     double X = Nx*dx;
@@ -121,7 +148,8 @@ double mem_f(double x, double y, double z) {
     double x2 = (X+A)/2.0;
     if (x< x2 && x > x1){
       if(mem_f_shape=="randst") f = f_2D_randst(y,z);
-      else if(mem_f_shape=="TIE_fighter") f0 = f_2D_TIE_fighter(y,z);
+      else if(mem_f_shape=="TIE_fighter") f = f_2D_TIE_fighter(y,z);
+      else if(mem_f_shape=="triangle") f = f_2D_triangle(y,z);
       else {
         printf("somethings wrong with the shape argument!!!");
         exit(1);
@@ -136,7 +164,10 @@ double mem_f(double x, double y, double z) {
           for (double z0 = z-A; z0<z+A; z0+=dx) {
             if(mem_f_shape=="randst") f0 = f_2D_randst(y0,z0);
             if(mem_f_shape=="TIE_fighter") f0 = f_2D_TIE_fighter(y0,z0);
+            if(mem_f_shape=="triangle") f0 = f_2D_triangle(y0,z0);
             if (f0 <= 0) {
+              //printf("f0 = %g\n",f0);
+              fflush(stdout);
               there_is_closest_point = 1;
               if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-closest_y0)*(y-closest_y0)+(z-closest_z0)*(z-closest_z0) ) {
                 closest_y0 = y0;
@@ -296,6 +327,11 @@ int main (int argc, char *argv[]) {
     Ny = ceil(B/dx) + 4;
     Nz = ceil(C/dx) + 4;
   }
+  if (mem_f_shape=="triangle") {
+    Nx = ceil(A/dx) + 4;
+    Ny = ceil(B/dx) + 4;
+    Nz = ceil(C/dx) + 4;
+  }
   if (mem_f_shape=="st") {
     Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*C/dx) + 4;
@@ -311,8 +347,19 @@ int main (int argc, char *argv[]) {
     Ny = ceil(2*A/dx) + 4;
     Nz = ceil(2*B/dx) + 4;
   }
-  printf("Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
-  for (int i;i<3*starting_num_guassians;i++){
+  char * out_file_name = new char[1024];
+  sprintf(out_file_name,"%s-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),A,B,C,D);
+  FILE * out_file = fopen((const char *)out_file_name,"w");
+
+  time_t t = time(0);   // get time now
+  struct tm * now = localtime( & t );
+  char * time = new char[1024];
+  sprintf(time, "%d/%d/%d at %d hours and %d minutes", now->tm_mon +1,now->tm_mday,now->tm_year +1900,now->tm_hour,now->tm_min);
+  fprintf(out_file,"This simulation was run on %s\n",time);
+
+
+  fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
+  for (int i=0;i<3*starting_num_guassians;i++){
     guass[i]=0;
   }
   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
@@ -327,6 +374,8 @@ int main (int argc, char *argv[]) {
   if (rand_seed == 99){
     for (int i=0;i<3*5;i++){
       guass[i]=guass99[i];
+      fprintf(out_file,"rand_seed is 99!");
+      fflush(stdout);
     }
   } else if (rand_seed == 98){
     for (int i=0;i<3*5;i++){
@@ -341,7 +390,11 @@ int main (int argc, char *argv[]) {
       guass[i]=guass96[i];
     }
   } else {
-    randomize_cell_wall(guass);
+    if (mem_f_shape == "randst"){
+      fprintf(out_file,"rand_seed is not 99!");
+      fflush(stdout);
+      randomize_cell_wall(guass);
+    }
   }
   nATP = new double[Nx*Ny*Nz];
   nADP = new double[Nx*Ny*Nz];
@@ -349,9 +402,8 @@ int main (int argc, char *argv[]) {
   Nd = new double[Nx*Ny*Nz];
   Nde = new double[Nx*Ny*Nz];
   f_mem = new double[Nx*Ny*Nz];
-  printf("For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
+  fprintf(out_file,"For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
          dx, tot_time, time_step, iter, iter_at_five_sec);
-  fflush(stdout);
   double *JxATP = new double[Nx*Ny*Nz];
   double *JyATP = new double[Nx*Ny*Nz];
   double *JzATP = new double[Nx*Ny*Nz];
@@ -364,7 +416,6 @@ int main (int argc, char *argv[]) {
   double *mem_A = new double[Nx*Ny*Nz]; //area of membrane in each cube
   bool *insideArr = new bool[Nx*Ny*Nz]; //whether each cube is inside at all
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
-  printf("here\n");
   bool force_to_generate_new_memA = true;
   if (mem_f_shape=="randst") {
     char* memA_name = new char[1024];
@@ -372,10 +423,10 @@ int main (int argc, char *argv[]) {
     FILE *memAin = fopen(memA_name,"r");
     if (!memAin || force_to_generate_new_memA) {
       if (memAin && force_to_generate_new_memA) fclose(memAin);
-      printf("There is evidently no file called %s,\n so we're going to create are own and fill it with memA information for future use\n",memA_name);
+      fprintf(out_file,"There is evidently no file called %s,\n so we're going to create are own and fill it with memA information for future use\n",memA_name);
       fflush(stdout);
       set_membrane(mem_f, mem_A);
-      printf ("Finished with set_membrane function now we have a mem_A\n");
+      fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A\n");
       fflush(stdout);
       char* memA_out = new char[1024];
       sprintf(memA_out,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,random_num_guassians,rand_seed);
@@ -385,24 +436,25 @@ int main (int argc, char *argv[]) {
       }
       fclose(memAout);
       delete[] memA_out;
-      printf("finished printing the memA file, now we're moving on with simulation\n");
-      fflush(stdout);
+      fprintf(out_file,"\nfinished printing the memA file, now we're moving on with simulation\n");
     } else {
-      printf("We're taking the memA info from a file that already exists\n");
+      fprintf(out_file,"We're taking the memA info from a file that already exists\n");
       for (int i=0;i<Nx*Ny*Nz;i++) {
         if (fscanf(memAin, "%lg\t",&mem_A[i])!=1) {
-            printf("There was a problem in trying to read into the mem_A array! RUN!!!!\n");
+          fprintf(out_file,"There was a problem in trying to read into the mem_A array! RUN!!!!\n");
             exit(1);
         }
       }
     }
+  } else {
+    set_membrane(mem_f, mem_A);
+    fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A and its not randst and Nx is = %d\n",Nx);
   }
   set_insideArr(insideArr);
-  printf("Finished with inside Arr function\n");
-  fflush(stdout);
+  fprintf(out_file,"Finished with inside Arr function\n");
   char* outfilename = new char[1024];
-  if (mem_f_shape == "randst") {
-    sprintf(outfilename,"membrane-%4.02f-%4.02f-%4.02f-%d.dat",A,B,C,rand_seed);
+  if (mem_f_shape == "randst" || mem_f_shape == "TIE_fighter" || mem_f_shape == "triangle") {
+    sprintf(outfilename,"membrane-%4.02f-%4.02f-%4.02f-%g.dat",A,B,C,D);
   } else {
     sprintf(outfilename,"membrane.dat");
   }
@@ -425,10 +477,11 @@ int main (int argc, char *argv[]) {
   fflush(stdout);
   fclose(out);
   //end of membrane
-  printf("\nMEMBRANE FILE PRINTED\n");
+  fprintf(out_file,"\nMEMBRANE FILE PRINTED\n");
   if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
     char *f_file_name = new char[1024];
-    sprintf(f_file_name,"shape-%s/f_membrane-%4.02f-%4.02f-%4.02f-%d.dat", mem_f_shape.c_str(),A,B,C,rand_seed);
+    if(f_file_name==NULL){fprintf(out_file,"OOOOOOOOOOOOOOOH no.");exit(1);}
+    sprintf(f_file_name,"shape-%s/f_membrane-%4.02f-%4.02f-%4.02f-%g.dat", mem_f_shape.c_str(),A,B,C,D);
     FILE *f_file = fopen((const char *)f_file_name,"w");
     double x = Nx/2.0*dx;
     for (int i=0;i<Ny;i++) {
@@ -437,10 +490,10 @@ int main (int argc, char *argv[]) {
       }
     }
     fclose(f_file);
-    printf("Finished printing out the mem_f_shape function!\n");
+    fprintf(out_file,"Finished printing out the mem_f_shape function!\n");
     fflush(stdout);
   }
-  printf ("membrane set with density in it!\n");
+  fprintf (out_file,"membrane set with density in it!\n");
   set_density(nATP,nE, mem_A);
   double bef_total_NATP=0;
   double bef_total_NADP=0;
@@ -454,7 +507,6 @@ int main (int argc, char *argv[]) {
   double total_Nde=0;
   double total_Nd=0;
   double total_N=0;
-  printf("herefive\n");
   for (int i=0;i<Nx*Ny*Nz;i++){
     bef_total_NATP += nATP[i]*dx*dx*dx;
     bef_total_NADP += nADP[i]*dx*dx*dx;
@@ -462,11 +514,8 @@ int main (int argc, char *argv[]) {
     bef_total_Nde += Nde[i];
     bef_total_Nd += Nd[i];
   }
-  printf("heresix\n");
-  fflush(stdout);
   bef_total_N = bef_total_NATP*2 + bef_total_NADP*2 + bef_total_NE + bef_total_Nde*3 + bef_total_Nd*2;
   //moved membrane
-  printf("herefour\n");
   char *outfilenameStart = new char[1000];
   sprintf(outfilenameStart, "starting_natp.dat");
   FILE *nATPStartfile = fopen((const char *)outfilenameStart,"w");
@@ -499,16 +548,15 @@ int main (int argc, char *argv[]) {
         }
         int percents_to_go = int(iter/percent - i/percent);
         if(percents_to_go%10==0 || percents_to_go == 99){
-          printf("We are %d percent complete and have %f seconds to go!\n",
+          fprintf(out_file,"We are %d percent complete and have %f seconds to go!\n",
                  i/percent, percents_to_go*time_for_percent);
         }
       }
     }
-    if (i%iter_at_five_sec == 0){printf("did this work????????????????? = %d\n",i);}
+    if (i%iter_at_five_sec == 0){fprintf(out_file,"did this work????????????????? = %d\n",i);}
     //printf("iter_at_five_sec = %d\n\n",iter_at_five_sec);
     if (i%iter_at_five_sec == 0) {
-      printf("******this is printing at iteration number = %d\n\n",i);
-      fflush(stdout);
+      fprintf(out_file,"******this is printing at iteration number = %d\n\n",i);
       //if(i>30){exit(1);}
       //int k = i/iter_at_five_sec;
       char *outfilenameATP = new char[1000];
@@ -522,7 +570,7 @@ int main (int argc, char *argv[]) {
         fprintf(nATPfile, "\n");
       }
       fclose(nATPfile);
-      printf("printed out new file = natp\n");
+      fprintf(out_file,"printed out new file = natp\n");
       char *outfilenameE = new char[1000];
       sprintf(outfilenameE, "shape-%s/ne-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,extra_dens,k);
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
@@ -534,7 +582,7 @@ int main (int argc, char *argv[]) {
         fprintf(nEfile, "\n");
       }
       fclose(nEfile);
-      printf("printed out new file = nadp\n");
+      fprintf(out_file,"printed out new file = nadp\n");
       char *outfilenameADP = new char[1000];
       sprintf(outfilenameADP, "shape-%s/nadp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,extra_dens,k);
       FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
@@ -546,7 +594,7 @@ int main (int argc, char *argv[]) {
         fprintf(nADPfile, "\n");
       }
       fclose(nADPfile);
-      printf("printed out new file = nadp\n");
+      fprintf(out_file,"printed out new file = nadp\n");
       char *outfilenameD = new char[1000];
       sprintf(outfilenameD, "shape-%s/nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,extra_dens,k);
       FILE *nDfile = fopen((const char *)outfilenameD,"w");
@@ -558,7 +606,7 @@ int main (int argc, char *argv[]) {
         fprintf(nDfile, "\n");
       }
       fclose(nDfile);
-      printf("printed out new file = nd\n");
+      fprintf(out_file,"printed out new file = nd\n");
       k++;
     }
   }
@@ -570,26 +618,28 @@ int main (int argc, char *argv[]) {
     total_Nd += Nd[i];
   }
   total_N = total_NATP*2 + total_NADP*2 + total_NE + total_Nde*3 + total_Nd*2;
-  printf("total before NATP is = %f\n",bef_total_NATP);
-  printf("total before NADP is = %f\n",bef_total_NADP);
-  printf("total before NE is = %f\n",bef_total_NE);
-  printf("total before Nd is = %f\n",bef_total_Nd);
-  printf("total before Nde is = %f\n",bef_total_Nde);
-  printf("total before N is = %f\n",bef_total_N);
-  printf("total after NATP is = %f\n",total_NATP);
-  printf("total after NADP is = %f\n",total_NADP);
-  printf("total after NE is = %f\n",total_NE);
-  printf("total after Nd is = %f\n",total_Nd);
-  printf("total after Nde is = %f\n",total_Nde);
-  printf("total after N is = %f\n",total_N);
+  fprintf(out_file,"total before NATP is = %f\n",bef_total_NATP);
+  fprintf(out_file,"total before NADP is = %f\n",bef_total_NADP);
+  fprintf(out_file,"total before NE is = %f\n",bef_total_NE);
+  fprintf(out_file,"total before Nd is = %f\n",bef_total_Nd);
+  fprintf(out_file,"total before Nde is = %f\n",bef_total_Nde);
+  fprintf(out_file,"total before N is = %f\n",bef_total_N);
+  fprintf(out_file,"total after NATP is = %f\n",total_NATP);
+  fprintf(out_file,"total after NADP is = %f\n",total_NADP);
+  fprintf(out_file,"total after NE is = %f\n",total_NE);
+  fprintf(out_file,"total after Nd is = %f\n",total_Nd);
+  fprintf(out_file,"total after Nde is = %f\n",total_Nde);
+  fprintf(out_file,"total after N is = %f\n",total_N);
 
   cout << "Program has Run!!\n";
+  fclose(out_file);
   return 0;
 }
 
 //checks corners of each gridpoint, creates mem_A
 void set_membrane(double (*mem_f)(double x, double y, double z),
 		 double mem_A[]) {
+  printf("\nInside the set_membrane function!!!!!\n");
   clock_t old_time = clock();
   for(int xi=0;xi<Nx;xi++){
     clock_t time = clock();
@@ -607,6 +657,9 @@ void set_membrane(double (*mem_f)(double x, double y, double z),
         double fxyZ = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
         double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
         double f = mem_f(xi*dx, yi*dx, zi*dx);
+        if (xi == int(Nx/2)){
+          //printf("x = %g y = %g, z = %g, f = %g\n",xi*dx,yi*dx,zi*dx,f);
+        }
         mem_A[xi*Ny*Nz+yi*Nz+zi] = find_intersection(fXYZ, fXYz, fXyZ, fXyz, fxYZ, fxYz, fxyZ, fxyz, f);
         //printf(" x =%g y = %g z = %g f = %g\n",xi*dx,yi*dx,zi*dx,f);
         //fflush(stdout);
@@ -934,29 +987,41 @@ int set_density(double *nATP, double *nE, double *mem_A){
   printf("total inside = %d\nTotal nE should be = %f\nE_per_cell = %f\n", count_inside,
   count_inside*NE_per_cell, NE_per_cell);
   double r2,U,V;
-  int right_most_point=0;
-  int left_most_point=Nz;
+  int right_most_point_z=0;
+  int left_most_point_z=Nz;
+  int right_most_point_y=0;
+  int left_most_point_y=Ny;
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if (k>right_most_point){
-            right_most_point = k;
+          if (k>right_most_point_z){
+            right_most_point_z = k;
           }
-          if(k<left_most_point){
-            left_most_point = k;
+          if(k<left_most_point_z){
+            left_most_point_z = k;
+          }
+          if (j>right_most_point_y){
+            right_most_point_y = j;
+          }
+          if (j<left_most_point_y){
+            right_most_point_y = j;
           }
         }
       }
     }
   }
-  int density_divider = int(right_most_point - (right_most_point - left_most_point)/3);
+  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
+  int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/3);
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(k>density_divider){
-            nATP[i*Ny*Nz+j*Nz+k] =extra_dens*500;
+          if(k>density_divider_z){
+            nATP[i*Ny*Nz+j*Nz+k] =extra_dens*700;
+          }
+          if(j>density_divider_y){
+            nATP[i*Ny*Nz+j*Nz+k] =extra_dens*700;
           }
           else {
             nATP[i*Ny*Nz+j*Nz+k] = extra_dens*200;
@@ -970,7 +1035,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>2*Nz/3){
-            nE[i*Ny*Nz+j*Nz+k] = extra_dens*200;
+            nE[i*Ny*Nz+j*Nz+k] = extra_dens*300;
           }
           else {
             nE[i*Ny*Nz+j*Nz+k] = extra_dens*100;
