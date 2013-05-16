@@ -26,7 +26,7 @@ data_shape = [data.shape[n] for n in range(len(data.shape))]
 data_size = [data.shape[n]*dx for n in range(len(data.shape))]
 axis = [arange(0,data_size[n],dx) for n in range(len(data.shape))]
 
-#between tstep-1 and tstep, track the location of the maximum. 
+
 
 X, Y = meshgrid(arange(0,10,.1),arange(0,10,.1))
 Z = -(X - 5*(X+1)/(X+1))**2 - (Y - 5*(Y+1)/(Y+1))**2 #+ 1*(X+1)/(X+1)
@@ -67,6 +67,11 @@ def maxvectorplot(dataset):
             positions += [(globalmax(dataset[t])[0][0],globalmax(dataset[t])[0][1])]
     for i in range(1,len(positions)):
         displacements += [(positions[i-1][0]-positions[i][0],positions[i-1][1]-positions[i][0])]
+    print displacements
     return 0
 
-f = maxvectorplot(data_natp_set)
+maxvectorplot(data_natp_set)
+f = maxtracker(data_natp_set)
+matshow(f)
+colorbar()
+show()
