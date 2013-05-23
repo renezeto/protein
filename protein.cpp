@@ -21,7 +21,9 @@ double rate_D = .025;
 double rate_dD = .0015;
 double rate_de = .7;
 double rate_E = .093;
-double extra_dens = 10;
+const double nATP_starting_density = 1000.0;//proteins per micrometer
+const double nE_starting_density = 350.0;//proteins per micrometer
+const double density_factor = 5.0;
 
 const int n = 706;
 
@@ -112,12 +114,12 @@ double f_2D_triangle(double y, double z){
   double zl1 = b1*y +a1;
   double zl3 = b3*y +a3;
   double rad = D*sqrt(3.0)*B/6.0;
-  double y_circle = Y/2.0; double z_circle = z1 + rad;
-  if (z < zl1 && z < zl3 && z > z1 && ((z-z_circle)*(z-z_circle) + (y-y_circle)*(y-y_circle)) < rad*rad){
+  double y_circle = Y/2.0; double z_circle = z1 + 2*rad;
+  if (z < zl1 && z < zl3 && /*z > z1 &&*/ ((z-z_circle)*(z-z_circle) + (y-y_circle)*(y-y_circle)) < rad*rad){
     //printf("rad = %g \n",rad);
-    f = -0.1;
+    f = -0.01;
   } else {
-    f = 0.1;
+    f = 0.01;
   }
   return f;
 }
@@ -362,13 +364,11 @@ int main (int argc, char *argv[]) {
   for (int i=0;i<3*starting_num_guassians;i++){
     guass[i]=0;
   }
+  //In the following, for every set of three numbers, the 1st is y and he 2nd is z and the 3rd is quassian width
   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
-  //double guass98[] = {1.0,1.0,.15,1.5,1.5,.3,2.1,1.7,.15,2.3,2.3,.3,1.7,2.8,.3};
-  //double guass97[] = {.7,1.5,.2,.9,1.5,.2,1.1,1.5,.2,1.3,1.5,.2,1.5,1.5,.2,1.7,1.5,.2,
-  //                    1.9,1.5,.2,2.1,1.5,.2,2.3,1.5,.2,2.5,1.5,.2,2.7,1.5,.2,1.7,1.9,.3};
   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
-                      3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.8,.6};
+                      3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
   if (rand_seed == 99){
@@ -424,7 +424,7 @@ int main (int argc, char *argv[]) {
     if (!memAin || force_to_generate_new_memA) {
       if (memAin && force_to_generate_new_memA) fclose(memAin);
       fprintf(out_file,"There is evidently no file called %s,\n so we're going to create are own and fill it with memA information for future use\n",memA_name);
-      set_membrane(mem_f, mem_A);
+      set_membrane(out_file, mem_f, mem_A);
       fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A\n");
       char* memA_out = new char[1024];
       sprintf(memA_out,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,random_num_guassians,rand_seed);
@@ -445,11 +445,53 @@ int main (int argc, char *argv[]) {
       }
     }
   } else {
-    set_membrane(mem_f, mem_A);
+    set_membrane(out_file, mem_f, mem_A);
     fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A and its not randst and Nx is = %d\n",Nx);
   }
+  char * area_rating_out = new char[1024];
+  sprintf(area_rating_out, "shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D);
+  FILE *area_rating_file = fopen((const char *)area_rating_out,"w");
+  if (area_rating_file == NULL){
+    printf("WAAAAAAAAAAAAAAAAAAAAAA\n");
+  }
+  fprintf(out_file,"finished opening area_rating file\n");
   set_insideArr(insideArr);
   fprintf(out_file,"Finished with inside Arr function\n");
+  double total_cell_volume = 0;
+  double total_cell_area = 0;
+  for (int i=0;i<Nx*Ny*Nz;i++){ // possible source of membrane.dat problem?
+    if (insideArr[i]==true) {
+      total_cell_volume += dx*dx*dx;
+    }
+  }
+  for (int i=0;i<Nx;i++){ // possible source of membrane.dat problem?
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        total_cell_area += mem_A[i*Ny*Nz+j*Nz+k];
+        if(i==int(Nx/2)){
+          if (insideArr[i*Ny*Nz+j*Nz+k]==true){
+            double area_rating = 0;
+            for (int i2=0;i2<Nx;i2++){ // possible source of membrane.dat problem?
+              for (int j2=0;j2<Ny;j2++){
+                for (int k2=0;k2<Nz;k2++){
+                  if(i2!=i && j2!=j && k2!=k){
+                    double dis = sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
+                    area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/dis;
+                  }
+                }
+              }
+            }
+            fprintf(area_rating_file,"%g\t%g\t%g\n",j*dx,k*dx,area_rating);
+          } else {
+            fprintf(area_rating_file,"%g\t%g\t%g\n",j*dx,k*dx,0.0);
+          }
+        }
+      }
+    }
+  }
+  fclose(area_rating_file);
+  fprintf(out_file,"Finished writing to the area_rating file!\n");
+  fprintf(out_file,"Total cell volume = %g\nTotal cell area = %g\n",total_cell_volume,total_cell_area);
   char* outfilename = new char[1024];
   if (mem_f_shape == "randst" || mem_f_shape == "TIE_fighter" || mem_f_shape == "triangle") {
     sprintf(outfilename,"membrane-%4.02f-%4.02f-%4.02f-%g.dat",A,B,C,D);
@@ -461,7 +503,6 @@ int main (int argc, char *argv[]) {
   double inmarker;
   double zt = A/2; double yt = B/2; double xt = C/2;
   double ft = mem_f(zt,yt,xt);
-  fflush(stdout);
   for (int j=0;j<Ny;j++){ // possible source of membrane.dat problem?
     for (int i=0;i<Nz;i++){
       if (insideArr[(int(Nx/2))*Ny*Nz+j*Nz+i]==true) inmarker = 1;
@@ -493,6 +534,8 @@ int main (int argc, char *argv[]) {
   }
   fprintf (out_file,"membrane set with density in it!\n");
   set_density(nATP,nE, mem_A);
+  fprintf (out_file,"nATP_starting density = %g and nE_starting_density = %g and density_factor = %g",
+           nATP_starting_density, nE_starting_density, density_factor);
   double bef_total_NATP=0;
   double bef_total_NADP=0;
   double bef_total_NE=0;
@@ -558,7 +601,7 @@ int main (int argc, char *argv[]) {
       //if(i>30){exit(1);}
       //int k = i/iter_at_five_sec;
       char *outfilenameATP = new char[1000];
-      sprintf(outfilenameATP, "shape-%s/natp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,extra_dens,k);
+      sprintf(outfilenameATP, "shape-%s/natp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
       for (int a=0;a<Ny;a++){
@@ -570,7 +613,7 @@ int main (int argc, char *argv[]) {
       fclose(nATPfile);
       fprintf(out_file,"printed out new file = natp\n");
       char *outfilenameE = new char[1000];
-      sprintf(outfilenameE, "shape-%s/ne-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,extra_dens,k);
+      sprintf(outfilenameE, "shape-%s/ne-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
       for (int a=0;a<Ny;a++){
@@ -582,7 +625,7 @@ int main (int argc, char *argv[]) {
       fclose(nEfile);
       fprintf(out_file,"printed out new file = nadp\n");
       char *outfilenameADP = new char[1000];
-      sprintf(outfilenameADP, "shape-%s/nadp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,extra_dens,k);
+      sprintf(outfilenameADP, "shape-%s/nadp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
       FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
       delete[] outfilenameADP;
       for (int a=0;a<Ny;a++){
@@ -594,7 +637,7 @@ int main (int argc, char *argv[]) {
       fclose(nADPfile);
       fprintf(out_file,"printed out new file = nadp\n");
       char *outfilenameD = new char[1000];
-      sprintf(outfilenameD, "shape-%s/nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,extra_dens,k);
+      sprintf(outfilenameD, "shape-%s/nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
       FILE *nDfile = fopen((const char *)outfilenameD,"w");
       delete[] outfilenameD;
       for (int a=0;a<Ny;a++){
@@ -635,13 +678,13 @@ int main (int argc, char *argv[]) {
 }
 
 //checks corners of each gridpoint, creates mem_A
-void set_membrane(double (*mem_f)(double x, double y, double z),
+ void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
 		 double mem_A[]) {
   printf("\nInside the set_membrane function!!!!!\n");
   clock_t old_time = clock();
   for(int xi=0;xi<Nx;xi++){
     clock_t time = clock();
-    printf("x row %d in set_membrane took %4.02f seconds",xi, (time-old_time)/double(CLOCKS_PER_SEC));
+    fprintf(out_file, "x row %d in set_membrane took %4.02f seconds",xi, (time-old_time)/double(CLOCKS_PER_SEC));
     fflush(stdout);
     old_time = time;
     for(int yi=0;yi<Ny;yi++){
@@ -868,7 +911,7 @@ int get_J(double difD, double *nATP, double *nADP, double *nE,
   double F;
   for(int xi=0;xi<Nx-1;xi++){
     for(int yi=0;yi<Ny-1;yi++){
-      for(int zi=0;zi<Nz-1;zi++){
+       for(int zi=0;zi<Nz-1;zi++){
         JzATP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nATP[xi*Ny*Nz+yi*Nz+zi+1]-nATP[xi*Ny*Nz+yi*Nz+zi])/dx;
         JyATP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nATP[xi*Ny*Nz+(yi+1)*Nz+zi]-nATP[xi*Ny*Nz+yi*Nz+zi])/dx;
         JxATP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nATP[(xi+1)*Ny*Nz+yi*Nz+zi]-nATP[xi*Ny*Nz+yi*Nz+zi])/dx;
@@ -1009,16 +1052,16 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
-  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
-  int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/2);
+  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/2.0);
+  int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/2.0);
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z && j>density_divider_y){
-            nATP[i*Ny*Nz+j*Nz+k] =extra_dens*700;
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor;
           } else {
-            nATP[i*Ny*Nz+j*Nz+k] = extra_dens*200;
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density;
           }
         }
       }
@@ -1028,11 +1071,11 @@ int set_density(double *nATP, double *nE, double *mem_A){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(k>2*Nz/3){
-            nE[i*Ny*Nz+j*Nz+k] = extra_dens*300;
+          if(k>density_divider_z && j>density_divider_y){
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor;
           }
           else {
-            nE[i*Ny*Nz+j*Nz+k] = extra_dens*100;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor;
           }
         }
       }
