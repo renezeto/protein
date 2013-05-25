@@ -31,7 +31,7 @@ const double dx=0.05;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
-const int iter_at_five_sec = int(5.0/time_step)+1;
+const int iter_at_half_sec = int(0.5/time_step)+1;
 double x, y, z;
 
 int Nx;
@@ -350,7 +350,7 @@ int main (int argc, char *argv[]) {
     Nz = ceil(2*B/dx) + 4;
   }
   char * out_file_name = new char[1024];
-  sprintf(out_file_name,"%s-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),A,B,C,D);
+  sprintf(out_file_name,"%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
 
   time_t t = time(0);   // get time now
@@ -403,7 +403,7 @@ int main (int argc, char *argv[]) {
   Nde = new double[Nx*Ny*Nz];
   f_mem = new double[Nx*Ny*Nz];
   fprintf(out_file,"For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
-         dx, tot_time, time_step, iter, iter_at_five_sec);
+         dx, tot_time, time_step, iter, iter_at_half_sec);
   double *JxATP = new double[Nx*Ny*Nz];
   double *JyATP = new double[Nx*Ny*Nz];
   double *JzATP = new double[Nx*Ny*Nz];
@@ -419,7 +419,7 @@ int main (int argc, char *argv[]) {
   bool force_to_generate_new_memA = true;
   if (mem_f_shape=="randst") {
     char* memA_name = new char[1024];
-    sprintf(memA_name,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,random_num_guassians,rand_seed);
+    sprintf(memA_name,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
     FILE *memAin = fopen(memA_name,"r");
     if (!memAin || force_to_generate_new_memA) {
       if (memAin && force_to_generate_new_memA) fclose(memAin);
@@ -427,7 +427,7 @@ int main (int argc, char *argv[]) {
       set_membrane(out_file, mem_f, mem_A);
       fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A\n");
       char* memA_out = new char[1024];
-      sprintf(memA_out,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%d-%d.dat",A,B,C,random_num_guassians,rand_seed);
+      sprintf(memA_out,"shape-randst/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.0f.dat",A,B,C,D,density_factor);
       FILE *memAout = fopen((const char *)memA_out,"w");
       for (int i=0;i<Nx*Ny*Nz;i++) {
         fprintf(memAout, "%g\t",mem_A[i]);
@@ -449,7 +449,7 @@ int main (int argc, char *argv[]) {
     fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A and its not randst and Nx is = %d\n",Nx);
   }
   char * area_rating_out = new char[1024];
-  sprintf(area_rating_out, "shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D);
+  sprintf(area_rating_out, "shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *area_rating_file = fopen((const char *)area_rating_out,"w");
   if (area_rating_file == NULL){
     printf("WAAAAAAAAAAAAAAAAAAAAAA\n");
@@ -494,7 +494,7 @@ int main (int argc, char *argv[]) {
   fprintf(out_file,"Total cell volume = %g\nTotal cell area = %g\n",total_cell_volume,total_cell_area);
   char* outfilename = new char[1024];
   if (mem_f_shape == "randst" || mem_f_shape == "TIE_fighter" || mem_f_shape == "triangle") {
-    sprintf(outfilename,"membrane-%4.02f-%4.02f-%4.02f-%g.dat",A,B,C,D);
+    sprintf(outfilename,"membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
   } else {
     sprintf(outfilename,"membrane.dat");
   }
@@ -520,7 +520,7 @@ int main (int argc, char *argv[]) {
   if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
     char *f_file_name = new char[1024];
     if(f_file_name==NULL){fprintf(out_file,"OOOOOOOOOOOOOOOH no.");exit(1);}
-    sprintf(f_file_name,"shape-%s/f_membrane-%4.02f-%4.02f-%4.02f-%g.dat", mem_f_shape.c_str(),A,B,C,D);
+    sprintf(f_file_name,"shape-%s/f_membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat", mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *f_file = fopen((const char *)f_file_name,"w");
     double x = Nx/2.0*dx;
     for (int i=0;i<Ny;i++) {
@@ -594,12 +594,12 @@ int main (int argc, char *argv[]) {
         }
       }
     }
-    if (i%iter_at_five_sec == 0){fprintf(out_file,"did this work????????????????? = %d\n",i);}
-    //printf("iter_at_five_sec = %d\n\n",iter_at_five_sec);
-    if (i%iter_at_five_sec == 0) {
+    if (i%iter_at_half_sec == 0){fprintf(out_file,"did this work????????????????? = %d\n",i);}
+    //printf("iter_at_half_sec = %d\n\n",iter_at_five_sec);
+    if (i%iter_at_half_sec == 0) {
       fprintf(out_file,"******this is printing at iteration number = %d\n\n",i);
       //if(i>30){exit(1);}
-      //int k = i/iter_at_five_sec;
+      //int k = i/iter_at_half_sec;
       char *outfilenameATP = new char[1000];
       sprintf(outfilenameATP, "shape-%s/natp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
