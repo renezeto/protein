@@ -1,0 +1,317 @@
+This simulation was run on 5/22/2013 at 14 hours and 55 minutes
+Nx=7
+Ny=124
+Nz=124
+X=0.350000
+Y=6.200000
+Z=6.200000
+For this simulation,
+dx = 0.050000
+tot_time = 186.000000
+timestep = 0.000100
+total iterations = 1860002
+iter at five sec = 50000
+There is evidently no file called shape-randst/memA-0.14-6.00-6.00-5-96.dat,
+ so we're going to create are own and fill it with memA information for future use
+x row 0 in set_membrane took 0.00 secondsx row 1 in set_membrane took 0.02 secondsx row 2 in set_membrane took 0.02 secondsx row 3 in set_membrane took 1.42 secondsx row 4 in set_membrane took 3.14 secondsx row 5 in set_membrane took 3.13 secondsx row 6 in set_membrane took 1.41 seconds
+Finished with set_membrane function now we have a mem_A
+
+finished printing the memA file, now we're moving on with simulation
+finished opening area_rating file
+Finished with inside Arr function
+Finished writing to the area_rating file!
+Total cell volume = 3.80075
+Total cell area = 79.3837
+
+MEMBRANE FILE PRINTED
+Finished printing out the mem_f_shape function!
+membrane set with density in it!
+did this work????????????????? = 0
+******this is printing at iteration number = 0
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 1 percent complete and have 48541.680000 seconds to go!
+did this work????????????????? = 50000
+******this is printing at iteration number = 50000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 100000
+******this is printing at iteration number = 100000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 150000
+******this is printing at iteration number = 150000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 10 percent complete and have 44128.800000 seconds to go!
+did this work????????????????? = 200000
+******this is printing at iteration number = 200000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 250000
+******this is printing at iteration number = 250000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 300000
+******this is printing at iteration number = 300000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 350000
+******this is printing at iteration number = 350000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 20 percent complete and have 39225.600000 seconds to go!
+did this work????????????????? = 400000
+******this is printing at iteration number = 400000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 450000
+******this is printing at iteration number = 450000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 500000
+******this is printing at iteration number = 500000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 550000
+******this is printing at iteration number = 550000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 30 percent complete and have 34322.400000 seconds to go!
+did this work????????????????? = 600000
+******this is printing at iteration number = 600000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 650000
+******this is printing at iteration number = 650000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 700000
+******this is printing at iteration number = 700000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 40 percent complete and have 29419.200000 seconds to go!
+did this work????????????????? = 750000
+******this is printing at iteration number = 750000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 800000
+******this is printing at iteration number = 800000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 850000
+******this is printing at iteration number = 850000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 900000
+******this is printing at iteration number = 900000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 50 percent complete and have 24516.000000 seconds to go!
+did this work????????????????? = 950000
+******this is printing at iteration number = 950000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1000000
+******this is printing at iteration number = 1000000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1050000
+******this is printing at iteration number = 1050000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1100000
+******this is printing at iteration number = 1100000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 60 percent complete and have 19612.800000 seconds to go!
+did this work????????????????? = 1150000
+******this is printing at iteration number = 1150000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1200000
+******this is printing at iteration number = 1200000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1250000
+******this is printing at iteration number = 1250000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1300000
+******this is printing at iteration number = 1300000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 70 percent complete and have 14709.600000 seconds to go!
+did this work????????????????? = 1350000
+******this is printing at iteration number = 1350000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1400000
+******this is printing at iteration number = 1400000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1450000
+******this is printing at iteration number = 1450000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 80 percent complete and have 9806.400000 seconds to go!
+did this work????????????????? = 1500000
+******this is printing at iteration number = 1500000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1550000
+******this is printing at iteration number = 1550000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1600000
+******this is printing at iteration number = 1600000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1650000
+******this is printing at iteration number = 1650000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 90 percent complete and have 4903.200000 seconds to go!
+did this work????????????????? = 1700000
+******this is printing at iteration number = 1700000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1750000
+******this is printing at iteration number = 1750000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1800000
+******this is printing at iteration number = 1800000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+did this work????????????????? = 1850000
+******this is printing at iteration number = 1850000
+
+printed out new file = natp
+printed out new file = nadp
+printed out new file = nadp
+printed out new file = nd
+We are 100 percent complete and have 0.000000 seconds to go!
+total before NATP is = 7668.750000
+total before NADP is = 0.000000
+total before NE is = 6651.312500
+total before Nd is = 0.000000
+total before Nde is = 0.000000
+total before N is = 21988.812500
+total after NATP is = 1487.563234
+total after NADP is = 2531.161757
+total after NE is = 3035.367133
+total after Nd is = 34.079642
+total after Nde is = 3615.945367
+total after N is = 21988.812500
