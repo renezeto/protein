@@ -1,0 +1,11 @@
+1. finish pygui.py
+currently can do one shape, one simulation at a time. will change later.
+add physical parameter info for each shape
+account for dummy values
+update protein.pl
+
+2. standardize file naming?
+
+3. higher resolution plot information
+
+
