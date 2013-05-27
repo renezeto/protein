@@ -1,8 +1,0 @@
-from Tkinter import *
-root = Tk()
-
-# create a menu
-menu = Menu(root)
-
-def callback():
-    print "called the callback!"
