@@ -37,6 +37,6 @@ def average_location(): #this function only works with a plane of data right now
     return tsum/(t_steps-off)
 
 #matshow(average_location())
-contourf(axis[0],axis[1],average_location())
+contourf(axis[0],axis[1],average_location(),500)
 colorbar()
 show()
