@@ -17,7 +17,7 @@ for fn in glob.iglob('shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2
     dat_filenames.append(fn)
 dat_filenames = sorted(dat_filenames)
 dat_filenames.pop(0)
-t_steps = len(dat_filenames) 
+t_steps = len(dat_filenames)
 data_natp_set = array([np.loadtxt(dat_filenames[i]) for i in range(t_steps)])
 
 dx = .05 #microns
@@ -26,7 +26,7 @@ data_shape = [data.shape[n] for n in range(len(data.shape))]
 data_size = [data.shape[n]*dx for n in range(len(data.shape))]
 axis = [arange(0,data_size[n],dx) for n in range(len(data.shape))]
 cell_membrane = np.loadtxt('membrane.dat')
-print cell_membrane
+#print cell_membrane
 
 def unzip_membrane(memdat):
     x = []
@@ -88,7 +88,7 @@ def maxvectorplot(dataset):
     plt.figure()
     ax = plt.gca()
     ax.quiver(X,Y,U,V,angles='xy',scale_units='xy',scale=1,linewidths=.05)
-    scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1], marker='.')
+    #scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1], marker='.')
     plt.xlim((0,data_shape[0]))
     plt.ylim((0,data_shape[1]))
     show()
