@@ -23,7 +23,7 @@ double rate_de = .7;
 double rate_E = .093;
 const double nATP_starting_density = 1000.0;//proteins per micrometer
 const double nE_starting_density = 350.0;//proteins per micrometer
-const double density_factor = 5.0;
+const double density_factor = 15.0;
 
 const int n = 706;
 
@@ -454,6 +454,12 @@ int main (int argc, char *argv[]) {
   if (area_rating_file == NULL){
     printf("WAAAAAAAAAAAAAAAAAAAAAA\n");
   }
+  char * area_rating_out_two = new char[1024];
+  sprintf(area_rating_out_two, "shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  FILE *area_rating_file_two = fopen((const char *)area_rating_out_two,"w");
+  if (area_rating_file_two == NULL){
+    printf("WAAAAAAAAAAAAAAAAAAAAAA\n");
+  }
   fprintf(out_file,"finished opening area_rating file\n");
   set_insideArr(insideArr);
   fprintf(out_file,"Finished with inside Arr function\n");
@@ -471,25 +477,33 @@ int main (int argc, char *argv[]) {
         if(i==int(Nx/2)){
           if (insideArr[i*Ny*Nz+j*Nz+k]==true){
             double area_rating = 0;
-            for (int i2=0;i2<Nx;i2++){
+            double area_rating_two = 0;
+            for (int i2=0;i2<Nx;i2++){ // possible source of membrane.dat problem?
               for (int j2=0;j2<Ny;j2++){
                 for (int k2=0;k2<Nz;k2++){
                   if(i2!=i && j2!=j && k2!=k){
                     double dis = sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
-                    area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/dis;
+                    area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
+                    if (dis<A){
+                      area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2];
+                    }
                   }
                 }
               }
             }
             fprintf(area_rating_file,"%g\t%g\t%g\n",j*dx,k*dx,area_rating);
+            fprintf(area_rating_file_two,"%g\t%g\t%g\n",j*dx,k*dx,area_rating_two);
           } else {
             fprintf(area_rating_file,"%g\t%g\t%g\n",j*dx,k*dx,0.0);
+            fprintf(area_rating_file_two,"%g\t%g\t%g\n",j*dx,k*dx,0.0);
           }
         }
       }
     }
   }
+  fclose(area_rating_file_two);
   fclose(area_rating_file);
+  fprintf(out_file,"area_rating_two file is using %g as the radius of the sphere its looking at areas in",A);
   fprintf(out_file,"Finished writing to the area_rating file!\n");
   fprintf(out_file,"Total cell volume = %g\nTotal cell area = %g\n",total_cell_volume,total_cell_area);
   char* outfilename = new char[1024];
@@ -1060,7 +1074,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(k>density_divider_z && j>density_divider_y){
+          if(k>density_divider_z){
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor;
           } else {
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density;
@@ -1073,7 +1087,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(k>density_divider_z && j>density_divider_y){
+          if(k>density_divider_z){
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor;
           }
           else {
