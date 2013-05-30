@@ -5,7 +5,7 @@ import numpy as np
 import time
 import sys
 
-t_steps = 14
+t_steps = 9
 cellshape = sys.argv[1]
 dimA = sys.argv[2]
 dimB = sys.argv[3]
@@ -62,7 +62,7 @@ def timemax(B,ylen):
         A = numpy.loadtxt(B[d+1])
         Z[d+1] = maxnum(A,ylen)
     maxval = max(Z)
-    return maxval
+    return maxval/4.0
 
 def timemin(B,ylen):
     Z = [0]*t_steps
@@ -73,7 +73,7 @@ def timemin(B,ylen):
     return minval
     
 
-def contourplt(B):
+def contourplt(B,title):
     pylab.ion()
     A = numpy.loadtxt(B[0])
     minval = timemin(B,A.shape[0])
@@ -85,7 +85,7 @@ def contourplt(B):
         Z, Y = np.meshgrid(zlen, ylen)
         pylab.ylabel('Y axis position')
         pylab.xlabel('Z axis position')
-        pylab.title('density at time: '+repr(5*(k+1))+'s')
+        pylab.title(title +' density at time: '+repr(5*(k+1))+'s')
         mylevel = np.arange(minval,maxval+10,5)
         CS = plt.contourf(Z, Y, A, cmap=plt.cm.jet,origin='lower',levels=mylevel)
         cbar = plt.colorbar(CS)
@@ -94,12 +94,12 @@ def contourplt(B):
         dt = 1
         time.sleep(dt)
         plt.axes().set_aspect('equal')
-        pylab.draw()           
+        pylab.draw()
         clf()
     print('graph done')
     close()
     
-contourplt(nATP)
-contourplt(nADP)
-contourplt(ne)
-contourplt(nd)
+contourplt(nATP,"nATP")
+contourplt(nADP,"nADP")
+contourplt(ne,"ne")
+contourplt(nd,"nd")
