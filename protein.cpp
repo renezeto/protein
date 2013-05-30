@@ -574,7 +574,7 @@ int main (int argc, char *argv[]) {
   bef_total_N = bef_total_NATP*2 + bef_total_NADP*2 + bef_total_NE + bef_total_Nde*3 + bef_total_Nd*2;
   //moved membrane
   char *outfilenameStart = new char[1000];
-  sprintf(outfilenameStart, "starting_natp.dat");
+  //sprintf(outfilenameStart, "starting_natp.dat");
   FILE *nATPStartfile = fopen((const char *)outfilenameStart,"w");
   delete[] outfilenameStart;
   for (int a=0;a<Ny;a++){
