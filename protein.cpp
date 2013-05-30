@@ -350,7 +350,7 @@ int main (int argc, char *argv[]) {
     Nz = ceil(2*B/dx) + 4;
   }
   char * out_file_name = new char[1024];
-  sprintf(out_file_name,"/data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
 
   time_t t = time(0);   // get time now
@@ -419,7 +419,7 @@ int main (int argc, char *argv[]) {
   bool force_to_generate_new_memA = true;
   if (mem_f_shape=="randst") {
     char* memA_name = new char[1024];
-    sprintf(memA_name,"/data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
+    sprintf(memA_name,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
     FILE *memAin = fopen(memA_name,"r");
     if (!memAin || force_to_generate_new_memA) {
       if (memAin && force_to_generate_new_memA) fclose(memAin);
@@ -427,7 +427,7 @@ int main (int argc, char *argv[]) {
       set_membrane(out_file, mem_f, mem_A);
       fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A\n");
       char* memA_out = new char[1024];
-      sprintf(memA_out,"/data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.0f.dat",A,B,C,D,density_factor);
+      sprintf(memA_out,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.0f.dat",A,B,C,D,density_factor);
       FILE *memAout = fopen((const char *)memA_out,"w");
       for (int i=0;i<Nx*Ny*Nz;i++) {
         fprintf(memAout, "%g\t",mem_A[i]);
@@ -449,7 +449,7 @@ int main (int argc, char *argv[]) {
     fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A and its not randst and Nx is = %d\n",Nx);
   }
   char * area_rating_out = new char[1024];
-  sprintf(area_rating_out, "/data/shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(area_rating_out, "data/shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *area_rating_file = fopen((const char *)area_rating_out,"w");
   if (area_rating_file == NULL){
     printf("WAAAAAAAAAAAAAAAAAAAAAA\n");
@@ -499,7 +499,7 @@ int main (int argc, char *argv[]) {
   //   sprintf(outfilename,"membrane.dat");
   // }
   // made membrane.dat print for each shape below (i hope)
-  sprintf(outfilename,"/data/shape-%s/membrane_files/membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(outfilename,"data/shape-%s/membrane_files/membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
   double marker;
   double inmarker;
@@ -522,7 +522,7 @@ int main (int argc, char *argv[]) {
   if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
     char *f_file_name = new char[1024];
     if(f_file_name==NULL){fprintf(out_file,"OOOOOOOOOOOOOOOH no.");exit(1);}
-    sprintf(f_file_name,"/data/shape-%s/membrane_files/f_membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat", mem_f_shape.c_str(),A,B,C,D,density_factor);
+    sprintf(f_file_name,"data/shape-%s/membrane_files/f_membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat", mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *f_file = fopen((const char *)f_file_name,"w");
     double x = Nx/2.0*dx;
     for (int i=0;i<Ny;i++) {
@@ -603,7 +603,7 @@ int main (int argc, char *argv[]) {
       //if(i>30){exit(1);}
       //int k = i/iter_at_half_sec;
       char *outfilenameATP = new char[1000];
-      sprintf(outfilenameATP, "/data/shape-%s/natp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameATP, "data/shape-%s/natp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
       for (int a=0;a<Ny;a++){
@@ -615,7 +615,7 @@ int main (int argc, char *argv[]) {
       fclose(nATPfile);
       fprintf(out_file,"printed out new file = natp\n");
       char *outfilenameE = new char[1000];
-      sprintf(outfilenameE, "/data/shape-%s/ne-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameE, "data/shape-%s/ne-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
       for (int a=0;a<Ny;a++){
@@ -627,7 +627,7 @@ int main (int argc, char *argv[]) {
       fclose(nEfile);
       fprintf(out_file,"printed out new file = nadp\n");
       char *outfilenameADP = new char[1000];
-      sprintf(outfilenameADP, "/data/shape-%s/nadp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameADP, "data/shape-%s/nadp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
       FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
       delete[] outfilenameADP;
       for (int a=0;a<Ny;a++){
@@ -639,7 +639,7 @@ int main (int argc, char *argv[]) {
       fclose(nADPfile);
       fprintf(out_file,"printed out new file = nadp\n");
       char *outfilenameD = new char[1000];
-      sprintf(outfilenameD, "/data/shape-%s/nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameD, "data/shape-%s/nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
       FILE *nDfile = fopen((const char *)outfilenameD,"w");
       delete[] outfilenameD;
       for (int a=0;a<Ny;a++){
