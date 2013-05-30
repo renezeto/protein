@@ -17,7 +17,7 @@ for fn in glob.iglob('../data/shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+
     dat_filenames.append(fn)
 dat_filenames = sorted(dat_filenames)
 dat_filenames.pop(0)
-t_steps = len(dat_filenames) 
+t_steps = len(dat_filenames)
 data_natp_set = array([np.loadtxt(dat_filenames[i]) for i in range(t_steps)])
 
 dx = .05 #microns
@@ -25,7 +25,9 @@ data = data_natp_set[0] #retrieves data format.
 data_shape = [data.shape[n] for n in range(len(data.shape))]
 data_size = [data.shape[n]*dx for n in range(len(data.shape))]
 axis = [arange(0,data_size[n],dx) for n in range(len(data.shape))]
+
 cell_membrane = np.loadtxt('membrane.dat') #update membrane.dat filename syntax
+
 
 def unzip_membrane(memdat):
     x = []
@@ -87,7 +89,11 @@ def maxvectorplot(dataset):
     plt.figure()
     ax = plt.gca()
     ax.quiver(X,Y,U,V,angles='xy',scale_units='xy',scale=1,linewidths=.05)
+<<<<<<< HEAD:extrema.py
+    #scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1], marker='.')
+=======
 #    scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1], marker='.')
+>>>>>>> 541a87a02008f4ac1b4e28dc7bdf163be85b54d5:pyplots/extrema.py
     plt.xlim((0,data_shape[0]))
     plt.ylim((0,data_shape[1]))
     show()
