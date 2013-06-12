@@ -113,13 +113,13 @@ double f_2D_triangle(double y, double z){
   double b3 = (z2-z3)/(y2-y3); double a3 = z3 - b3*y3;
   double zl1 = b1*y +a1;
   double zl3 = b3*y +a3;
-  double rad = D*sqrt(3.0)*B/6.0;
-  double y_circle = Y/2.0; double z_circle = z1 + 2*rad;
-  if (z < zl1 && z < zl3 && /*z > z1 &&*/ ((z-z_circle)*(z-z_circle) + (y-y_circle)*(y-y_circle)) < rad*rad){
+  double rad = 1.75*(y2-y1)*sqrt(3.0)/6.0;
+  double y_circle = Y/2.0; double z_circle = z1 + sqrt(3)*(y2-y1)/6.0;
+  if ((z < zl1) && (z < zl3) && (z > z1) && ((z-z_circle)*(z-z_circle) + (y-y_circle)*(y-y_circle)) < rad*rad){
     //printf("rad = %g \n",rad);
-    f = -0.01;
+    f = -0.1;
   } else {
-    f = 0.01;
+    f = 0.1;
   }
   return f;
 }
@@ -455,7 +455,7 @@ int main (int argc, char *argv[]) {
     printf("WAAAAAAAAAAAAAAAAAAAAAA\n");
   }
   char * area_rating_out_two = new char[1024];
-  sprintf(area_rating_out_two, "shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(area_rating_out_two, "data/shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *area_rating_file_two = fopen((const char *)area_rating_out_two,"w");
   if (area_rating_file_two == NULL){
     printf("WAAAAAAAAAAAAAAAAAAAAAA\n");
@@ -465,12 +465,12 @@ int main (int argc, char *argv[]) {
   fprintf(out_file,"Finished with inside Arr function\n");
   double total_cell_volume = 0;
   double total_cell_area = 0;
-  for (int i=0;i<Nx*Ny*Nz;i++){ 
+  for (int i=0;i<Nx*Ny*Nz;i++){
     if (insideArr[i]==true) {
       total_cell_volume += dx*dx*dx;
     }
   }
-  for (int i=0;i<Nx;i++){ 
+  for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         total_cell_area += mem_A[i*Ny*Nz+j*Nz+k];
@@ -482,9 +482,9 @@ int main (int argc, char *argv[]) {
               for (int j2=0;j2<Ny;j2++){
                 for (int k2=0;k2<Nz;k2++){
                   if(i2!=i && j2!=j && k2!=k){
-                    double dis = sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
+                    double dis = dx*sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
                     area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
-                    if (dis<A){
+                    if (dis<1.5*A){
                       area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2];
                     }
                   }
@@ -506,6 +506,7 @@ int main (int argc, char *argv[]) {
   fprintf(out_file,"area_rating_two file is using %g as the radius of the sphere its looking at areas in",A);
   fprintf(out_file,"Finished writing to the area_rating file!\n");
   fprintf(out_file,"Total cell volume = %g\nTotal cell area = %g\n",total_cell_volume,total_cell_area);
+  fflush(out_file);
   char* outfilename = new char[1024];
   // if (mem_f_shape == "randst" || mem_f_shape == "TIE_fighter" || mem_f_shape == "triangle") {
   //   sprintf(outfilename,"membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
@@ -549,9 +550,14 @@ int main (int argc, char *argv[]) {
     fflush(stdout);
   }
   fprintf (out_file,"membrane set with density in it!\n");
+  fflush(out_file);
   set_density(nATP,nE, mem_A);
+  printf("helooooooooo???\n");
+  printf ("nATP_starting density = %g and nE_starting_density = %g and density_factor = %g",
+          nATP_starting_density, nE_starting_density, density_factor);
   fprintf (out_file,"nATP_starting density = %g and nE_starting_density = %g and density_factor = %g",
            nATP_starting_density, nE_starting_density, density_factor);
+  fflush(out_file);
   double bef_total_NATP=0;
   double bef_total_NADP=0;
   double bef_total_NE=0;
@@ -573,18 +579,20 @@ int main (int argc, char *argv[]) {
   }
   bef_total_N = bef_total_NATP*2 + bef_total_NADP*2 + bef_total_NE + bef_total_Nde*3 + bef_total_Nd*2;
   //moved membrane
-  char *outfilenameStart = new char[1000];
-  //sprintf(outfilenameStart, "starting_natp.dat");
-  FILE *nATPStartfile = fopen((const char *)outfilenameStart,"w");
-  delete[] outfilenameStart;
-  for (int a=0;a<Ny;a++){
-    for (int b=0;b<Nz;b++){
-      //printf("nATP is %g\n", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-      fprintf(nATPStartfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-    }
-    fprintf(nATPStartfile, "\n");
-  }
-  fclose(nATPStartfile);
+  // char *outfilenameStart = new char[1000];
+  // //sprintf(outfilenameStart, "starting_natp.dat");
+  // FILE *nATPStartfile = fopen((const char *)outfilenameStart,"w");
+  // delete[] outfilenameStart;
+  // printf("Got here first!!!!!!!!!!!!!!!!!!!!!\n");
+  // for (int a=0;a<Ny;a++){
+  //   for (int b=0;b<Nz;b++){
+  //     //printf("nATP is %g\n", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+  //     fprintf(nATPStartfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+  //   }
+  //   fprintf(nATPStartfile, "\n");
+  // }
+  // fclose(nATPStartfile);
+  printf("Got here second !!!!!!!!!!!!!!!!!!!!!\n");
   int percent = int(iter/100);
   double time_for_percent;
   bool check = true;
@@ -665,6 +673,7 @@ int main (int argc, char *argv[]) {
       fclose(nDfile);
       fprintf(out_file,"printed out new file = nd\n");
       k++;
+      fflush(out_file);
     }
   }
   for (int i=0;i<Nx*Ny*Nz;i++){
@@ -687,6 +696,7 @@ int main (int argc, char *argv[]) {
   fprintf(out_file,"total after Nd is = %f\n",total_Nd);
   fprintf(out_file,"total after Nde is = %f\n",total_Nde);
   fprintf(out_file,"total after N is = %f\n",total_N);
+  fflush(out_file);
 
   cout << "Program has Run!!\n";
   fclose(out_file);
@@ -1083,6 +1093,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
+  printf("first I got here\n");
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
@@ -1091,12 +1102,13 @@ int set_density(double *nATP, double *nE, double *mem_A){
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor;
           }
           else {
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density;
           }
         }
       }
     }
   }
+  printf("Then I got here!!!\n");
   for (int i=0;i<Nx*Ny*Nz;i++) {
     nADP[i] = 0;
     Nd[i] = 0;
