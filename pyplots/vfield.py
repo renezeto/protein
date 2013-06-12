@@ -16,7 +16,7 @@ f_param4 = sys.argv[5]
 f_seed = sys.argv[6]
 
 dat_filenames = []
-for fn in glob.iglob('../data/shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_seed+'*.dat'):
+for fn in glob.iglob('./data/shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_seed+'*.dat'):
         dat_filenames.append(fn)
 dat_filenames = sorted(dat_filenames)
 dat_filenames.pop(0)

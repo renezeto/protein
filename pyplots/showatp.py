@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 import sys
+import glob
 
 f_shape = sys.argv[1]
 f_param1 = sys.argv[2]
@@ -11,13 +12,19 @@ f_param2 = sys.argv[3]
 f_param3 = sys.argv[4]
 f_param4 = sys.argv[5]
 #f_density = sys.argv[6]
-f_seed = sys.argv[6]
+f_param5 = sys.argv[6]
+
+#for fn in glob.iglob('../data/shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
+#        dat_filenames.append(fn)
 
 dat_filenames = []
-for fn in glob.iglob('../data/shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_seed+'*.dat'):
+for fn in glob.iglob('./data/shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
         dat_filenames.append(fn)
 dat_filenames = sorted(dat_filenames)
-dat_filenames.pop(0)
+print "Filenames are: "
+print f_param5
+for i in range(4):
+        dat_filenames.pop(0)
 t_steps = len(dat_filenames)
 data_natp_set = array([np.loadtxt(dat_filenames[i]) for i in range(t_steps)])
 
@@ -46,7 +53,7 @@ def minnum(page):
 def timemax(dataset):
     Z = [0. for i in range(t_steps)]
     for i in (range(t_steps-1)):
-        page = numpy.loadtxt(B[i+1])
+        page = dataset[i+1]
         Z[i+1] = maxnum(page)
     maxval = max(Z)
     return maxval
@@ -54,7 +61,7 @@ def timemax(dataset):
 def timemin(dataset):
     Z = [0. for i in range(t_steps)]
     for i in (range(t_steps-1)):
-        page = numpy.loadtxt(B[i+1])
+        page = dataset[i+1]
         Z[i+1] = minnum(page)
     minval = min(Z)
     return minval
@@ -64,7 +71,7 @@ def contourplt(dataset):
     minval = timemin(dataset)
     maxval = timemax(dataset)
     for k in range(len(dataset)):
-        page = numpy.loadtxt(dataset[k])
+        page = dataset[k]
         Z, Y = np.meshgrid(np.arange(0,data.shape[1],1), np.arange(0,data.shape[0],1))
         pylab.ylabel('Y axis position')
         pylab.xlabel('Z axis position')
@@ -76,12 +83,12 @@ def contourplt(dataset):
         dt = 1
         time.sleep(dt)
         plt.axes().set_aspect('equal')
-        pylab.draw()           
+        pylab.draw()
         clf()
     print('graph done')
     close()
-    
-contourplt(nATP)
+
+contourplt(data_natp_set)
 
 ## old file importing - has been replaced with a better method
 # nATP = ['natp']*(t_steps)
