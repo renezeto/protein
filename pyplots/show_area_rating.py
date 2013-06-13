@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 
-fname = "shape-" + str(sys.argv[1]) + "/area_rating_two-" + str(sys.argv[2]) + "-" + str(sys.argv[3]) + "-" + str(sys.argv[4]) + "-" + str(sys.argv[5]) + "-" + str(sys.argv[6]) + ".dat"
+fname = "data/shape-" + str(sys.argv[1]) + "/area_rating_two-" + str(sys.argv[2]) + "-" + str(sys.argv[3]) + "-" + str(sys.argv[4]) + "-" + str(sys.argv[5]) + "-" + str(sys.argv[6]) + ".dat"
 print fname
 A = np.loadtxt(fname, dtype = float)
 8/.05 +4
@@ -48,7 +48,7 @@ for i in range(A.shape[0]):
         min_rating = A[i][2]
 
 area_rating = unzip(A)
-mylevel = np.arange(0,0.1,.001)
+mylevel = np.arange(0,1.7,.001)
 contourf(Y,Z,area_rating,cmap=plt.cm.jet,levels=mylevel)
 colorbar()
 show()
