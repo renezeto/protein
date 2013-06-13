@@ -26,9 +26,7 @@ data_shape = [data.shape[n] for n in range(len(data.shape))]
 data_size = [data.shape[n]*dx for n in range(len(data.shape))]
 axis = [arange(0,data_size[n],dx) for n in range(len(data.shape))]
 
-cell_membrane = loadtxt('./data/shape-'+f_shape+'/membrane_files/membrane-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.dat')
-
-
+#cell_membrane = loadtxt('./data/shape-'+f_shape+'/membrane_files/membrane-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.dat')
 
 def unzip_membrane(memdat):
     x = []
@@ -60,13 +58,52 @@ def globalmax(page):
                 gmax = [lmax[i]]
             elif (lmax[i][2] == gmax[0][2]):
                 gmax += [lmax[i]]
-                # if gmax[0] == 0.:
-                #     gmax.pop(0) #need to check this 
+                if gmax[0] == 0.:
+                    gmax.pop(0) #need to check this 
     else:
         return "empty"
     if len(gmax)>1:
         gmax.pop(1)
     return gmax
+
+# X, Y = meshgrid(arange(0,6,dx),arange(0,6,dx))
+# Z = [0. for i in range(20)]
+# one = ones_like(X)
+# for t in range(20):
+#     Z[t] = exp(-(X-one*t*(6/20))**2 - (Y-one*t*(6/20))**2)
+# #z is a moving guassian with constant (1.0) amplitude.
+
+# print "Debugging extrema.py, with our friend, the moving guassian distribution."
+# # print "global maxima:"
+# # for i in range(20):
+# #     print globalmax(Z[i])
+
+# # print "local maxima:"
+# # for i in range(20):
+# #     print localmax(Z[i])
+
+# print "now lets add some time dependence to the amplitude so we have local maxima in time as well:"
+# for t in range(20):
+#     Z[t] = exp(-(X-one*t*(6/20))**2 - (Y-one*t*(6/20))**2)*sin(one*t*(6/20)) #periodic amplitude
+
+# print "global maxima:"
+# for i in range(20):
+#     print globalmax(Z[i])
+
+# print "local maxima in time:"
+# #prune the "empty"'s:
+# A = []
+# for t in range(20):
+#     if globalmax(Z[t]) != "empty":
+#         A += globalmax(Z[t])
+
+# print A
+
+# for t in range(1,len(A)-1):
+#     if (A[t][2]>A[t-1][2]) and (A[t][2]>A[t+1][2]):
+#         print A[t]
+
+# #hooray! working algorithm.
 
 def maxtracker(dataset):
     locs = zeros_like(dataset[0])
@@ -81,15 +118,19 @@ def maxtracker(dataset):
 def maxvectorplot(dataset):
     positions = []
     displacements = []
-    for t in range(1,t_steps-1):
-        if type(globalmax(dataset[t])) != type('empty'): #bug - empty globalmaxs are getting through this if statement
-            print t
-            print globalmax(dataset[t+1])
-            print globalmax(dataset[t+1])[0][2]
-            if (globalmax(dataset[t])[0][2] > globalmax(dataset[t+1])[0][2]) and (globalmax(dataset[t])[0][2] > globalmax(dataset[t-1])[0][2]):
-                    positions += [[globalmax(dataset[t])[0][0],globalmax(dataset[t])[0][1]]]
+    nonempty = []
+    for t in range(t_steps):
+        if globalmax(dataset[t]) != "empty":
+            nonempty += globalmax(dataset[t])
+    print nonempty
+    for i in range(1,len(nonempty)-1):
+        if (nonempty[i][2]>nonempty[i-1][2]) and (nonempty[i][2]>nonempty[i+1][2]):
+            print "got here"
+            positions += [[nonempty[i][0],nonempty[i][1]]]
+    print positions
     for i in range(1,len(positions)):
         displacements += [[positions[i-1][0],positions[i-1][1],positions[i][0]-positions[i-1][0],positions[i][1]-positions[i-1][1]]] #[tail_x, tail_y, head_x, head_y]
+    print displacements
     X,Y,U,V = zip(*displacements)
     plt.figure()
     ax = plt.gca()
