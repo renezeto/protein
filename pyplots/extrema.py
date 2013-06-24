@@ -66,55 +66,6 @@ def globalmax(page):
         gmax.pop(1)
     return gmax
 
-# X, Y = meshgrid(arange(0,6,dx),arange(0,6,dx))
-# Z = [0. for i in range(20)]
-# one = ones_like(X)
-# for t in range(20):
-#     Z[t] = exp(-(X-one*t*(6/20))**2 - (Y-one*t*(6/20))**2)
-# #z is a moving guassian with constant (1.0) amplitude.
-
-# print "Debugging extrema.py, with our friend, the moving guassian distribution."
-# # print "global maxima:"
-# # for i in range(20):
-# #     print globalmax(Z[i])
-
-# # print "local maxima:"
-# # for i in range(20):
-# #     print localmax(Z[i])
-
-# print "now lets add some time dependence to the amplitude so we have local maxima in time as well:"
-# for t in range(20):
-#     Z[t] = exp(-(X-one*t*(6/20))**2 - (Y-one*t*(6/20))**2)*sin(one*t*(6/20)) #periodic amplitude
-
-# print "global maxima:"
-# for i in range(20):
-#     print globalmax(Z[i])
-
-# print "local maxima in time:"
-# #prune the "empty"'s:
-# A = []
-# for t in range(20):
-#     if globalmax(Z[t]) != "empty":
-#         A += globalmax(Z[t])
-
-# print A
-
-# for t in range(1,len(A)-1):
-#     if (A[t][2]>A[t-1][2]) and (A[t][2]>A[t+1][2]):
-#         print A[t]
-
-# #hooray! working algorithm.
-
-def maxtracker(dataset):
-    locs = zeros_like(dataset[0])
-    for t in range(1,t_steps-1):
-        if globalmax(dataset[t]) != "empty":
-            for i in range(len(globalmax(dataset[t]))):
-                if (globalmax(dataset[t])[i] > globalmax(dataset[t+1])[i]) and (globalmax(dataset[t])[i] > globalmax(dataset[t-1])[i]):
-                    x, y, m = globalmax(dataset[t])[i] #[i] accounting for possibility of multiple maxima
-                    locs[x][y] = m
-    return locs
-
 def maxvectorplot(dataset):
     positions = []
     displacements = []
@@ -123,9 +74,9 @@ def maxvectorplot(dataset):
         if globalmax(dataset[t]) != "empty":
             nonempty += globalmax(dataset[t])
     print nonempty
+    print "done"
     for i in range(1,len(nonempty)-1):
         if (nonempty[i][2]>nonempty[i-1][2]) and (nonempty[i][2]>nonempty[i+1][2]):
-            print "got here"
             positions += [[nonempty[i][0],nonempty[i][1]]]
     print positions
     for i in range(1,len(positions)):
