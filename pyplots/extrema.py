@@ -26,7 +26,8 @@ data_shape = [data.shape[n] for n in range(len(data.shape))]
 data_size = [data.shape[n]*dx for n in range(len(data.shape))]
 axis = [arange(0,data_size[n],dx) for n in range(len(data.shape))]
 
-#cell_membrane = loadtxt('./data/shape-'+f_shape+'/membrane_files/membrane-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.dat')
+
+cell_membrane = loadtxt('./data/shape-'+f_shape+'/membrane_files/membrane-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.dat')
 
 def unzip_membrane(memdat):
     x = []
@@ -73,23 +74,19 @@ def maxvectorplot(dataset):
     for t in range(t_steps):
         if globalmax(dataset[t]) != "empty":
             nonempty += globalmax(dataset[t])
-    print nonempty
-    print "done"
     for i in range(1,len(nonempty)-1):
         if (nonempty[i][2]>nonempty[i-1][2]) and (nonempty[i][2]>nonempty[i+1][2]):
             positions += [[nonempty[i][0],nonempty[i][1]]]
-    print positions
     for i in range(1,len(positions)):
         displacements += [[positions[i-1][0],positions[i-1][1],positions[i][0]-positions[i-1][0],positions[i][1]-positions[i-1][1]]] #[tail_x, tail_y, head_x, head_y]
-    print displacements
+    testv = array([[0,0,1,2], [1,2,2,3], [2,3,4,5], [4,5,6,8]])
     X,Y,U,V = zip(*displacements)
     plt.figure()
     ax = plt.gca()
-    ax.quiver(X,Y,U,V,angles='xy',scale=1,linewidths=.05)
-#    scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1], marker='.')
+    ax.quiver(X,Y,U,V)
     plt.xlim((0,data_shape[0]))
     plt.ylim((0,data_shape[1]))
-    print displacements
+    scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1])
     show()
     return 0
 
