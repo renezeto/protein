@@ -60,7 +60,7 @@ def globalmax(page):
             elif (lmax[i][2] == gmax[0][2]):
                 gmax += [lmax[i]]
                 if gmax[0] == 0.:
-                    gmax.pop(0) #need to check this 
+                    gmax.pop(0)
     else:
         return "empty"
     if len(gmax)>1:
@@ -77,13 +77,16 @@ def maxvectorplot(dataset):
     for i in range(1,len(nonempty)-1):
         if (nonempty[i][2]>nonempty[i-1][2]) and (nonempty[i][2]>nonempty[i+1][2]):
             positions += [[nonempty[i][0],nonempty[i][1]]]
+    print "these are the position vectors to calculate displacements between:"
+    print positions
     for i in range(1,len(positions)):
-        displacements += [[positions[i-1][0],positions[i-1][1],positions[i][0]-positions[i-1][0],positions[i][1]-positions[i-1][1]]] #[tail_x, tail_y, head_x, head_y]
-    testv = array([[0,0,1,2], [1,2,2,3], [2,3,4,5], [4,5,6,8]])
+        displacements += [[positions[i-1][0],positions[i-1][1],positions[i][0]-positions[i-1][0],positions[i][1]-positions[i-1][1]]]
+    print "these are the vectors I want to plot, with form: [x coord, y coord, x component, y component]"
+    print displacements
     X,Y,U,V = zip(*displacements)
     plt.figure()
     ax = plt.gca()
-    ax.quiver(X,Y,U,V)
+    ax.quiver(X,Y,U,V,angles='xy',scale_units='xy',scale=1)
     plt.xlim((0,data_shape[0]))
     plt.ylim((0,data_shape[1]))
     scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1])
