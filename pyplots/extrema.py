@@ -84,12 +84,14 @@ def maxvectorplot(dataset):
     print "these are the vectors I want to plot, with form: [x coord, y coord, x component, y component]"
     print displacements
     X,Y,U,V = zip(*displacements)
-    plt.figure()
+    figure()
     ax = plt.gca()
     ax.quiver(X,Y,U,V,angles='xy',scale_units='xy',scale=1)
-    plt.xlim((0,data_shape[0]))
-    plt.ylim((0,data_shape[1]))
+    xlim((0,data_shape[0]))
+    ylim((0,data_shape[1]))
     scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1])
+    savefig('./data/shape-'+f_shape+'/plots/extrema-natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
+    #this only does it for NATP right now. will need to automate for other protein types later.
     show()
     return 0
 
