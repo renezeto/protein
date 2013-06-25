@@ -4,9 +4,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+f_shape = sys.argv[1]
+f_param1 = sys.argv[2]
+f_param2 = sys.argv[3]
+f_param3 = sys.argv[4]
+f_param4 = sys.argv[5]
+f_param5 = sys.argv[6]
 
 fname = "data/shape-" + str(sys.argv[1]) + "/area_rating_two-" + str(sys.argv[2]) + "-" + str(sys.argv[3]) + "-" + str(sys.argv[4]) + "-" + str(sys.argv[5]) + "-" + str(sys.argv[6]) + ".dat"
-print fname
+#print fname
 A = np.loadtxt(fname, dtype = float)
 8/.05 +4
 if sys.argv[1] == "randst" or sys.argv[1] == "triangle":
@@ -15,13 +21,13 @@ if sys.argv[1] == "randst" or sys.argv[1] == "triangle":
 if sys.argv[1] == "p":
     max_y = 2*float(sys.argv[3])
     max_z = float(sys.argv[2])+2*float(sys.argv[3])
-print "max_y " + str(max_y)
+#print "max_y " + str(max_y)
 width_y = int(max_y/0.05+4.0)
 width_z = int(max_z/0.05+4.0)
-print len(A[:,0])
-print width_y
-print width_z
-print "width_y*width_z = " + str(width_y*width_z)
+#print len(A[:,0])
+#print width_y
+#print width_z
+#print "width_y*width_z = " + str(width_y*width_z)
 
 y = np.zeros(width_y)
 z = np.zeros(width_z)
@@ -51,4 +57,8 @@ area_rating = unzip(A)
 mylevel = np.arange(0,1.7,.001)
 contourf(Y,Z,area_rating,cmap=plt.cm.jet,levels=mylevel)
 colorbar()
-show()
+savefig('./data/shape-'+f_shape+'/plots/show_area_rating-natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
+#this only does it for NATP right now. will need to automate for other protein types later.
+print "show_area_rating plot generated."
+
+#show()

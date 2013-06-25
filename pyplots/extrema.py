@@ -77,12 +77,8 @@ def maxvectorplot(dataset):
     for i in range(1,len(nonempty)-1):
         if (nonempty[i][2]>nonempty[i-1][2]) and (nonempty[i][2]>nonempty[i+1][2]):
             positions += [[nonempty[i][0],nonempty[i][1]]]
-    print "these are the position vectors to calculate displacements between:"
-    print positions
     for i in range(1,len(positions)):
         displacements += [[positions[i-1][0],positions[i-1][1],positions[i][0]-positions[i-1][0],positions[i][1]-positions[i-1][1]]]
-    print "these are the vectors I want to plot, with form: [x coord, y coord, x component, y component]"
-    print displacements
     X,Y,U,V = zip(*displacements)
     figure()
     ax = plt.gca()
@@ -92,7 +88,7 @@ def maxvectorplot(dataset):
     scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1])
     savefig('./data/shape-'+f_shape+'/plots/extrema-natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
     #this only does it for NATP right now. will need to automate for other protein types later.
-    show()
+    print "extrema plot generated."
     return 0
 
 maxvectorplot(data_natp_set)

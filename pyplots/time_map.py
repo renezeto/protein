@@ -33,12 +33,10 @@ def average_location(dataset):
             tsum += dataset[t]
     return tsum/(t_steps)
 
-print len(axis[0]), len(axis[1]), shape(average_location(data_natp_set))
-
 #matshow(average_location())
 figure()
 contourf(axis[1],axis[0],average_location(data_natp_set),500)
 colorbar()
 savefig('./data/shape-'+f_shape+'/plots/time_map-natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
 #this only does it for NATP right now. will need to automate for other protein types later.
-show()
+print "time_map plot generated."
