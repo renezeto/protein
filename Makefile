@@ -1,12 +1,22 @@
 #CXXFLAGS = -g -O3
 CXXFLAGS = -g -Wall -Werror
 
+.SUFFIXES: .tex .dvi .ps .bib .bbl .pdf .fig .eps .aux .jpg .png .svg \
+		.gp .mf .2602gf .pl .xgr
+
 #OBJECTS = grid.h showDensity.
 
-all : protein
+all : protein #paper/paper.pdf
+
+#FIGURES=$(patsubst %.pdf)
 
 clean:
 	rm -f *.o protein
+
+plots:
+	sh runplots.sh randst 0.50 6.00 8.00 98.00 15.00
+
+# ne-randst-0.50-6.00-8.00-98.00-15.00-296.dat
 
 #protein: test.o #foo.o
 
