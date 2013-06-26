@@ -349,6 +349,38 @@ int main (int argc, char *argv[]) {
     Ny = ceil(2*A/dx) + 4;
     Nz = ceil(2*B/dx) + 4;
   }
+
+  //printing to a catalog for each directory so we know what we've run.
+
+  char *fname = new char[1024];
+  sprintf(fname,"data/shape-%s/catalog.txt",mem_f_shape.c_str());
+  FILE * catalog;
+  int catalog_exists;
+
+  time_t rawtime;
+  struct tm * timeinfo;
+
+  time (&rawtime);
+  timeinfo = localtime (&rawtime);
+
+  catalog = fopen(fname,"r");
+  if (catalog==NULL) {
+    catalog_exists=0;
+  }
+  else {
+    catalog_exists=1;
+    fclose(catalog);
+  }
+  if (catalog_exists==1) {
+    catalog=fopen(fname,"a+b");
+  }
+  else { 
+    catalog=fopen(fname,"w+b");
+  }
+  if (catalog!=NULL) {
+    fprintf(catalog," %s %1.2f %1.2f %1.2f %1.2f %1.2f\n", mem_f_shape.c_str(),A,B,C,D,density_factor);
+    fclose(catalog);
+  }
   char * out_file_name = new char[1024];
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
@@ -478,7 +510,7 @@ int main (int argc, char *argv[]) {
           if (insideArr[i*Ny*Nz+j*Nz+k]==true){
             double area_rating = 0;
             double area_rating_two = 0;
-            for (int i2=0;i2<Nx;i2++){ // possible source of membrane.dat problem?
+            for (int i2=0;i2<Nx;i2++){
               for (int j2=0;j2<Ny;j2++){
                 for (int k2=0;k2<Nz;k2++){
                   if(i2!=i && j2!=j && k2!=k){

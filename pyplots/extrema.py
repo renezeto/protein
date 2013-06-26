@@ -82,7 +82,7 @@ def maxvectorplot(dataset):
     X,Y,U,V = zip(*displacements)
     figure()
     ax = plt.gca()
-    ax.quiver(X,Y,U,V,angles='xy',scale_units='xy',scale=1)
+    ax.quiver(X,Y,U,V,scale_units='xy',angles='xy',scale=1)
     xlim((0,data_shape[0]))
     ylim((0,data_shape[1]))
     scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1])
