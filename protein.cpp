@@ -11,23 +11,21 @@ using namespace std;
 #include <cassert>
 //  #include <ctime>
 
+double difD = 2.5; // (um)^2 s^-1 
+double difE = 2.5; // (um)^2 s^-1
+double rate_ADP_ATP = 1; // s^-1
+double rate_D = .025; // um s^-1
+double rate_dD = .0015; // (um)^3 s^-1 
+double rate_de = .7; // s^-1
+double rate_E = .093; // (um)^3 s^-1
 
-
-
-
-double difD = 2.5; double difE = 2.5;
-double rate_ADP_ATP = 1;
-double rate_D = .025;
-double rate_dD = .0015;
-double rate_de = .7;
-double rate_E = .093;
-const double nATP_starting_density = 1000.0;//proteins per micrometer
-const double nE_starting_density = 350.0;//proteins per micrometer
+const double nATP_starting_density = 1000.0; //proteins per micrometer
+const double nE_starting_density = 350.0; //proteins per micrometer
 const double density_factor = 15.0;
 
 const int n = 706;
 
-const double dx=0.05;
+const double dx=0.35;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;

@@ -15,7 +15,8 @@ clean:
 
 plots:
 	sh runplots.sh randst 0.50 6.00 8.00 98.00 15.00
-
+	sh runplots.sh p 1.5 1.0 1.1 0.0 15.0
+	sh runplots.sh p 1.5 1.0 0.0 0.0 15.0
 # ne-randst-0.50-6.00-8.00-98.00-15.00-296.dat
 
 #protein: test.o #foo.o

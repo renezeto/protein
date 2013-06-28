@@ -21,10 +21,10 @@ dat_filenames = []
 for fn in glob.iglob('./data/shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
         dat_filenames.append(fn)
 dat_filenames = sorted(dat_filenames)
-print "Filenames are: "
-print f_param5
+print dat_filenames
 for i in range(4):
         dat_filenames.pop(0)
+
 t_steps = len(dat_filenames)
 data_natp_set = array([np.loadtxt(dat_filenames[i]) for i in range(t_steps)])
 
