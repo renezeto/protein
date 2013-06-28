@@ -25,7 +25,7 @@ const double density_factor = 15.0;
 
 const int n = 706;
 
-const double dx=0.35;
+const double dx=0.05;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
@@ -347,42 +347,10 @@ int main (int argc, char *argv[]) {
     Ny = ceil(2*A/dx) + 4;
     Nz = ceil(2*B/dx) + 4;
   }
-
-  //printing to a catalog for each directory so we know what we've run.
-
-  char *fname = new char[1024];
-  sprintf(fname,"data/shape-%s/catalog.txt",mem_f_shape.c_str());
-  FILE * catalog;
-  int catalog_exists;
-
-  time_t rawtime;
-  struct tm * timeinfo;
-
-  time (&rawtime);
-  timeinfo = localtime (&rawtime);
-
-  catalog = fopen(fname,"r");
-  if (catalog==NULL) {
-    catalog_exists=0;
-  }
-  else {
-    catalog_exists=1;
-    fclose(catalog);
-  }
-  if (catalog_exists==1) {
-    catalog=fopen(fname,"a+b");
-  }
-  else { 
-    catalog=fopen(fname,"w+b");
-  }
-  if (catalog!=NULL) {
-    fprintf(catalog," %s %1.2f %1.2f %1.2f %1.2f %1.2f\n", mem_f_shape.c_str(),A,B,C,D,density_factor);
-    fclose(catalog);
-  }
   char * out_file_name = new char[1024];
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
-
+  
   time_t t = time(0);   // get time now
   struct tm * now = localtime( & t );
   char * time = new char[1024];
@@ -1143,6 +1111,39 @@ int set_density(double *nATP, double *nE, double *mem_A){
     nADP[i] = 0;
     Nd[i] = 0;
     Nde[i] = 0;
+  }
+
+  //printing to a catalog for each directory so we know what we've run.
+  char *fname = new char[1024];
+  sprintf(fname,"data/shape-%s/catalog.txt",mem_f_shape.c_str());
+
+
+  FILE * catalog;
+  int catalog_exists;
+
+  time_t rawtime;
+  struct tm * timeinfo;
+
+  time (&rawtime);
+  timeinfo = localtime (&rawtime);
+
+  catalog = fopen(fname,"r");
+  if (catalog==NULL) {
+    catalog_exists=0;
+  }
+  else {
+    catalog_exists=1;
+    fclose(catalog);
+  }
+  if (catalog_exists==1) {
+    catalog=fopen(fname,"a+b");
+  }
+  else { 
+    catalog=fopen(fname,"w+b");
+  }
+  if (catalog!=NULL) {
+    fprintf(catalog," %s %1.2f %1.2f %1.2f %1.2f %1.2f\n", mem_f_shape.c_str(),A,B,C,D,density_factor);
+    fclose(catalog);
   }
   return 0;
 }
