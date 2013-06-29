@@ -6,7 +6,7 @@ CXXFLAGS = -g -Wall -Werror
 
 #OBJECTS = grid.h showDensity.
 
-all : protein #paper/paper.pdf
+all : protein protein_microscopy #paper/paper.pdf
 
 #FIGURES=$(patsubst %.pdf)
 

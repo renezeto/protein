@@ -18,7 +18,7 @@ f_param5 = sys.argv[6]
 #        dat_filenames.append(fn)
 
 dat_filenames = []
-for fn in glob.iglob('./data/shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
+for fn in glob.iglob('./data/m_shape-'+f_shape+'/natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
         dat_filenames.append(fn)
 dat_filenames = sorted(dat_filenames)
 print dat_filenames
