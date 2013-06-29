@@ -24,8 +24,9 @@ const double nE_starting_density = 350.0; //proteins per micrometer
 double density_factor;
 
 const int n = 706; //what is this?
+int area_rating_flag;
 
-const double dx=0.05;
+const double dx=0.15;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
@@ -187,13 +188,12 @@ double mem_f(double x, double y, double z) {
   }
 
   if (mem_f_shape=="p"){
-    //A = length, B = radius of endcap and cylinder, C = ???
+    //A = length, B = radius of endcap and cylinder
     double f;
     double X = Nx*dx;
     double Y = Ny*dx;
     double Z = Nz*dx;
     double z1 = (Z-A)/2;
-    //printf("z1 = %f and Z = %f and A = %f and B = %f\n",z1,Z,A,B);
     double z2 = (A+(Z-A)/2);
     double x1 = X/2;
     double y1 = Y/2;
@@ -223,7 +223,7 @@ double mem_f(double x, double y, double z) {
   }
 
   if (mem_f_shape=="c"){
-    //A = length of cone, B = radius of base, C = ???
+    //A = length of cone, B = radius of base
     double f;
     double X = Nx*dx;
     double Y = Ny*dx;
@@ -260,7 +260,7 @@ double mem_f(double x, double y, double z) {
 	}
 
   if (mem_f_shape=="sp"){
-    // A = radius, B = ???, C = ???
+    // A = radius
     double X = Nx*dx;
     double Y = Ny*dx;
     double Z = Nz*dx;
@@ -288,7 +288,6 @@ double mem_f(double x, double y, double z) {
     double f = 1;
   	return f;
   }
-
 }
 
 int main (int argc, char *argv[]) {
@@ -299,10 +298,12 @@ int main (int argc, char *argv[]) {
   D = atof(argv[5]);
   density_factor = atof(argv[6]);
 
-  //compute grid size based on cell parameters
-  if (argc != 2){
-    printf("usage: %s mem_f_shape A B C D E\n", argv[0]);
+  // input extra command line argument equal to 1 for area_rating check only
+  if(argc > 7) { 
+    area_rating_flag = atoi(argv[7]);
   }
+
+  //compute grid size based on cell parameters
   if (mem_f_shape=="p") {
     Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*B/dx) + 4;
@@ -352,16 +353,15 @@ int main (int argc, char *argv[]) {
     Ny = ceil(2*A/dx) + 4;
     Nz = ceil(2*B/dx) + 4;
   }
-
   char * out_file_name = new char[1024];
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
   
   time_t t = time(0);   // get time now
   struct tm * now = localtime( & t );
-  char * time = new char[1024];
-  sprintf(time, "%d/%d/%d at %d hours and %d minutes", now->tm_mon +1,now->tm_mday,now->tm_year +1900,now->tm_hour,now->tm_min);
-  fprintf(out_file,"This simulation was run on %s\n",time);
+  char * timevar = new char[1024];
+  sprintf(timevar, "%d/%d/%d at %d hours and %d minutes", now->tm_mon +1,now->tm_mday,now->tm_year +1900,now->tm_hour,now->tm_min);
+  fprintf(out_file,"This simulation was run on %s\n",timevar);
 
 
   fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
@@ -452,21 +452,27 @@ int main (int argc, char *argv[]) {
     set_membrane(out_file, mem_f, mem_A);
     fprintf (out_file,"\nFinished with set_membrane function now we have a mem_A and its not randst and Nx is = %d\n",Nx);
   }
-  char * area_rating_out = new char[1024];
+
+  //starting area_rating portion
+
+  char *area_rating_out = new char[1024];
   sprintf(area_rating_out, "data/shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *area_rating_file = fopen((const char *)area_rating_out,"w");
   if (area_rating_file == NULL){
-    printf("WAAAAAAAAAAAAAAAAAAAAAA\n");
+    printf("WAAAAAAAAAAAAAAAAAAAAAA - area_rating_file == null \n");
   }
+
   char * area_rating_out_two = new char[1024];
   sprintf(area_rating_out_two, "data/shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *area_rating_file_two = fopen((const char *)area_rating_out_two,"w");
   if (area_rating_file_two == NULL){
-    printf("WAAAAAAAAAAAAAAAAAAAAAA\n");
+    printf("WAAAAAAAAAAAAAAAAAAAAAA - area_rating_file_two == null \n");
   }
+
   fprintf(out_file,"finished opening area_rating file\n");
   set_insideArr(insideArr);
   fprintf(out_file,"Finished with inside Arr function\n");
+
   double total_cell_volume = 0;
   double total_cell_area = 0;
   for (int i=0;i<Nx*Ny*Nz;i++){
@@ -507,17 +513,20 @@ int main (int argc, char *argv[]) {
   }
   fclose(area_rating_file_two);
   fclose(area_rating_file);
+
+  if(area_rating_flag==1) {
+    exit(0);
+  }
+
+  //finished with everything about area_rating
+
   fprintf(out_file,"area_rating_two file is using %g as the radius of the sphere its looking at areas in",A);
   fprintf(out_file,"Finished writing to the area_rating file!\n");
   fprintf(out_file,"Total cell volume = %g\nTotal cell area = %g\n",total_cell_volume,total_cell_area);
   fflush(out_file);
+
+
   char* outfilename = new char[1024];
-  // if (mem_f_shape == "randst" || mem_f_shape == "TIE_fighter" || mem_f_shape == "triangle") {
-  //   sprintf(outfilename,"membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
-  // } else {
-  //   sprintf(outfilename,"membrane.dat");
-  // }
-  // made membrane.dat print for each shape below (i hope)
   sprintf(outfilename,"data/shape-%s/membrane_files/membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
   double marker;
@@ -556,8 +565,7 @@ int main (int argc, char *argv[]) {
   fprintf (out_file,"membrane set with density in it!\n");
   fflush(out_file);
   set_density(nATP,nE, mem_A);
-  printf("helooooooooo???\n");
-  printf ("nATP_starting density = %g and nE_starting_density = %g and density_factor = %g",
+  printf("nATP_starting_density = %g \n nE_starting_density = %g \n Density_factor = %g",
           nATP_starting_density, nE_starting_density, density_factor);
   fprintf (out_file,"nATP_starting density = %g and nE_starting_density = %g and density_factor = %g",
            nATP_starting_density, nE_starting_density, density_factor);
@@ -582,6 +590,7 @@ int main (int argc, char *argv[]) {
     bef_total_Nd += Nd[i];
   }
   bef_total_N = bef_total_NATP*2 + bef_total_NADP*2 + bef_total_NE + bef_total_Nde*3 + bef_total_Nd*2;
+
   //moved membrane
   // char *outfilenameStart = new char[1000];
   // //sprintf(outfilenameStart, "starting_natp.dat");
@@ -596,7 +605,7 @@ int main (int argc, char *argv[]) {
   //   fprintf(nATPStartfile, "\n");
   // }
   // fclose(nATPStartfile);
-  printf("Got here second !!!!!!!!!!!!!!!!!!!!!\n");
+
   int percent = int(iter/100);
   double time_for_percent;
   bool check = true;
@@ -704,13 +713,46 @@ int main (int argc, char *argv[]) {
 
   cout << "Program has Run!!\n";
   fclose(out_file);
+
+  //printing to a catalog for each directory so we know what we've run.
+  char *fname = new char[1024];
+  sprintf(fname,"data/shape-%s/catalog.txt",mem_f_shape.c_str());
+
+
+  FILE * catalog;
+  int catalog_exists;
+
+  time_t rawtime;
+  struct tm * timeinfo;
+
+  time (&rawtime);
+  timeinfo = localtime (&rawtime);
+
+  catalog = fopen(fname,"r");
+  if (catalog==NULL) {
+    catalog_exists=0;
+  }
+  else {
+    catalog_exists=1;
+    fclose(catalog);
+  }
+  if (catalog_exists==1) {
+    catalog=fopen(fname,"a+b");
+  }
+  else { 
+    catalog=fopen(fname,"w+b");
+  }
+  if (catalog!=NULL) {
+    fprintf(catalog," %s %1.2f %1.2f %1.2f %1.2f %1.2f\n", mem_f_shape.c_str(),A,B,C,D,density_factor);
+    fclose(catalog);
+  }
+
   return 0;
 }
 
 //checks corners of each gridpoint, creates mem_A
  void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
 		 double mem_A[]) {
-  printf("\nInside the set_membrane function!!!!!\n");
   clock_t old_time = clock();
   for(int xi=0;xi<Nx;xi++){
     clock_t time = clock();
@@ -1055,8 +1097,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
   double NE_stdev = sqrt(NE_per_cell);
   double NATP_stdev = sqrt(NATP_per_cell);
   printf("NATP_per_cell = %g and NATP_stdev = %g\n", NATP_per_cell, NATP_stdev);
-  printf("total inside = %d\nTotal nE should be = %f\nE_per_cell = %f\n", count_inside,
-  count_inside*NE_per_cell, NE_per_cell);
+  printf("Total inside = %d\nTotal nE should be = %f\n NE per cell = %f\n", count_inside,count_inside*NE_per_cell, NE_per_cell);
   double r2,U,V;
   int right_most_point_z=0;
   int left_most_point_z=Nz;
@@ -1097,7 +1138,6 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
-  printf("first I got here\n");
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
@@ -1112,45 +1152,10 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
-  printf("Then I got here!!!\n");
   for (int i=0;i<Nx*Ny*Nz;i++) {
     nADP[i] = 0;
     Nd[i] = 0;
     Nde[i] = 0;
   }
-
-  //printing to a catalog for each directory so we know what we've run.
-  char *fname = new char[1024];
-  sprintf(fname,"data/shape-%s/catalog.txt",mem_f_shape.c_str());
-
-
-  FILE * catalog;
-  int catalog_exists;
-
-  time_t rawtime;
-  struct tm * timeinfo;
-
-  time (&rawtime);
-  timeinfo = localtime (&rawtime);
-
-  catalog = fopen(fname,"r");
-  if (catalog==NULL) {
-    catalog_exists=0;
-  }
-  else {
-    catalog_exists=1;
-    fclose(catalog);
-  }
-  if (catalog_exists==1) {
-    catalog=fopen(fname,"a+b");
-  }
-  else { 
-    catalog=fopen(fname,"w+b");
-  }
-  if (catalog!=NULL) {
-    fprintf(catalog," %s %1.2f %1.2f %1.2f %1.2f %1.2f\n", mem_f_shape.c_str(),A,B,C,D,density_factor);
-    fclose(catalog);
-  }
-  fprintf(out_file,"Simulation finished.");
   return 0;
 }
