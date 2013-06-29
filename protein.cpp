@@ -11,30 +11,34 @@ using namespace std;
 #include <cassert>
 //  #include <ctime>
 
-double difD = 2.5; // (um)^2 s^-1 
-double difE = 2.5; // (um)^2 s^-1
-double rate_ADP_ATP = 1; // s^-1
-double rate_D = .025; // um s^-1
-double rate_dD = .0015; // (um)^3 s^-1 
-double rate_de = .7; // s^-1
-double rate_E = .093; // (um)^3 s^-1
+const double difD = 2.5; // (um)^2 s^-1 
+const double difE = 2.5; // (um)^2 s^-1
+const double rate_ADP_ATP = 1; // s^-1
+const double rate_D = .025; // um s^-1
+const double rate_dD = .0015; // (um)^3 s^-1 
+const double rate_de = .7; // s^-1
+const double rate_E = .093; // (um)^3 s^-1
 
 const double nATP_starting_density = 1000.0; //proteins per micrometer
 const double nE_starting_density = 350.0; //proteins per micrometer
-const double density_factor = 15.0;
+double density_factor;
 
-const int n = 706;
+const int n = 706; //what is this?
 
 const double dx=0.05;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
 const int iter_at_half_sec = int(0.5/time_step)+1;
-double x, y, z;
 
-int Nx;
-int Ny;
-int Nz;
+double x, y, z;
+int Nx, Ny, Nz;
+
+string mem_f_shape;
+double A;
+double B;
+double C;
+double D;
 
 double *nATP;
 double *nADP;
@@ -43,17 +47,11 @@ double *Nd;
 double *Nde;
 double *f_mem;
 
-string mem_f_shape;
-double A;
-double B;
-double C;
-double D;
-
 const int starting_num_guassians=20;
-double guass[3*starting_num_guassians];//stores y,z, and sigma for each guassian when creating random cell wall
+double guass[3*starting_num_guassians]; //stores y,z, and sigma for each guassian when creating random cell wall
 const int random_num_guassians=5;
-int rand_seed=0;//=14; at this point I have this passed in from the command line as the D argument
-double Norm = 15.0;//This is the height of the guassians that make the cell wall
+int rand_seed=0; //=14; at this point I have this passed in from the command line as the D argument
+double Norm = 15.0; //This is the height of the guassians that make the cell wall
 
 double rand_dis(double d0,double d_fac,int i) {
   int fac = 1;
@@ -82,8 +80,6 @@ void randomize_cell_wall(double guass[]){
   }
 }
 
-//void get_dis_from_wall(double x, double y, ) {
-
 double f_2D_TIE_fighter(double y, double z){
   double f = 0;double f1 = 0;double f2 = 0;double f3 = 0;
   double Y = Ny*dx;
@@ -98,7 +94,6 @@ double f_2D_TIE_fighter(double y, double z){
     f3 = abs(z-Z/2.0)-.5;
   } else {f3 = 0.1;}
   f = f1+f2+f3;
-  //printf("y = %g, z = %g, f = %g\n",y,z,f);
   return f;
 }
 
@@ -114,14 +109,12 @@ double f_2D_triangle(double y, double z){
   double rad = 1.75*(y2-y1)*sqrt(3.0)/6.0;
   double y_circle = Y/2.0; double z_circle = z1 + sqrt(3)*(y2-y1)/6.0;
   if ((z < zl1) && (z < zl3) && (z > z1) && ((z-z_circle)*(z-z_circle) + (y-y_circle)*(y-y_circle)) < rad*rad){
-    //printf("rad = %g \n",rad);
     f = -0.1;
   } else {
     f = 0.1;
   }
   return f;
 }
-
 
 double f_2D_randst(double y, double z){
   int num_guassians = 0;
@@ -192,7 +185,8 @@ double mem_f(double x, double y, double z) {
       return f;
     }
   }
-  if (mem_f_shape=="p"){ //pill
+
+  if (mem_f_shape=="p"){
     //A = length, B = radius of endcap and cylinder, C = ???
     double f;
     double X = Nx*dx;
@@ -212,6 +206,7 @@ double mem_f(double x, double y, double z) {
     }
     return f;
   }
+
   if (mem_f_shape=="b"){
     //A (x),B (z),C (y) lengths
     double f;
@@ -226,7 +221,8 @@ double mem_f(double x, double y, double z) {
       }
     return f;
   }
-  if (mem_f_shape=="c"){ //cone
+
+  if (mem_f_shape=="c"){
     //A = length of cone, B = radius of base, C = ???
     double f;
     double X = Nx*dx;
@@ -242,6 +238,7 @@ double mem_f(double x, double y, double z) {
     else { f = 1; }
     return f;
 	}
+
   if (mem_f_shape=="st"){
     //A = length, B = x axis radius radius, C = y axis radius radius, D = z axis radius radius
     double f;
@@ -261,7 +258,8 @@ double mem_f(double x, double y, double z) {
     }
     return f;
 	}
-  if (mem_f_shape=="sp"){ //sphere
+
+  if (mem_f_shape=="sp"){
     // A = radius, B = ???, C = ???
     double X = Nx*dx;
     double Y = Ny*dx;
@@ -273,7 +271,9 @@ double mem_f(double x, double y, double z) {
     f = sqrt((x-x1)*(x-x1) + (y-y1)*(y-y1) + (z-z1)*(z-z1)) - A;
     return f;
   }
-	if (mem_f_shape=="e"){ //ellipsoid B = x axis radius radius, C = y axis radius radius, A = z axis radius radius
+
+  if (mem_f_shape=="e"){ 
+    //B = x axis radius radius, C = y axis radius radius, A = z axis radius radius
     double X = Nx*dx;
     double Y = Ny*dx;
     double Z = Nz*dx;
@@ -283,21 +283,26 @@ double mem_f(double x, double y, double z) {
     double f = sqrt( (x-x1)*(x-x1)/(B*B) + (y-y1)*(y-y1)/(C*C)+ (z-z1)*(z-z1)/(A*A) ) - 1;
     return f;
   }
+
   else {
     double f = 1;
   	return f;
   }
+
 }
 
 int main (int argc, char *argv[]) {
-  if (argc != 2){
-    printf("usage: %s mem_f_shape\n", argv[0]);
-  }
   mem_f_shape = argv[1];
   A = atof(argv[2]);
   B = atof(argv[3]);
   C = atof(argv[4]);
   D = atof(argv[5]);
+  density_factor = atof(argv[6]);
+
+  //compute grid size based on cell parameters
+  if (argc != 2){
+    printf("usage: %s mem_f_shape A B C D E\n", argv[0]);
+  }
   if (mem_f_shape=="p") {
     Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*B/dx) + 4;
@@ -347,6 +352,7 @@ int main (int argc, char *argv[]) {
     Ny = ceil(2*A/dx) + 4;
     Nz = ceil(2*B/dx) + 4;
   }
+
   char * out_file_name = new char[1024];
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
@@ -1145,5 +1151,6 @@ int set_density(double *nATP, double *nE, double *mem_A){
     fprintf(catalog," %s %1.2f %1.2f %1.2f %1.2f %1.2f\n", mem_f_shape.c_str(),A,B,C,D,density_factor);
     fclose(catalog);
   }
+  fprintf(out_file,"Simulation finished.");
   return 0;
 }
