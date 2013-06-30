@@ -1,97 +1,72 @@
-import pylab, numpy, math
-from pylab import *
-import matplotlib.pyplot as plt
+from __future__ import division
 import numpy as np
+import matplotlib.pyplot as plt
+import sys
 import time
-from file_loader import *
+import file_loader as load
+
+f_shape = sys.argv[1]
+f_param1 = sys.argv[2]
+f_param2 = sys.argv[3]
+f_param3 = sys.argv[4]
+f_param4 = sys.argv[5]
+f_param5 = sys.argv[6]
+
+natp = load.data(protein="natp")
+ne = load.data(protein="ne")
+nadp = load.data(protein="nadp")
+nd = load.data(protein="nd")
 
 def maxnum(page):
-    Z = [0. for i in range(data.shape[0])]
-    for i in range(data.shape[0]):
+    Z = [0. for i in range(page.shape[0])]
+    for i in range(page.shape[0]):
         Z[i] = max(page[i])
     maxval = max(Z)
     return maxval
 
 def minnum(page):
-    Z = [0. for i in range(data.shape[0])]
-    for i in range(data.shape[0]):
+    Z = [0. for i in range(page.shape[0])]
+    for i in range(page.shape[0]):
         Z[i] = min(page[i])
         if Z[i] == 0:
-            Z[i] = 50000000
+            Z[i] = 50000000 #change this
     minval = min(Z)
     return minval
 
-def timemax(dataset):
-    Z = [0. for i in range(t_steps)]
-    for i in (range(t_steps-1)):
-        page = dataset[i+1]
-        Z[i+1] = maxnum(page)
+def timemax(protein):
+    Z = [0. for i in range(protein.tsteps)]
+    for i in (range(protein.tsteps-1)):
+        Z[i+1] = maxnum(protein.dataset[i+1])
     maxval = max(Z)
     return maxval
 
-def timemin(dataset):
-    Z = [0. for i in range(t_steps)]
-    for i in (range(t_steps-1)):
-        page = dataset[i+1]
-        Z[i+1] = minnum(page)
+def timemin(protein):
+    Z = [0. for i in range(protein.tsteps)]
+    for i in (range(protein.tsteps-1)):
+        Z[i+1] = minnum(protein.dataset[i+1])
     minval = min(Z)
     return minval
 
-def contourplt(dataset):
-    pylab.ion()
-    minval = timemin(dataset)
-    maxval = timemax(dataset)
-    for k in range(len(dataset)):
-        page = dataset[k]
-        Z, Y = np.meshgrid(np.arange(0,data.shape[1],1), np.arange(0,data.shape[0],1))
-        pylab.ylabel('Y axis position')
-        pylab.xlabel('Z axis position')
-        pylab.title('density at time: '+repr(5*(k+1))+'s')
+def contourplt(protein):
+    plt.ion()
+    maxval = timemax(protein)
+    minval = timemin(protein)
+    for k in range(len(protein.dataset)):
+        page = protein.dataset[k]
+        Z, Y = np.meshgrid(np.arange(0,protein.datashape[1],1), np.arange(0,protein.datashape[0],1))
+        plt.ylabel('Y axis position')
+        plt.xlabel('Z axis position')
+        plt.title('density at time: '+repr(5*(k+1))+'s') #not correct
         CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval+10,5))
         cbar = plt.colorbar(CS)
         plt.clim(minval,maxval)
         cbar.ax.set_ylabel('density')
-        dt = 1
-        time.sleep(dt)
         plt.axes().set_aspect('equal')
-        pylab.draw()
-        clf()
-    print('graph done')
+        plt.draw()
+        plt.clf()
     close()
 
-contourplt(data_natp_set)
-
-## old file importing - has been replaced with a better method
-# nATP = ['natp']*(t_steps)
-# for n in range(0,t_steps): #change '+sys.argv[1]+' to '+sys.argv[1]+' on diff comp
-#     if n < 10:
-#         nATP[n] = 'shape-'+sys.argv[1]+'/natp-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-'+sys.argv[6]+'-00'+repr(n)+'.dat'
-#     else:
-#         nATP[n] = 'shape-'+sys.argv[1]+'/natp-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-'+sys.argv[6]+'-0'+repr(n)+'.dat'
-
-# ne = ['ne']*(t_steps)
-# for n in range(0,t_steps):
-#     if n < 10:
-#         ne[n] = 'shape-'+sys.argv[1]+'/ne-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-'+sys.argv[6]+'-00'+repr(n)+'.dat'
-#     else:
-#         ne[n] = 'shape-'+sys.argv[1]+'/ne-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-'+sys.argv[6]+'-0'+repr(n)+'.dat'
-
-# nADP = ['nADP']*(t_steps)
-# for n in range(0,t_steps):
-#   if n < 10:
-#     nADP[n] = 'shape-'+sys.argv[1]+'/nadp-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-'+sys.argv[6]+'-00'+repr(n)+'.dat'
-#   else:
-#     nADP[n] = 'shape-'+sys.argv[1]+'/nadp-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-'+sys.argv[6]+'-0'+repr(n)+'.dat'
-
-# nd = ['nd']*(t_steps)
-# for n in range(0,t_steps):
-#   if n < 10:
-#     nd[n] = 'shape-'+sys.argv[1]+'/nd-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-'+sys.argv[6]+'-00'+repr(n)+'.dat'
-#   else:
-#     nd[n] = 'shape-'+sys.argv[1]+'/nd-'+sys.argv[1]+'-'+sys.argv[2]+'-'+sys.argv[3]+'-'+sys.argv[4]+'-'+sys.argv[5]+'-'+sys.argv[6]+'-0'+repr(n)+'.dat'
-
-# cellshape = sys.argv[1]
-# dimA = sys.argv[2]
-# dimB = sys.argv[3]
-# dimC =sys.argv[4]
-# dimD =sys.argv[5]
+contourplt(natp)
+contourplt(ne)
+contourplt(nadp)
+contourplt(nd)

@@ -1,12 +1,22 @@
 from __future__ import division
-from numpy import *
-from matplotlib import *
-from pylab import *
+import numpy as np
+import matplotlib.pyplot as plt
 import sys
-import glob
-from file_loader import *
+import file_loader as load
 
-cell_membrane = loadtxt('./data/shape-'+f_shape+'/membrane_files/membrane-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.dat')
+f_shape = sys.argv[1]
+f_param1 = sys.argv[2]
+f_param2 = sys.argv[3]
+f_param3 = sys.argv[4]
+f_param4 = sys.argv[5]
+f_param5 = sys.argv[6]
+
+cell_membrane = np.loadtxt('./data/shape-'+f_shape+'/membrane_files/membrane-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.dat')
+
+natp = load.data(protein="natp")
+ne = load.data(protein="ne")
+nadp = load.data(protein="nadp")
+nd = load.data(protein="nd")
 
 def unzip_membrane(memdat):
     x = []
@@ -23,7 +33,7 @@ def localmax(page):
     for i in range(1,len(page)-1):
         index_pairs = list(enumerate(page[i]))
         for j in range(1,len(page[0])-1):
-            if (page[i][j] > page[i-1][j-1]) and (page[i][j] > page[i-1][j]) and (page[i][j] > page[i-1][j+1]) and (page[i][j] > page[i][j-1]) and (page[i][j] > page[i][j+1]) and (page[i][j] > page[i+1][j-1]) and (page[i][j] > page[i+1][j]) and (page[i][j] > page[i+1][j+1]):
+            if (page[i][j] > page[i-1][j-1]) and (page[i][j] > page[i-1][j]) and (page[i][j] > page[i-1][j+1]) and (page[i][j] > page[i][j-1]) and (page[i][j] > page[i][j+1]) and (page[i][j] > page[i+1][j-1]) and (page[i][j] > page[i+1][j]) and (page[i][j] > page[i+1][j+1]): #rewrite using chains
                 lmax += [(i,index_pairs[j][0],index_pairs[j][1])]
     if (lmax == []):
         return "empty"
@@ -46,28 +56,27 @@ def globalmax(page):
         gmax.pop(1)
     return gmax
 
-def maxvectorplot(dataset):
+def maxvectorplot(protein):
     positions = []
     displacements = []
     nonempty = []
-    for t in range(t_steps):
-        if globalmax(dataset[t]) != "empty":
-            nonempty += globalmax(dataset[t])
+    for t in range(protein.tsteps):
+        if globalmax(protein.dataset[t]) != "empty":
+            nonempty += globalmax(protein.dataset[t])
     for i in range(1,len(nonempty)-1):
         if (nonempty[i][2]>nonempty[i-1][2]) and (nonempty[i][2]>nonempty[i+1][2]):
             positions += [[nonempty[i][0],nonempty[i][1]]]
     for i in range(1,len(positions)):
         displacements += [[positions[i-1][0],positions[i-1][1],positions[i][0]-positions[i-1][0],positions[i][1]-positions[i-1][1]]]
-    X,Y,U,V = zip(*displacements)
-    figure()
-    ax = plt.gca()
-    ax.quiver(X,Y,U,V,scale_units='xy',angles='xy',scale=1)
-    xlim((0,data_shape[0]))
-    ylim((0,data_shape[1]))
-    scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1])
-    savefig('./data/shape-'+f_shape+'/plots/extrema-natp-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
-    #this only does it for NATP right now. will need to automate for other protein types later.
-    print "extrema plot generated."
-    return 0
+    return displacements
 
-maxvectorplot(data_natp_set)
+for p in [natp, ne, nadp, nd]:
+    X,Y,U,V = zip(*maxvectorplot(p))
+    plt.figure()
+    plt.ax = plt.gca()
+    plt.ax.quiver(X,Y,U,V,scale_units='xy',angles='xy',scale=1)
+    plt.xlim((0,p.datashape[0]))
+    plt.ylim((0,p.datashape[1]))
+    plt.scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1])
+    plt.savefig('./data/shape-'+f_shape+'/plots/extrema-'+str(p.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
+    print "extrema plot generated: " + str(p.protein)

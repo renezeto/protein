@@ -7,6 +7,8 @@ import glob
 from matplotlib.widgets import Slider, RadioButtons
 from file_loader import *
 
+#NEEDS UPDATE TO NEW FILE LOAD
+
 def gradient(data):
 	if len(data.shape) == 2:
 		gradStore =  [[(0.,0.) for y in range((data_shape[0]-2))] for z in range((data_shape[1]-2))]
