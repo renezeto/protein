@@ -1,0 +1,3 @@
+current bugs:
+--------------
+- show_area_rating.py has index error.
