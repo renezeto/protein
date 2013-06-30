@@ -1130,7 +1130,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor;
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor; //paper density check
           } else {
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density;
           }
