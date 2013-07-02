@@ -1202,10 +1202,35 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
+
   for (int i=0;i<Nx*Ny*Nz;i++) {
     nADP[i] = 0;
     Nd[i] = 0;
     Nde[i] = 0;
   }
+  
+  // //verifying that our average densities are correct
+  // //get cross sectional protein density:
+  // int* natp_density_check = new int[Nz];
+  // int* ne_density_check = new int[Nz];
+  // int natp_avg = 0;
+  // int ne_avg = 0;
+  // for (int k=0; k<Nz; k++) {
+  //   for (int i=0; i<Nx; i++) {
+  //     for (int j=0; j<Ny; j++) {
+  //       natp_density_check[k] += nATP[i*Ny*Nz+j*Nz+k];
+  //       ne_density_check[k] += nE[i*Ny*Nz+j*Nz+k];
+  //     }
+  //   }
+  //   natp_density_check[k] = natp_density_check[k]/slice_totals[k];
+  //   ne_density_check[k] = ne_density_check[k]/slice_totals[k];
+  //   natp_avg += natp_density_check[k];
+  //   ne_avg += ne_density_check[k];
+  //   printf("natp density at %d: %d\n", k, natp_density_check[k]);
+  //   printf("ne density at %d: %d\n\n", k, ne_density_check[k]);
+  // }
+  // printf("natp_avg: %d\n", natp_avg/40);
+  // printf("ne_avg: %d\n", ne_avg/40);
+
   return 0;
 }
