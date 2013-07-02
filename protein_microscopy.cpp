@@ -1193,10 +1193,10 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density/slice_totals[k]*density_factor;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density/slice_totals[k]*density_right;
           }
           else {
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density/slice_totals[k];
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density/slice_totals[k]*density_left;
           }
         }
       }
