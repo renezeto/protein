@@ -1113,7 +1113,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
-        if (inside(i,j,k)){
+        if (inside(i,j,k)){ //very clever jeff
           if (k>right_most_point_z){
             right_most_point_z = k;
           }
@@ -1132,14 +1132,35 @@ int set_density(double *nATP, double *nE, double *mem_A){
   }
   int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/2.0);
   //  int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/2.0); unused
+
+  //get the correct number of inside gridpoints at one z slice:
+  int* count_at_slice = new int[Nz];
+  for (int i=0; i<Nz; i++) {
+    int countsum = 0;
+    for (int j=0; j<Nx; j++) {
+      for (int k=0; k<Ny; k++) {
+        if (inside(i,j,k)) {
+          countsum += 1;
+        }
+      }
+    }
+    count_at_slice[i] = countsum;  
+  }  
+  //begin setting density at each gridpoint:
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor;
+            //note: proteins must have a number density per cross sectional area
+            //of 1000/(um)^2 and 350/(um)^2 for natp and ne respectively.
+            //that means that summing over constant z gridpoints should have
+            //a protein total of 1000 and 350. divide by number of const z gridpoints.
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density/count_at_slice[k]*density_factor; 
           } else {
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density;
+            //the density on this side needs to be reduced 
+            //to compensate for the higher density on the right (and keep the total # of proteins correct)
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density/count_at_slice[k];
           }
         }
       }
@@ -1150,10 +1171,10 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density/count_at_slice[k]*density_factor;
           }
           else {
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density/count_at_slice[k];
           }
         }
       }
