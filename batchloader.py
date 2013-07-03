@@ -2,6 +2,8 @@ from __future__ import division
 import numpy as np
 import sys
 import os
+import subprocess
+import time
 
 batch_pill = []
 i=1
@@ -12,5 +14,12 @@ while i<20:
         batch_pill+=[[a,b]]
     i+=1
 
+processes = set()
+max_processes = 7
+
 for job in batch_pill:
-    os.system("srun ./protein_microscopy p "+str(job[0])+" "+str(job[1])+" 0.00 0.00 15.00 > /dev/null")
+    processes.add(subprocess.Popen(['./protein_microscopy','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
+    if len(processes) >= max_processes:
+        os.wait()
+        processes.difference_update(
+            p for p in processes if p.poll() is not None)
