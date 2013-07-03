@@ -54,6 +54,7 @@ def contourplt(protein):
     for k in range(len(protein.dataset)):
         page = protein.dataset[k]
         Z, Y = np.meshgrid(np.arange(0,protein.datashape[1],1), np.arange(0,protein.datashape[0],1))
+        plt.axes().set_aspect('equal', 'datalim')
         plt.ylabel('Y axis position')
         plt.xlabel('Z axis position')
         plt.title('density at time: '+repr(5*(k+1))+'s') #not correct

@@ -24,6 +24,7 @@ def average_location(dataset):
 
 for p in [natp, ne, nadp, nd]:
     plt.figure()
+    plt.axes().set_aspect('equal', 'datalim')
     plt.contourf(p.axes[1],p.axes[0],average_location(p.dataset),500) #why are axes backwards?
     plt.colorbar()
     plt.savefig('./data/shape-'+f_shape+'/plots/time_map-'+str(p.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')

@@ -73,6 +73,7 @@ def maxvectorplot(protein):
 for p in [natp, ne, nadp, nd]:
     X,Y,U,V = zip(*maxvectorplot(p))
     plt.figure()
+    plt.axes().set_aspect('equal', 'datalim')
     plt.ax = plt.gca()
     plt.ax.quiver(X,Y,U,V,scale_units='xy',angles='xy',scale=1)
     plt.xlim((0,p.datashape[0]))
