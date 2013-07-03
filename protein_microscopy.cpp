@@ -1120,7 +1120,10 @@ int set_density(double *nATP, double *nE, double *mem_A){
     }
   }
 
-  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/2.0);
+  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3.0);
+
+  //convention: from here on out, I identify i<->x, j<->y, k<->z, regardless of for loop order, to
+  //keep things from getting confusing
 
   //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
   int gridpoints_left = 0;
@@ -1144,27 +1147,31 @@ int set_density(double *nATP, double *nE, double *mem_A){
 
   //get gridpoints per slice for correct protein count
   int* slice_totals = new int[Nz];
-  for (int i=0; i<Nz; i++) {
+  for (int k=0; k<Nz; k++) {
     int gridpoints_on_slice = 0;
-    for (int j=0; j<Nx; j++) {
-      for (int k=0; k<Ny; k++) {
+    for (int i=0; i<Nx; i++) {
+      for (int j=0; j<Ny; j++) {
         if (inside(i,j,k)) {
           gridpoints_on_slice += 1;
         }
       }
     }
     if (gridpoints_on_slice==0) {
-      slice_totals[i] = 1; //avoid division by zero problem
+      slice_totals[k] = 1; //avoid division by zero problem
     }
     else {
-      slice_totals[i] = gridpoints_on_slice;
+      slice_totals[k] = gridpoints_on_slice;
     }
+    //printf("%d\n",slice_totals[k]);
   }
   
   //compute density scale factors left and right of divide (to ensure correct protein #)
   double density_right = density_factor;
   double density_left = (gridpoints_total - density_right*gridpoints_right)/gridpoints_left;
 
+  printf("%d\n",gridpoints_left);
+  printf("%d\n",gridpoints_right);
+  printf("%d\n",gridpoints_total);
   //begin setting density at each gridpoint:
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
@@ -1176,13 +1183,13 @@ int set_density(double *nATP, double *nE, double *mem_A){
             //that means that summing over constant z gridpoints should have
             //a protein total of 1000 and 350. divide by number of const z gridpoints.
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density/slice_totals[k]*density_right; 
-            // printf("%f\n",nATP[i*Ny*Nz+j*Nz+k] = nATP[i*Ny*Nz+j*Nz+k]);
+            printf("natp density at gridpoint: %d %d %d is: %f\n", i, j, k, nATP[i*Ny*Nz+j*Nz+k]);
           } 
           else {
             //the density on this side needs to be reduced 
             //to compensate for the higher density on the right (and keep the total # of proteins correct)
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density/slice_totals[k]*density_left;
-            // printf("%f\n",nATP[i*Ny*Nz+j*Nz+k] = nATP[i*Ny*Nz+j*Nz+k]);
+            printf("natp density at gridpoint: %d %d %d is: %f\n", i, j, k, nATP[i*Ny*Nz+j*Nz+k]);
           }
         }
       }
@@ -1208,29 +1215,5 @@ int set_density(double *nATP, double *nE, double *mem_A){
     Nd[i] = 0;
     Nde[i] = 0;
   }
-  
-  // //verifying that our average densities are correct
-  // //get cross sectional protein density:
-  // int* natp_density_check = new int[Nz];
-  // int* ne_density_check = new int[Nz];
-  // int natp_avg = 0;
-  // int ne_avg = 0;
-  // for (int k=0; k<Nz; k++) {
-  //   for (int i=0; i<Nx; i++) {
-  //     for (int j=0; j<Ny; j++) {
-  //       natp_density_check[k] += nATP[i*Ny*Nz+j*Nz+k];
-  //       ne_density_check[k] += nE[i*Ny*Nz+j*Nz+k];
-  //     }
-  //   }
-  //   natp_density_check[k] = natp_density_check[k]/slice_totals[k];
-  //   ne_density_check[k] = ne_density_check[k]/slice_totals[k];
-  //   natp_avg += natp_density_check[k];
-  //   ne_avg += ne_density_check[k];
-  //   printf("natp density at %d: %d\n", k, natp_density_check[k]);
-  //   printf("ne density at %d: %d\n\n", k, ne_density_check[k]);
-  // }
-  // printf("natp_avg: %d\n", natp_avg/40);
-  // printf("ne_avg: %d\n", ne_avg/40);
-
   return 0;
 }
