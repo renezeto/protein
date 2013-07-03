@@ -2,14 +2,14 @@ import numpy as np
 import sys
 import glob
 
-#test
-
 f_shape = sys.argv[1]
 f_param1 = sys.argv[2]
 f_param2 = sys.argv[3]
 f_param3 = sys.argv[4]
 f_param4 = sys.argv[5]
 f_param5 = sys.argv[6]
+
+#get_filenames method sloppy but it works.
 
 dx=.05
 
@@ -26,8 +26,12 @@ class data(object):
     @staticmethod
     def get_filenames(protein):
         dat_filenames = []
-        for fn in glob.iglob('./data/shape-'+f_shape+'/m_'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
+        for fn in glob.iglob('./data/shape-'+f_shape+'/*m_'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
             dat_filenames.append(fn)
+        if './data/shape-'+f_shape+'/hires-m_'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat' in dat_filenames:
+            dat_filenames = []
+            for fn in glob.iglob('./data/shape-'+f_shape+'/hires-m_'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
+                dat_filenames.append(fn)        
         dat_filenames = sorted(dat_filenames)
         if (dat_filenames == []):
             print "File loading error: filename list is empty."

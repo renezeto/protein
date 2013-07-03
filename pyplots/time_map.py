@@ -22,10 +22,26 @@ def average_location(dataset):
             tsum += dataset[t]
     return tsum/(natp.tsteps)
 
+plt.figure(1)
+plt.subplot(221)
+plt.contourf(natp.axes[1],natp.axes[0],average_location(natp.dataset),500)
+
+plt.subplot(222)
+plt.contourf(ne.axes[1],ne.axes[0],average_location(ne.dataset),500)
+
+plt.subplot(223)
+plt.contourf(nadp.axes[1],nadp.axes[0],average_location(nadp.dataset),500)
+
+plt.subplot(224)
+plt.contourf(nd.axes[1],nd.axes[0],average_location(nd.dataset),500)
+#plt.show(1)
+plt.savefig('./data/shape-'+f_shape+'/plots/time_map_compare-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
+print "time_map plot generated: subplot comparison"
+
 for p in [natp, ne, nadp, nd]:
     plt.figure()
+    plt.contourf(p.axes[1],p.axes[0],average_location(p.dataset),500)
     plt.axes().set_aspect('equal', 'datalim')
-    plt.contourf(p.axes[1],p.axes[0],average_location(p.dataset),500) #why are axes backwards?
     plt.colorbar()
     plt.savefig('./data/shape-'+f_shape+'/plots/time_map-'+str(p.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
     print "time_map plot generated: " + str(p.protein)

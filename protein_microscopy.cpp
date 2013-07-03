@@ -30,7 +30,7 @@ double density_factor;
 const int n = 706; //what is this?
 int area_rating_flag;
 
-const double dx=0.15;
+double dx=0.15;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
 const int iter = int(tot_time/time_step)+3;
@@ -306,9 +306,24 @@ int main (int argc, char *argv[]) {
   D = atof(argv[5]);
   density_factor = atof(argv[6]);
 
-  // input extra command line argument equal to 1 for area_rating check only
-  if(argc > 7) { 
-    area_rating_flag = atoi(argv[7]);
+  // input extra command line argument equal to 1 for area_rating check only, also hires
+  // not the best way to do this. but for now it works.
+  if (argc == 8) {
+    if (strcmp(argv[7],"-area")==0) {
+      area_rating_flag = 1;
+      printf("got here");
+    }
+    if (strcmp(argv[7],"-hires")==0) {
+      dx = .05;
+      printf("Using high resolution: dx = .05 microns");
+    }
+  }
+  if (argc == 9) {
+    if ( ((strcmp(argv[7],"-area") == 0) && (strcmp(argv[8],"-hires") == 0)) || ((strcmp(argv[8],"-area") == 0) && (strcmp(argv[7],"-hires") == 0)) ) {
+      area_rating_flag = 1;
+      dx = .05;
+      printf("Using high resolution: dx = .05 microns");
+    }
   }
 
   //compute grid size based on cell parameters
@@ -463,14 +478,24 @@ int main (int argc, char *argv[]) {
 
   //begin area rating
   char *area_rating_out = new char[1024];
-  sprintf(area_rating_out, "data/shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  if (dx==.05) {
+    sprintf(area_rating_out, "data/shape-%s/hires-area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  else {
+    sprintf(area_rating_out, "data/shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
   FILE *area_rating_file = fopen((const char *)area_rating_out,"w");
   if (area_rating_file == NULL){
     printf("WAAAAAAAAAAAAAAAAAAAAAA - area_rating_file == null \n");
   }
 
   char * area_rating_out_two = new char[1024];
-  sprintf(area_rating_out_two, "data/shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  if (dx==.05) {
+    sprintf(area_rating_out_two, "data/shape-%s/hires-area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  else {
+    sprintf(area_rating_out_two, "data/shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
   FILE *area_rating_file_two = fopen((const char *)area_rating_out_two,"w");
   if (area_rating_file_two == NULL){
     printf("WAAAAAAAAAAAAAAAAAAAAAA - area_rating_file_two == null \n");
@@ -638,7 +663,12 @@ int main (int argc, char *argv[]) {
       //if(i>30){exit(1);}
       //int k = i/iter_at_half_sec;
       char *outfilenameATP = new char[1000];
-      sprintf(outfilenameATP, "data/shape-%s/m_natp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      if (dx==.05) {
+        sprintf(outfilenameATP, "data/shape-%s/hires-m_natp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
+      else {
+        sprintf(outfilenameATP, "data/shape-%s/m_natp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
       for (int a=0;a<Ny;a++){
@@ -654,7 +684,12 @@ int main (int argc, char *argv[]) {
       fclose(nATPfile);
       fprintf(out_file,"printed out new file = natp\n");
       char *outfilenameE = new char[1000];
-      sprintf(outfilenameE, "data/shape-%s/m_ne-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      if (dx==.05) {
+        sprintf(outfilenameE, "data/shape-%s/hires-m_ne-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
+      else {
+        sprintf(outfilenameE, "data/shape-%s/m_ne-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
       for (int a=0;a<Ny;a++){
@@ -670,7 +705,12 @@ int main (int argc, char *argv[]) {
       fclose(nEfile);
       fprintf(out_file,"printed out new file = nadp\n");
       char *outfilenameADP = new char[1000];
-      sprintf(outfilenameADP, "data/shape-%s/m_nadp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      if (dx==.05) {
+        sprintf(outfilenameADP, "data/shape-%s/hires-m_nadp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
+      else {
+        sprintf(outfilenameADP, "data/shape-%s/m_nadp-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
       FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
       delete[] outfilenameADP;
       for (int a=0;a<Ny;a++){
@@ -686,7 +726,12 @@ int main (int argc, char *argv[]) {
       fclose(nADPfile);
       fprintf(out_file,"printed out new file = nadp\n");
       char *outfilenameD = new char[1000];
-      sprintf(outfilenameD, "data/shape-%s/m_nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      if (dx==.05) {
+        sprintf(outfilenameD, "data/shape-%s/hires-m_nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
+      else {      
+        sprintf(outfilenameD, "data/shape-%s/m_nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
       FILE *nDfile = fopen((const char *)outfilenameD,"w");
       delete[] outfilenameD;
       for (int a=0;a<Ny;a++){
