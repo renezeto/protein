@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 import time
 import file_loader as load
-
+#
 f_shape = sys.argv[1]
 f_param1 = sys.argv[2]
 f_param2 = sys.argv[3]

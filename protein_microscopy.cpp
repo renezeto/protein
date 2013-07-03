@@ -1093,7 +1093,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
 
   //  printf("Total inside = %d\nTotal nE should be = %f\n NE per cell = %f\n", count_inside,count_inside*NE_per_cell, NE_per_cell);
   //  printf("Total inside = %d\nTotal nATP should be = %f\n NE per cell = %f\n", count_inside,count_inside*NE_per_cell, NE_per_cell);
-
+  //.
   //double r2,U,V; unused
   int right_most_point_z=0;
   int left_most_point_z=Nz;
