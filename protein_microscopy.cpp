@@ -376,6 +376,7 @@ int main (int argc, char *argv[]) {
     Ny = ceil(2*A/dx) + 4;
     Nz = ceil(2*B/dx) + 4;
   }
+
   char * out_file_name = new char[1024];
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
@@ -775,6 +776,8 @@ int main (int argc, char *argv[]) {
   fflush(out_file);
   cout << "Program has Run!!\n";
   fclose(out_file);
+  //end catalog
+
 
   //printing to a catalog for each directory so we know what we've run.
   char *fname = new char[1024];
@@ -800,10 +803,12 @@ int main (int argc, char *argv[]) {
     catalog=fopen(fname,"w+b");
   }
   if (catalog!=NULL) {
+    if (dx==.05) {
+      fprintf(catalog,"hires ");
+    }
     fprintf(catalog," %s %1.2f %1.2f %1.2f %1.2f %1.2f\n", mem_f_shape.c_str(),A,B,C,D,density_factor);
     fclose(catalog);
   }
-  //end catalog
 
   return 0;
 }
