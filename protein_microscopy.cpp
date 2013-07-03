@@ -9,7 +9,7 @@ using namespace std;
 #include "protein.h"
 #include "MersenneTwister.h"
 #include <cassert>
-//  #include <ctime> /
+//  #include <ctime> ////
 
 //notes:
 //variables commented out and flagged as unused were causing compiler errors
