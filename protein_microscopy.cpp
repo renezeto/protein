@@ -9,7 +9,6 @@ using namespace std;
 #include "protein.h"
 #include "MersenneTwister.h"
 #include <cassert>
-//  #include <ctime> ////
 
 //notes:
 //variables commented out and flagged as unused were causing compiler errors
@@ -473,7 +472,7 @@ int main (int argc, char *argv[]) {
     }
   } else {
     set_membrane(out_file, mem_f, mem_A);
-    fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.",Nx);
+    fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
   }
 
   //begin area rating
@@ -778,7 +777,7 @@ int main (int argc, char *argv[]) {
 
   //printing to the root directory so we have a shortlist of what we've done.
   char *fname = new char[1024];
-  sprintf(fname,"catalog.txt",mem_f_shape.c_str());
+  sprintf(fname,"catalog.txt");
   FILE * catalog;
   int catalog_exists;
   catalog = fopen(fname,"r");
