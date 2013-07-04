@@ -42,17 +42,17 @@ if '-sim' in sys.argv:
 #plots the recent simulations:
 if '-plot' in sys.argv:
     processes = set()
-    max_processes = 14
+    max_processes = 7
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
-            processes.add(subprocess.Popen(['python','pyplots/extrema.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
-            processes.add(subprocess.Popen(['python','pyplots/time_map.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
+            processes.add(subprocess.Popen(['python','pyplots/extrema.py','p',str(job[0])+'0',str(job[1])+'0','0.00','0.00','15.00']))
+            processes.add(subprocess.Popen(['python','pyplots/time_map.py','p',str(job[0])+'0',str(job[1])+'0','0.00','0.00','15.00']))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
     if 'randst' in sys.argv:
         for job in batch_pill_simulations:
-            processes.add(subprocess.Popen(['python','pyplots/extrema.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
+            processes.add(subprocess.Popen(['python','pyplots/extrema.py','p',str(job[0])+'0',str(job[1])+'0','0.00','0.00','15.00']))
             processes.add(subprocess.Popen(['python','pyplots/time_map.py','randst',str(job[0]),str(job[1]),str(job[2]),str(job[3]),'15.00']))
             if len(processes) >= max_processes:
                 os.wait()
