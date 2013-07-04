@@ -11,7 +11,10 @@ f_param5 = sys.argv[6]
 
 #get_filenames method sloppy but it works.
 
-dx=.05
+if "-hires" in sys.argv:
+    dx=.05
+else:
+    dx=.15
 
 class data(object):
     def __init__(self,protein):
