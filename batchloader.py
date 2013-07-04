@@ -14,7 +14,7 @@ while i<20:
     if ([a, b] not in batch_pill_simulations) and ([b, a] not in batch_pill_simulations):
         batch_pill_simulations+=[[a,b]]
     i+=1
-
+print batch_pill_simulations
 batch_randst_simulations = [[1.00, 1.00, 1.00, 96.00], \
                                 [1.00, 1.00, 1.00, 97.00], \
                                 [1.00, 1.00, 1.00, 98.00], \
