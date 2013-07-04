@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import file_loader as load
 import sys
-#
+
 natp = load.data(protein="natp")
 ne = load.data(protein="ne")
 nadp = load.data(protein="nadp")
