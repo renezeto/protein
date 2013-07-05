@@ -14,7 +14,6 @@ using namespace std;
 //variables commented out and flagged as unused were causing compiler errors
 //since they were unused.
 
-//const double pi = atan(1)*4;
 const double difD = 2.5; // (um)^2 s^- 1
 const double difE = 2.5; // (um)^2 s^-1
 const double rate_ADP_ATP = 1; // s^-1
@@ -633,12 +632,33 @@ int main (int argc, char *argv[]) {
   //  clock_t newtime; unused
   clock_t start = clock();
   int k=0;
+
+  double* nATP_avg = new double[Nx*Ny*Nz];
+  double* nE_avg = new double[Nx*Ny*Nz];
+  double* nADP_avg = new double[Nx*Ny*Nz];
+  double* nD_avg = new double[Nx*Ny*Nz];
+
   for (int i=0;i<iter;i++){
+    //get average 
+
+    for (int i2=0; i2<Nx; i2++) {
+      for (int j2=0; j2<Ny; j2++) {
+        for (int k2=0; k2<Nz; k2++) {
+          nATP_avg[i2*Ny*Nz+j2*Nz+k2] += nATP[i2*Ny*Nz+j2*Nz+k2];
+          nE_avg[i2*Ny*Nz+j2*Nz+k2] += nE[i2*Ny*Nz+j2*Nz+k2];
+          nADP_avg[i2*Ny*Nz+j2*Nz+k2] += nADP[i2*Ny*Nz+j2*Nz+k2];
+          nD_avg[i2*Ny*Nz+j2*Nz+k2] += Nd[i2*Ny*Nz+j2*Nz+k2];
+        }
+      }
+    }
+
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
           JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
     get_next_density(mem_A, insideArr, nATP, nADP, nE, Nd, Nde, JxATP, JyATP, JzATP,
                      JxADP, JyADP, JzADP, JxE, JyE, JzE);
+
     
+
     //begin status update
     if (i%percent == 0){
       if (i!=0){
@@ -807,6 +827,38 @@ int main (int argc, char *argv[]) {
   }
   //end catalog
 
+  char* nATPavg_name = new char[1024];
+  char* nEavg_name = new char[1024];
+  char* nADPavg_name = new char[1024];
+  char* nDavg_name = new char[1024];
+  sprintf(nATPavg_name,"data/shape-%s/avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(nEavg_name,"data/shape-%s/avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(nADPavg_name,"data/shape-%s/avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(nDavg_name,"data/shape-%s/avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  FILE* nATPavg_file = fopen((const char *)nATPavg_name,"w");
+  FILE* nEavg_file = fopen((const char *)nEavg_name,"w");
+  FILE* nADPavg_file = fopen((const char *)nADPavg_name,"w");
+  FILE* nDavg_file = fopen((const char *)nDavg_name,"w");
+
+  for (int i2=0; i2<Nx; i2++) {
+    for (int j2=0; j2<Ny; j2++) {
+      for (int k2=0; k2<Nz; k2++) {
+        nATP_avg[i2*Ny*Nz+j2*Nz+k2] *= 1/((double) iter);
+        nE_avg[i2*Ny*Nz+j2*Nz+k2] *= 1/((double) iter);
+        nADP_avg[i2*Ny*Nz+j2*Nz+k2] *= 1/((double) iter);
+        nD_avg[i2*Ny*Nz+j2*Nz+k2] *= 1/((double) iter);
+        fprintf(nATPavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nATP_avg[i2*Ny*Nz+j2*Nz+k2]);
+        fprintf(nEavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nE_avg[i2*Ny*Nz+j2*Nz+k2]);
+        fprintf(nADPavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nADP_avg[i2*Ny*Nz+j2*Nz+k2]);
+        fprintf(nDavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nD_avg[i2*Ny*Nz+j2*Nz+k2]);
+        //x y z avg_density print to each file
+      }  
+    }
+  }
+  fclose(nATPavg_file);
+  fclose(nEavg_file);
+  fclose(nADPavg_file);
+  fclose(nDavg_file);
   return 0;
 }
 
