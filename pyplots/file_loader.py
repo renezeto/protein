@@ -40,5 +40,4 @@ class data(object):
             print "File loading error: filename list is empty."
             exit(1)
         else:
-            dat_filenames.pop(0)
             return dat_filenames
