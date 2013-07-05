@@ -32,8 +32,9 @@ int area_rating_flag;
 double dx=0.15;
 const double tot_time = 186;
 const double time_step = .1*dx*dx/difD;
+
 const int iter = int(tot_time/time_step)+3;
-const int iter_at_half_sec = int(0.5/time_step)+1;
+const int iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second
 
 double x, y, z;
 int Nx, Ny, Nz;
@@ -1219,7 +1220,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
     }
   }
 
-  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3.0);
+  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/2.0);
 
   //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
   int gridpoints_left = 0;
@@ -1276,12 +1277,12 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_right/(M_PI*B*B); 
-            //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_right/(M_PI*B*B);
+            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
           } 
           else {
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_left/(M_PI*B*B);
-            //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
+            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
           }
         }
       }
