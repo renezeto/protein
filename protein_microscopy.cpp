@@ -14,6 +14,7 @@ using namespace std;
 //variables commented out and flagged as unused were causing compiler errors
 //since they were unused.
 
+//const double pi = atan(1)*4;
 const double difD = 2.5; // (um)^2 s^- 1
 const double difE = 2.5; // (um)^2 s^-1
 const double rate_ADP_ATP = 1; // s^-1
@@ -599,7 +600,7 @@ int main (int argc, char *argv[]) {
   fprintf (out_file,"Membrane set with density in it.\n");
   fflush(out_file);
   //end mem_f printing
-
+  
   set_density(nATP, nE, mem_A);
   fprintf(out_file,"nATP_starting_density = %g proteins per micron^2 \nnE_starting_density = %g proteins per micron^2 \n",
          nATP_starting_density, nE_starting_density);
@@ -1148,7 +1149,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
-        if (inside(i,j,k)){ //very clever jeff
+        if (inside(i,j,k)){
           if (k>right_most_point_z){
             right_most_point_z = k;
           }
@@ -1167,9 +1168,6 @@ int set_density(double *nATP, double *nE, double *mem_A){
   }
 
   int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3.0);
-
-  //convention: from here on out, I identify i<->x, j<->y, k<->z, regardless of for loop order, to
-  //keep things from getting confusing
 
   //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
   int gridpoints_left = 0;
@@ -1191,63 +1189,64 @@ int set_density(double *nATP, double *nE, double *mem_A){
     }
   }
 
-  //get gridpoints per slice for correct protein count
-  int* slice_totals = new int[Nz];
-  for (int k=0; k<Nz; k++) {
-    int gridpoints_on_slice = 0;
-    for (int i=0; i<Nx; i++) {
-      for (int j=0; j<Ny; j++) {
-        if (inside(i,j,k)) {
-          gridpoints_on_slice += 1;
-        }
-      }
-    }
-    if (gridpoints_on_slice==0) {
-      slice_totals[k] = 1; //avoid division by zero problem
-    }
-    else {
-      slice_totals[k] = gridpoints_on_slice;
-    }
-    //printf("%d\n",slice_totals[k]);
-  }
+  // //get gridpoints per slice for correct protein count
+  // int* slice_totals = new int[Nz];
+  // for (int k=0; k<Nz; k++) {
+  //   int gridpoints_on_slice = 0;
+  //   for (int i=0; i<Nx; i++) {
+  //     for (int j=0; j<Ny; j++) {
+  //       if (inside(i,j,k)) {
+  //         gridpoints_on_slice += 1;
+  //       }
+  //     }
+  //   }
+  //   if (gridpoints_on_slice==0) {
+  //     slice_totals[k] = 1; //avoid division by zero problem
+  //   }
+  //   else {
+  //     slice_totals[k] = gridpoints_on_slice;
+  //   }
+  //   //printf("%d\n",slice_totals[k]);
+  // }
   
   //compute density scale factors left and right of divide (to ensure correct protein #)
   double density_right = density_factor;
-  double density_left = (gridpoints_total - density_right*gridpoints_right)/gridpoints_left;
+  //double density_left = (gridpoints_total - density_right*gridpoints_right)/gridpoints_left;
+  double density_left = 1;
 
-  printf("%d\n",gridpoints_left);
-  printf("%d\n",gridpoints_right);
-  printf("%d\n",gridpoints_total);
+  printf("\nGridpoints left of the divider: %d\n",gridpoints_left);
+  printf("Gridpoints right of the divider:%d\n",gridpoints_right);
+  printf("Gridpoints total: %d\n",gridpoints_total);
+
   //begin setting density at each gridpoint:
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            //note: proteins must have a number density per cross sectional area
-            //of 1000/(um)^2 and 350/(um)^2 for natp and ne respectively.
-            //that means that summing over constant z gridpoints should have
-            //a protein total of 1000 and 350. divide by number of const z gridpoints.
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density/slice_totals[k]*density_right; 
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_right/(M_PI*B*B); 
+            //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
           } 
           else {
-            //the density on this side needs to be reduced 
-            //to compensate for the higher density on the right (and keep the total # of proteins correct)
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density/slice_totals[k]*density_left;
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_left/(M_PI*B*B);
+            //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
           }
         }
       }
     }
   }
+
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density/slice_totals[k]*density_right;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_right/(M_PI*B*B);
+            //            printf("%f\n",nE[i*Ny*Nz+j*Nz+k]);
           }
           else {
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density/slice_totals[k]*density_left;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_left/(M_PI*B*B);
+            //            printf("%f\n",nE[i*Ny*Nz+j*Nz+k]);
           }
         }
       }
