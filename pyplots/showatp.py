@@ -52,7 +52,7 @@ def contourplt(protein):
     maxval = timemax(protein)
     minval = timemin(protein)
     plt.figure(1)
-    os.system("rm -f /data/shape-"+f_shape+"/plots/tmp_*.png")
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/tmp_*.png")
     Z, Y = np.meshgrid(np.arange(0,protein.datashape[1],1), np.arange(0,protein.datashape[0],1))
     for k in range(len(protein.dataset)): #fig.dpi method
         page = protein.dataset[k]
@@ -67,16 +67,20 @@ def contourplt(protein):
             plt.savefig('./data/shape-'+f_shape+'/plots/tmp_0'+str(k)+'-'+str(protein.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
         else:
             plt.savefig('./data/shape-'+f_shape+'/plots/tmp_'+str(k)+'-'+str(protein.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
-        sys.stdout.write('%3d%%\r' %int(k/protein.tsteps))
     os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
     +"/plots/density_movie-"+str(protein.protein)+"-"+f_shape \
     +"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".gif")
-    os.system("rm -f /data/shape-"+f_shape+"/plots/tmp_*.png")
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/tmp_*.png")
     return 0
 
+print "Generating nATP plot:"
 contourplt(natp)
+print "Done! Generating nE plot:"
 contourplt(ne)
+print "Done! Generating nADP plot:"
 contourplt(nadp)
+print "Done! Generating nD plot:"
 contourplt(nd)
+print "Finished generating plots."
