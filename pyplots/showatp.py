@@ -1,6 +1,7 @@
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 import sys
 import time
 import file_loader as load
@@ -48,24 +49,32 @@ def timemin(protein):
     return minval
 
 def contourplt(protein):
-    plt.ion()
     maxval = timemax(protein)
     minval = timemin(protein)
-    for k in range(len(protein.dataset)):
+    plt.figure(1)
+    os.system("rm -f /data/shape-"+f_shape+"/plots/tmp_*.png")
+    Z, Y = np.meshgrid(np.arange(0,protein.datashape[1],1), np.arange(0,protein.datashape[0],1))
+    for k in range(len(protein.dataset)): #fig.dpi method
         page = protein.dataset[k]
-        Z, Y = np.meshgrid(np.arange(0,protein.datashape[1],1), np.arange(0,protein.datashape[0],1))
+        plt.clf()
         plt.axes().set_aspect('equal', 'datalim')
-        plt.ylabel('Y axis position')
-        plt.xlabel('Z axis position')
-        plt.title('density at time: '+repr(5*(k+1))+'s') #not correct
         CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval+10,5))
         cbar = plt.colorbar(CS)
         plt.clim(minval,maxval)
-        cbar.ax.set_ylabel('density')
-        plt.axes().set_aspect('equal')
-        plt.draw()
-        plt.clf()
-    close()
+        if k<10:
+            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_00'+str(k)+'-'+str(protein.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
+        elif k<100:
+            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_0'+str(k)+'-'+str(protein.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
+        else:
+            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_'+str(k)+'-'+str(protein.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
+        sys.stdout.write('%3d%%\r' %int(k/protein.tsteps))
+    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/tmp_*" \
+    +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
+    +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
+    +"/plots/density_movie-"+str(protein.protein)+"-"+f_shape \
+    +"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".gif")
+    os.system("rm -f /data/shape-"+f_shape+"/plots/tmp_*.png")
+    return 0
 
 contourplt(natp)
 contourplt(ne)
