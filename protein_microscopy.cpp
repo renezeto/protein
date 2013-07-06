@@ -5,7 +5,7 @@ using namespace std;
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "test.h"
+//#include "test.h"
 #include "protein.h"
 #include "MersenneTwister.h"
 #include <cassert>
@@ -817,7 +817,7 @@ int main (int argc, char *argv[]) {
     catalog=fopen(fname,"w+b");
   }
   if (catalog!=NULL) {
-    fprintf(catalog,"%s %1.2f %1.2f %1.2f %1.2f %1.2f\n", mem_f_shape.c_str(),A,B,C,D,density_factor);
+    fprintf(catalog,"%s %1.2f %1.2f %1.2f %1.2f %1.2f", mem_f_shape.c_str(),A,B,C,D,density_factor);
     if (dx==.05) {
       fprintf(catalog," -hires\n");
     }
