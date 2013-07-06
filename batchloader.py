@@ -6,13 +6,15 @@ import subprocess
 import time
 
 #set up simulations to be run:
-batch_pill_simulations = []
+batch_randst_simulations = []
 i=1
-while i<20:
+while i<7:
     a = abs(i/2)
     b = abs(5-i/2)
-    if ([a, b] not in batch_pill_simulations) and ([b, a] not in batch_pill_simulations):
-        batch_pill_simulations+=[[a,b]]
+    c = 2.00
+    if ([a, b] not in batch_randst_simulations) and ([b, a] not in batch_randst_simulations):
+        for d in [96.00, 97.00, 98.00, 99.00]:
+            batch_randst_simulations+=[[a,b,c,d]]
     i+=1
 
 batch_pill_simulations = [ [0.50, 3.50], \
@@ -25,11 +27,6 @@ batch_pill_simulations = [ [0.50, 3.50], \
                                [8.00, 3.00], \
                                [8.50, 3.50], \
                                [9.00, 4.00] ]
-
-batch_randst_simulations = [[1.00, 1.00, 1.00, 96.00], \
-                                [1.00, 1.00, 1.00, 97.00], \
-                                [1.00, 1.00, 1.00, 98.00], \
-                                [1.00, 1.00, 1.00, 99.00]]
 
 #simulation subprocess management:
 if '-sim' in sys.argv:
@@ -48,6 +45,8 @@ if '-sim' in sys.argv:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
 
+print batch_randst_simulations
+
 #plots the recent simulations:
 if '-plot' in sys.argv:
     processes = set()
@@ -56,13 +55,15 @@ if '-plot' in sys.argv:
         for job in batch_pill_simulations:
             processes.add(subprocess.Popen(['python','pyplots/extrema.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
             processes.add(subprocess.Popen(['python','pyplots/time_map.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
+            processes.add(subprocess.Popen(['python','pyplots/showatp.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
     if 'randst' in sys.argv:
-        for job in batch_pill_simulations:
-            processes.add(subprocess.Popen(['python','pyplots/extrema.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
-            processes.add(subprocess.Popen(['python','pyplots/time_map.py','randst',str(job[0]),str(job[1]),str(job[2]),str(job[3]),'15.00']))
+        for job in batch_randst_simulations:
+#            processes.add(subprocess.Popen(['python','pyplots/extrema.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
+#            processes.add(subprocess.Popen(['python','pyplots/time_map.py','randst',str(job[0]),str(job[1]),str(job[2]),str(job[3]),'15.00']))
+            processes.add(subprocess.Popen(['python','pyplots/showatp.py','randst',str(job[0])+'0',str(job[1])+'0',str(job[2])+'0',str(job[3])+'0','15.00']))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)

@@ -640,15 +640,17 @@ int main (int argc, char *argv[]) {
   double* nD_avg = new double[Nx*Ny*Nz];
 
   for (int i=0;i<iter;i++){
-    //get average 
+    //get average. note: starting after the first 10% of iterations to let things equillibriate (same is done for plotting- may change later).
 
-    for (int i2=0; i2<Nx; i2++) {
-      for (int j2=0; j2<Ny; j2++) {
-        for (int k2=0; k2<Nz; k2++) {
-          nATP_avg[i2*Ny*Nz+j2*Nz+k2] += nATP[i2*Ny*Nz+j2*Nz+k2];
-          nE_avg[i2*Ny*Nz+j2*Nz+k2] += nE[i2*Ny*Nz+j2*Nz+k2];
-          nADP_avg[i2*Ny*Nz+j2*Nz+k2] += nADP[i2*Ny*Nz+j2*Nz+k2];
-          nD_avg[i2*Ny*Nz+j2*Nz+k2] += Nd[i2*Ny*Nz+j2*Nz+k2];
+    if (i > iter/10) {
+      for (int i2=0; i2<Nx; i2++) {
+        for (int j2=0; j2<Ny; j2++) {
+          for (int k2=0; k2<Nz; k2++) {
+            nATP_avg[i2*Ny*Nz+j2*Nz+k2] += nATP[i2*Ny*Nz+j2*Nz+k2];
+            nE_avg[i2*Ny*Nz+j2*Nz+k2] += nE[i2*Ny*Nz+j2*Nz+k2];
+            nADP_avg[i2*Ny*Nz+j2*Nz+k2] += nADP[i2*Ny*Nz+j2*Nz+k2];
+            nD_avg[i2*Ny*Nz+j2*Nz+k2] += Nd[i2*Ny*Nz+j2*Nz+k2];
+          }
         }
       }
     }
@@ -840,7 +842,7 @@ int main (int argc, char *argv[]) {
   FILE* nEavg_file = fopen((const char *)nEavg_name,"w");
   FILE* nADPavg_file = fopen((const char *)nADPavg_name,"w");
   FILE* nDavg_file = fopen((const char *)nDavg_name,"w");
-
+  
   for (int i2=0; i2<Nx; i2++) {
     for (int j2=0; j2<Ny; j2++) {
       for (int k2=0; k2<Nz; k2++) {
@@ -860,6 +862,7 @@ int main (int argc, char *argv[]) {
   fclose(nEavg_file);
   fclose(nADPavg_file);
   fclose(nDavg_file);
+
   return 0;
 }
 
@@ -1220,7 +1223,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
     }
   }
 
-  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/2.0);
+  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
 
   //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
   int gridpoints_left = 0;
@@ -1241,29 +1244,10 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
-
-  // //get gridpoints per slice for correct protein count
-  // int* slice_totals = new int[Nz];
-  // for (int k=0; k<Nz; k++) {
-  //   int gridpoints_on_slice = 0;
-  //   for (int i=0; i<Nx; i++) {
-  //     for (int j=0; j<Ny; j++) {
-  //       if (inside(i,j,k)) {
-  //         gridpoints_on_slice += 1;
-  //       }
-  //     }
-  //   }
-  //   if (gridpoints_on_slice==0) {
-  //     slice_totals[k] = 1; //avoid division by zero problem
-  //   }
-  //   else {
-  //     slice_totals[k] = gridpoints_on_slice;
-  //   }
-  //   //printf("%d\n",slice_totals[k]);
-  // }
   
   //compute density scale factors left and right of divide (to ensure correct protein #)
   double density_right = density_factor;
+  //bug: this should be proteins, not gridpoints
   //double density_left = (gridpoints_total - density_right*gridpoints_right)/gridpoints_left;
   double density_left = 1;
 
@@ -1278,11 +1262,11 @@ int set_density(double *nATP, double *nE, double *mem_A){
         if (inside(i,j,k)){
           if(k>density_divider_z){
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_right/(M_PI*B*B);
-            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
+            //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
           } 
           else {
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_left/(M_PI*B*B);
-            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
+            //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
           }
         }
       }
