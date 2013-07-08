@@ -22,15 +22,14 @@ const double rate_dD = .0015; // (um)^3 s^-1
 const double rate_de = .7; // s^-1
 const double rate_E = .093; // (um)^3 s^-1
 
-const double nATP_starting_density = 1000.0; //proteins per micrometer
-const double nE_starting_density = 350.0; //proteins per micrometer
+const double nATP_starting_density = 1000.0/(M_PI*0.5*0.5); //proteins per micrometer^3 (values from paper)
+const double nE_starting_density = 350.0/(M_PI*0.5*0.5); // proteins per micrometer
 double density_factor;
 
 const int n = 706; //what is this?
 int area_rating_flag;
 
-//double dx=0.15;
-double dx=0.05;
+double dx=0.15;
 const double tot_time = 62;
 const double time_step = .1*dx*dx/difD;
 
@@ -644,7 +643,6 @@ int main (int argc, char *argv[]) {
 
   for (int i=0;i<iter;i++){
     //get average. note: starting after the first 10% of iterations to let things equillibriate (same is done for plotting- may change later).
-
     if (i > iter/10) {
       for (int i2=0; i2<Nx; i2++) {
         for (int j2=0; j2<Ny; j2++) {
@@ -1249,13 +1247,14 @@ int set_density(double *nATP, double *nE, double *mem_A){
   }
 
   //compute density scale factors left and right of divide (to ensure correct protein #)
-  double density_factor_right = density_factor;
-  //double density_factor_left = (gridpoints_total - density_factor_right*gridpoints_right)/gridpoints_left;
-  double density_factor_left = 1;
+  double density_factor_left = gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
+  double density_factor_right = density_factor*gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
 
-  printf("left: %f, right: %f\n, ratio: %f", density_factor_left, density_factor_right, density_factor_left/density_factor_right);
 
-  printf("\nGridpoints left of the divider: %d\n",gridpoints_left);
+
+  printf("left: %f, right: %f\n, ratio: %f\n", density_factor_left, density_factor_right, density_factor_right/density_factor_left);
+
+  printf("Gridpoints left of the divider: %d\n",gridpoints_left);
   printf("Gridpoints right of the divider:%d\n",gridpoints_right);
   printf("Gridpoints total: %d\n",gridpoints_total);
 
@@ -1265,12 +1264,10 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right/(M_PI*A*A);
-            //printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
           }
           else {
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left/(M_PI*A*A);
-            //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left;
           }
         }
       }
@@ -1282,12 +1279,10 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right/(M_PI*A*A);
-            //            printf("%f\n",nE[i*Ny*Nz+j*Nz+k]);
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
           }
           else {
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left/(M_PI*A*A);
-            //            printf("%f\n",nE[i*Ny*Nz+j*Nz+k]);
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left;
           }
         }
       }

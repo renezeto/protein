@@ -16,6 +16,10 @@ ne = load.data(protein="ne")
 nadp = load.data(protein="nadp")
 nd = load.data(protein="nd")
 
+areaFname = "data/shape-" + f_shape +"/area_rating_two-" +f_param1+ "-" +f_param2 + "-" +f_param3+ "-" +f_param4 + "-" +f_param5+ ".dat"
+areaFile = np.loadtxt(areaFname,dtype=float)
+
+
 def splitdata(protein):
     areaFname = "data/shape-" + f_shape +"/area_rating_two-" +f_param1+ "-" +f_param2 + "-" +f_param3+ "-" +f_param4 + "-" +f_param5+ ".dat"
     areaFile = np.loadtxt(areaFname,dtype=float)
@@ -32,11 +36,20 @@ def splitdata(protein):
             areaRating += [areaFile[i][3]]
     return areaRating, avgProtein
 
-for p in [natp, ne, nadp, nd]:
-    plt.figure()
-    plt.title(str(p.protein))
-    plt.ylabel("average protein density (proteins per micron^3)")
-    plt.xlabel("area rating")
-    plt.scatter(splitdata(p)[0], splitdata(p)[1])
-    print './data/shape-'+f_shape+'/plots/avg_density-'+str(p.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf'
-    plt.savefig('./data/shape-'+f_shape+'/plots/avg_density-'+str(p.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
+y = np.zeros(natp.datasize[0]/load.dx)
+z = np.zeros(natp.datasize[1]/load.dx)
+
+Y,Z = np.meshgrid(y,z) 
+area_rating = np.zeros_like(Y)
+
+print area_rating.shape
+def unzip(areaFile):
+    for i in range(areaFile.shape[0]):
+        y = (round(areaFile[i][0])/load.dx)
+        z = (round(areaFile[i][1])/load.dx)
+        area_rating[y][z] = areaFile[i][3]
+    return area_rating
+
+plt.figure()
+plt.contourf(y,z,unzip(areaFile))
+plt.show()
