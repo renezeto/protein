@@ -30,7 +30,7 @@ const int n = 706; //what is this?
 int area_rating_flag;
 
 double dx=0.15;
-const double tot_time = 186;
+const double tot_time = 62;
 const double time_step = .1*dx*dx/difD;
 
 const int iter = int(tot_time/time_step)+3;
@@ -526,7 +526,7 @@ int main (int argc, char *argv[]) {
                   double dis = dx*sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
                   area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
                   if (dis<1.5*A){
-                    area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2];
+                    area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
                   }
                 }
               }
@@ -834,10 +834,10 @@ int main (int argc, char *argv[]) {
   char* nEavg_name = new char[1024];
   char* nADPavg_name = new char[1024];
   char* nDavg_name = new char[1024];
-  sprintf(nATPavg_name,"data/shape-%s/avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
-  sprintf(nEavg_name,"data/shape-%s/avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
-  sprintf(nADPavg_name,"data/shape-%s/avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
-  sprintf(nDavg_name,"data/shape-%s/avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(nATPavg_name,"data/shape-%s/natp-avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(nEavg_name,"data/shape-%s/ne-avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(nADPavg_name,"data/shape-%s/nadp-avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(nDavg_name,"data/shape-%s/nd-avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE* nATPavg_file = fopen((const char *)nATPavg_name,"w");
   FILE* nEavg_file = fopen((const char *)nEavg_name,"w");
   FILE* nADPavg_file = fopen((const char *)nADPavg_name,"w");
@@ -1246,10 +1246,11 @@ int set_density(double *nATP, double *nE, double *mem_A){
   }
   
   //compute density scale factors left and right of divide (to ensure correct protein #)
-  double density_right = density_factor;
-  //bug: this should be proteins, not gridpoints
-  //double density_left = (gridpoints_total - density_right*gridpoints_right)/gridpoints_left;
-  double density_left = 1;
+  double density_factor_right = density_factor;
+  //double density_factor_left = (gridpoints_total - density_factor_right*gridpoints_right)/gridpoints_left;
+  double density_factor_left = 1;
+
+  printf("left: %f, right: %f\n, ratio: %f", density_factor_left, density_factor_right, density_factor_left/density_factor_right);
 
   printf("\nGridpoints left of the divider: %d\n",gridpoints_left);
   printf("Gridpoints right of the divider:%d\n",gridpoints_right);
@@ -1261,11 +1262,11 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_right/(M_PI*B*B);
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right/(M_PI*A*A);
             //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
           } 
           else {
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_left/(M_PI*B*B);
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left/(M_PI*A*A);
             //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
           }
         }
@@ -1278,11 +1279,11 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if(k>density_divider_z){
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_right/(M_PI*B*B);
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right/(M_PI*A*A);
             //            printf("%f\n",nE[i*Ny*Nz+j*Nz+k]);
           }
           else {
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_left/(M_PI*B*B);
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left/(M_PI*A*A);
             //            printf("%f\n",nE[i*Ny*Nz+j*Nz+k]);
           }
         }
