@@ -29,7 +29,8 @@ double density_factor;
 const int n = 706; //what is this?
 int area_rating_flag;
 
-double dx=0.15;
+//double dx=0.15;
+double dx=0.05;
 const double tot_time = 62;
 const double time_step = .1*dx*dx/difD;
 
@@ -159,8 +160,8 @@ double mem_f(double x, double y, double z) {
         return f;
       }
       if (f>0) {
-        double closest_y0 = -100.0; 
-        double closest_z0 = -100.0; 
+        double closest_y0 = -100.0;
+        double closest_z0 = -100.0;
         //bool there_is_closest_point=0; unused
         for (double y0 = y-A; y0<y+A; y0+=dx) {
           for (double z0 = z-A; z0<z+A; z0+=dx) {
@@ -280,7 +281,7 @@ double mem_f(double x, double y, double z) {
     return f;
   }
 
-  if (mem_f_shape=="e"){ 
+  if (mem_f_shape=="e"){
     //B = x axis radius radius, C = y axis radius radius, A = z axis radius radius
     double X = Nx*dx;
     double Y = Ny*dx;
@@ -308,7 +309,9 @@ int main (int argc, char *argv[]) {
 
   // input extra command line argument equal to 1 for area_rating check only, also hires
   // not the best way to do this. but for now it works.
-  if (argc == 8) {
+  if (argc >= 8) {
+    string arg = argv[7];
+    printf("%s\n",arg.c_str());
     if (strcmp(argv[7],"-area")==0) {
       area_rating_flag = 1;
     }
@@ -1244,7 +1247,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
-  
+
   //compute density scale factors left and right of divide (to ensure correct protein #)
   double density_factor_right = density_factor;
   //double density_factor_left = (gridpoints_total - density_factor_right*gridpoints_right)/gridpoints_left;
@@ -1263,8 +1266,8 @@ int set_density(double *nATP, double *nE, double *mem_A){
         if (inside(i,j,k)){
           if(k>density_divider_z){
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right/(M_PI*A*A);
-            //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
-          } 
+            //printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
+          }
           else {
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left/(M_PI*A*A);
             //            printf("%f\n",nATP[i*Ny*Nz+j*Nz+k]);
