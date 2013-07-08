@@ -526,7 +526,7 @@ int main (int argc, char *argv[]) {
                   double dis = dx*sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
                   area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
                   if (dis<1.5*A){
-                    area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2];
+                    area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
                   }
                 }
               }
