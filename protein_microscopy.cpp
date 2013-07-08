@@ -159,8 +159,8 @@ double mem_f(double x, double y, double z) {
         return f;
       }
       if (f>0) {
-        double closest_y0 = -100.0; 
-        double closest_z0 = -100.0; 
+        double closest_y0 = -100.0;
+        double closest_z0 = -100.0;
         //bool there_is_closest_point=0; unused
         for (double y0 = y-A; y0<y+A; y0+=dx) {
           for (double z0 = z-A; z0<z+A; z0+=dx) {
@@ -280,7 +280,7 @@ double mem_f(double x, double y, double z) {
     return f;
   }
 
-  if (mem_f_shape=="e"){ 
+  if (mem_f_shape=="e"){
     //B = x axis radius radius, C = y axis radius radius, A = z axis radius radius
     double X = Nx*dx;
     double Y = Ny*dx;
