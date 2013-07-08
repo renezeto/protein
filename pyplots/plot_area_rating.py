@@ -33,9 +33,10 @@ def splitdata(protein):
     return areaRating, avgProtein
 
 for p in [natp, ne, nadp, nd]:
-    plt.figure(1)
+    plt.figure()
     plt.title(str(p.protein))
     plt.ylabel("average protein density (proteins per micron^3)")
     plt.xlabel("area rating")
     plt.scatter(splitdata(p)[0], splitdata(p)[1])
-    plt.show()
+    print './data/shape-'+f_shape+'/plots/avg_density-'+str(p.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf'
+    plt.savefig('./data/shape-'+f_shape+'/plots/avg_density-'+str(p.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
