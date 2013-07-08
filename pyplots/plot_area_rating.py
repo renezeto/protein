@@ -27,13 +27,13 @@ def splitdata(protein):
     areaRating = []
 
     for i in range(len(areaFile)):
-        if not (proteinFile[i]==0 and areaFile[i]==0):
+        if not (proteinFile[i][3]==0 and areaFile[i][3]==0):
             avgProtein += [proteinFile[i][3]]
             areaRating += [areaFile[i][3]]
     return areaRating, avgProtein
 
 for p in [natp, ne, nadp, nd]:
-    plt.figure()
+    plt.figure(1)
     plt.title(str(p.protein))
     plt.ylabel("average protein density (proteins per micron^3)")
     plt.xlabel("area rating")
