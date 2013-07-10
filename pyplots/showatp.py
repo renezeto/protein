@@ -13,6 +13,8 @@ f_param3 = sys.argv[4]
 f_param4 = sys.argv[5]
 f_param5 = sys.argv[6]
 
+flE = load.data(protein="flE")
+flD = load.data(protein="flD")
 natp = load.data(protein="natp")
 ne = load.data(protein="ne")
 nadp = load.data(protein="nadp")
@@ -30,7 +32,7 @@ def minnum(page):
     for i in range(page.shape[0]):
         Z[i] = min(page[i])
         if Z[i] == 0:
-            Z[i] = 50000000 #change this
+            Z[i] = 50000000 #eh
     minval = min(Z)
     return minval
 
@@ -62,11 +64,14 @@ def contourplt(protein):
         cbar = plt.colorbar(CS)
         plt.clim(minval,maxval)
         if k<10:
-            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_00'+str(k)+'-'+str(protein.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
+            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_00'+str(k)+'-'+str(protein.protein)+ \
+                            '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
         elif k<100:
-            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_0'+str(k)+'-'+str(protein.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
+            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_0'+str(k)+'-'+str(protein.protein)+ \
+                            '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
         else:
-            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_'+str(k)+'-'+str(protein.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
+            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_'+str(k)+'-'+str(protein.protein)+ \
+                            '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
     os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
@@ -75,6 +80,8 @@ def contourplt(protein):
     os.system("rm -f ./data/shape-"+f_shape+"/plots/tmp_*.png")
     return 0
 
+print "Generating flourescent tagging plot:"
+contourplt(flD)
 print "Generating nATP plot:"
 contourplt(natp)
 print "Done! Generating nE plot:"

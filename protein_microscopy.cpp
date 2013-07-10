@@ -31,10 +31,10 @@ int area_rating_flag;
 
 double dx=0.15;
 const double tot_time = 62;
-const double time_step = .1*dx*dx/difD;
+const double time_step = .1*dx*dx/difD; // = .0009 s if dx=.15
 
 const int iter = int(tot_time/time_step)+3;
-const int iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second
+const int iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second = 556
 
 double x, y, z;
 int Nx, Ny, Nz;
@@ -305,7 +305,7 @@ int main (int argc, char *argv[]) {
   C = atof(argv[4]);
   D = atof(argv[5]);
   density_factor = atof(argv[6]);
-
+  printf("%d\n",iter_at_half_sec);
   // input extra command line argument equal to 1 for area_rating check only, also hires
   // not the best way to do this. but for now it works.
   if (argc >= 8) {
@@ -769,6 +769,48 @@ int main (int argc, char *argv[]) {
         fprintf(nDfile, "\n");
       }
       fclose(nDfile);
+
+      char *outfilenameflE = new char[1000];
+      if (dx==.05) {
+        sprintf(outfilenameflE, "data/shape-%s/hires-m_flE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
+      else {      
+        sprintf(outfilenameflE, "data/shape-%s/m_flE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
+      FILE *flEfile = fopen((const char *)outfilenameflE,"w");
+      delete[] outfilenameflE;
+      for (int a=0;a<Ny;a++){
+        for (int b=0;b<Nz;b++){
+          double flEsum = 0;
+          for (int c=0;c<Nx;c++){
+            flEsum += nE[c*Ny*Nz+a*Nz+b] + Nde[c*Ny*Nz+a*Nz+b];
+          }
+          fprintf(flEfile, "%1.2f ", flEsum);
+        }
+        fprintf(flEfile, "\n");
+      }
+      fclose(flEfile);
+
+      char *outfilenameflD = new char[1000];
+      if (dx==.05) {
+        sprintf(outfilenameflD, "data/shape-%s/hires-m_flD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
+      else {      
+        sprintf(outfilenameflD, "data/shape-%s/m_flD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      }
+      FILE *flDfile = fopen((const char *)outfilenameflD,"w");
+      delete[] outfilenameflD;
+      for (int a=0;a<Ny;a++){
+        for (int b=0;b<Nz;b++){
+          double flDsum = 0;
+          for (int c=0;c<Nx;c++){
+            flDsum += Nde[c*Ny*Nz+a*Nz+b] + nADP[c*Ny*Nz+a*Nz+b] + nATP[c*Ny*Nz+a*Nz+b] + Nd[c*Ny*Nz+a*Nz+b];
+          }
+          fprintf(flDfile, "%1.2f ", flDsum);
+        }
+        fprintf(flDfile, "\n");
+      }
+      fclose(flDfile);
 
       k++;
       fflush(out_file);
@@ -1249,8 +1291,6 @@ int set_density(double *nATP, double *nE, double *mem_A){
   //compute density scale factors left and right of divide (to ensure correct protein #)
   double density_factor_left = gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
   double density_factor_right = density_factor*gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
-
-
 
   printf("left: %f, right: %f\n, ratio: %f\n", density_factor_left, density_factor_right, density_factor_right/density_factor_left);
 
