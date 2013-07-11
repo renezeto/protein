@@ -63,6 +63,9 @@ def contourplt(protein):
         CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval+10,5))
         cbar = plt.colorbar(CS)
         plt.clim(minval,maxval)
+        plt.title(str(protein.protein)+" volume density at time: "+str(k/2)+" sec")
+        plt.xlabel("Z position")
+        plt.ylabel("Y position")
         if k<10:
             plt.savefig('./data/shape-'+f_shape+'/plots/tmp_00'+str(k)+'-'+str(protein.protein)+ \
                             '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
