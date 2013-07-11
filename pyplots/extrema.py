@@ -13,10 +13,12 @@ f_param5 = sys.argv[6]
 
 cell_membrane = np.loadtxt('./data/shape-'+f_shape+'/membrane_files/membrane-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.dat')
 
-natp = load.data(protein="natp")
-ne = load.data(protein="ne")
-nadp = load.data(protein="nadp")
-nd = load.data(protein="nd")
+nflE = load.data(protein="nflE")
+nflD = load.data(protein="nflD")
+nATP = load.data(protein="nATP")
+nE = load.data(protein="nE")
+nADP = load.data(protein="nADP")
+Nd = load.data(protein="Nd")
 
 def unzip_membrane(memdat):
     x = []
@@ -70,7 +72,7 @@ def maxvectorplot(protein):
         displacements += [[positions[i-1][0],positions[i-1][1],positions[i][0]-positions[i-1][0],positions[i][1]-positions[i-1][1]]]
     return displacements
 
-for p in [natp, ne, nadp, nd]:
+for p in [nflE, nflD, nATP, nE, nADP, Nd]:
     X,Y,U,V = zip(*maxvectorplot(p))
     plt.figure()
     plt.axes().set_aspect('equal', 'datalim')

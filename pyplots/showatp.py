@@ -5,7 +5,7 @@ import os
 import sys
 import time
 import file_loader as load
-#
+
 f_shape = sys.argv[1]
 f_param1 = sys.argv[2]
 f_param2 = sys.argv[3]
@@ -80,14 +80,16 @@ def contourplt(protein):
     os.system("rm -f ./data/shape-"+f_shape+"/plots/tmp_*.png")
     return 0
 
-print "Generating flourescent tagging plot:"
+print "Generating flourescent Min D tagging plot:"
 contourplt(nflD)
-# print "Generating nATP plot:"
-# contourplt(natp)
-# print "Done! Generating nE plot:"
-# contourplt(ne)
-# print "Done! Generating nADP plot:"
-# contourplt(nadp)
-# print "Done! Generating nD plot:"
-# contourplt(nd)
-# print "Finished generating plots."
+print "Done! Generating flourescent Min E tagging plot:"
+contourplt(nflE)
+print "Generating nATP plot:"
+contourplt(nATP)
+print "Done! Generating nE plot:"
+contourplt(nE)
+print "Done! Generating nADP plot:"
+contourplt(nADP)
+print "Done! Generating nD plot:"
+contourplt(Nd)
+print "Finished generating plots."
