@@ -306,11 +306,11 @@ int main (int argc, char *argv[]) {
       area_rating_flag = 1;
       printf("Area rating printout.\n");
     }
-    else if (strcmp(argv[i],"-hires")==0) {
+    if (strcmp(argv[i],"-hires")==0) {
       dx=.05;
       printf("Using high resolution.\n");
     }
-    else if (strcmp(argv[i],"-slice")==0) {
+    if (strcmp(argv[i],"-slice")==0) {
       slice_flag = 1;
       printf("Printing middle slice data.\n");
     }
