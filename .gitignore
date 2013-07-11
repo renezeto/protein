@@ -5,8 +5,9 @@
 *.gif
 *.tmp.sh
 *.py~
-protein
-protein_microscopy
+*.pyc
+*protein*
+*protein_microscopy*
 *.pdf
 *.dat
 catalog.txt

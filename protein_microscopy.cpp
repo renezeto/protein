@@ -5,14 +5,9 @@ using namespace std;
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-//#include "test.h"
 #include "protein.h"
 #include "MersenneTwister.h"
 #include <cassert>
-
-//notes:
-//variables commented out and flagged as unused were causing compiler errors
-//since they were unused.
 
 const double difD = 2.5; // (um)^2 s^- 1
 const double difE = 2.5; // (um)^2 s^-1
@@ -27,13 +22,13 @@ const double nE_starting_density = 350.0/(M_PI*0.5*0.5); // proteins per microme
 double density_factor;
 
 const int n = 706; //what is this?
-int area_rating_flag;
-int slice_flag;
+
+int area_rating_flag = 0;
+int slice_flag = 0;
 
 double dx=0.15;
 const double tot_time = 62;
 const double time_step = .1*dx*dx/difD; // = .0009 s if dx=.15
-
 const int iter = int(tot_time/time_step)+3;
 const int iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second = 556
 
@@ -41,16 +36,13 @@ double x, y, z;
 int Nx, Ny, Nz;
 
 string mem_f_shape;
-double A;
-double B;
-double C;
-double D;
+double A, B, C, D;
 
-double *nATP;
-double *nADP;
-double *nE;
-double *Nd;
-double *Nde;
+double *nATP; //min D bound to an ATP
+double *nADP; //min D bound to an ADP
+double *nE; //loose min E in cytoplasm
+double *Nd; //min D bound to ATP on the wall
+double *Nde; //min D bound to ATP and min E on the wall 
 double *f_mem;
 
 const int starting_num_guassians=20;
