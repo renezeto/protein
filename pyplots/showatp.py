@@ -13,12 +13,12 @@ f_param3 = sys.argv[4]
 f_param4 = sys.argv[5]
 f_param5 = sys.argv[6]
 
-flE = load.data(protein="flE")
-flD = load.data(protein="flD")
-natp = load.data(protein="natp")
-ne = load.data(protein="ne")
-nadp = load.data(protein="nadp")
-nd = load.data(protein="nd")
+nflE = load.data(protein="nflE")
+nflD = load.data(protein="nflD")
+nATP = load.data(protein="nATP")
+nE = load.data(protein="nE")
+nADP = load.data(protein="nADP")
+Nd = load.data(protein="Nd")
 
 def maxnum(page):
     Z = [0. for i in range(page.shape[0])]
@@ -81,13 +81,13 @@ def contourplt(protein):
     return 0
 
 print "Generating flourescent tagging plot:"
-contourplt(flD)
-print "Generating nATP plot:"
-contourplt(natp)
-print "Done! Generating nE plot:"
-contourplt(ne)
-print "Done! Generating nADP plot:"
-contourplt(nadp)
-print "Done! Generating nD plot:"
-contourplt(nd)
-print "Finished generating plots."
+contourplt(nflD)
+# print "Generating nATP plot:"
+# contourplt(natp)
+# print "Done! Generating nE plot:"
+# contourplt(ne)
+# print "Done! Generating nADP plot:"
+# contourplt(nadp)
+# print "Done! Generating nD plot:"
+# contourplt(nd)
+# print "Finished generating plots."

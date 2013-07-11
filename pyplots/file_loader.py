@@ -29,20 +29,27 @@ class data(object):
     @staticmethod
     def get_filenames(protein):
         dat_filenames = []
-        for fn in glob.iglob('./data/shape-'+f_shape+'/*m_'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
-            dat_filenames.append(fn)
-        if './data/shape-'+f_shape+'/hires-m_'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat' in dat_filenames:
-            dat_filenames = []
-            for fn in glob.iglob('./data/shape-'+f_shape+'/hires-m_'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
-                dat_filenames.append(fn)
+        if "-hires" in sys.argv:
+            if "-slice" in sys.argv:
+                for fn in glob.iglob('./data/shape-'+f_shape+'/hires-'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
+                    dat_filenames.append(fn)
+            else:
+                for fn in glob.iglob('./data/shape-'+f_shape+'/hires-m-'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
+                    dat_filenames.append(fn)
+        else:
+            if "-slice" in sys.argv:
+                for fn in glob.iglob('./data/shape-'+f_shape+'/'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
+                    dat_filenames.append(fn)
+            else:
+                for fn in glob.iglob('./data/shape-'+f_shape+'/m-'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
+                    dat_filenames.append(fn)
         dat_filenames = sorted(dat_filenames)
         i=0
         while i<round(len(dat_filenames)/10):
             dat_filenames.pop(0)
             i+=1
         if (dat_filenames == []):
-            print "File loading error: filename list is empty:"
-            print './data/shape-'+f_shape+'/*m_'+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'
+            print "File loading error: filename list is empty."
             exit(1)
         else:
             return dat_filenames
