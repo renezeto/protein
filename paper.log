@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.7.20)  12 JUL 2013 13:39
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.5.14)  12 JUL 2013 15:37
 entering extended mode
  %&-line parsing enabled.
-**paper.tex
-(./paper.tex
+**paper/paper.tex
+(./paper/paper.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
 yphenation, farsi, arabic, croatian, bulgarian, ukrainian, russian, czech, slov
@@ -199,7 +199,7 @@ File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
 Package graphics Info: Driver file: pdftex.def on input line 91.
 
 (/usr/share/texmf-texlive/tex/latex/pdftex-def/pdftex.def
-File: pdftex.def 2009/08/25 v0.04m Graphics/color for pdfTeX
+File: pdftex.def 2010/03/12 v0.04p Graphics/color for pdfTeX
 \Gread@gobject=\count107
 ))
 \Gin@req@height=\dimen111
@@ -420,53 +420,58 @@ Underfull \hbox (badness 1546) in paragraph at lines 66--97
  []
 
 
-LaTeX Warning: File `data/shape-randst/plots/time-map-compare-randst-10-60-60-9
-90-150.pdf' not found on input line 107.
+<data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf, id=1, 57
+8.16pt x 433.62pt>
+File: data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf Grap
+hic file (type pdf)
 
+<use data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf>
+<data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf, id=2, 57
+8.16pt x 433.62pt>
+File: data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf Grap
+hic file (type pdf)
 
-! Package pdftex.def Error: File `data/shape-randst/plots/time-map-compare-rand
-st-10-60-60-990-150.pdf' not found.
+<use data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf>
+<data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf, id=3, 57
+8.16pt x 433.62pt>
+File: data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf Grap
+hic file (type pdf)
 
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.107 ...-map-compare-randst-10-60-60-990-150.pdf}
-                                                  
-? 
-! Interruption.
-\GenericError  ...                                
-                                                  \endgroup 
-l.107 ...-map-compare-randst-10-60-60-990-150.pdf}
-                                                  
-? quit
-OK, entering \batchmode...
- [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./paper.bbl) [2] (./pa
-per.aux)
+<use data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf>
+<data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf, id=4, 57
+8.16pt x 433.62pt>
+File: data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf Grap
+hic file (type pdf)
 
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right .
+<use data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf>
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./data/shape-randst/plot
+s/time-map-compare-randst-10-60-60-990-150.pdf>]
 
+LaTeX Warning: A float is stuck (cannot be placed); try class option [floatfix]
+ on input line 140.
 
- ) 
+[2 <./data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf> <./
+data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf> <./data/s
+hape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf>] (./paper.aux) 
+) 
 Here is how much of TeX's memory you used:
- 4570 strings out of 493848
- 55602 string characters out of 1152823
- 130022 words of memory out of 3000000
- 7801 multiletter control sequences out of 15000+50000
- 8870 words of font info for 34 fonts, out of 3000000 for 9000
+ 4581 strings out of 493848
+ 56853 string characters out of 1152823
+ 130291 words of memory out of 3000000
+ 7811 multiletter control sequences out of 15000+50000
+ 8703 words of font info for 33 fonts, out of 3000000 for 9000
  714 hyphenation exceptions out of 8191
- 34i,13n,33p,266b,271s stack positions out of 5000i,500n,10000p,200000b,50000s
-</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/shar
-e/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-tex
-live/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-texlive/fonts/t
-ype1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/
-amsfonts/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/c
-mr9.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></u
-sr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/tex
-mf-texlive/fonts/type1/public/amsfonts/cm/cmtt9.pfb>
-Output written on paper.pdf (2 pages, 109860 bytes).
+ 34i,13n,33p,272b,251s stack positions out of 5000i,500n,10000p,200000b,50000s
+</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/share
+/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texl
+ive/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-texlive/fonts/ty
+pe1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/a
+msfonts/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cm
+r9.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></us
+r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
+Output written on paper.pdf (2 pages, 5297082 bytes).
 PDF statistics:
- 45 PDF objects out of 1000 (max. 8388607)
+ 131 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
 
