@@ -37,18 +37,18 @@ if '-sim' in sys.argv:
         for job in batch_randst_simulations:
             processes.add(subprocess.Popen(['srun','./protein_microscopy','randst',str(job[0]),str(job[1]),str(job[2]),str(job[3]),'15.00']))
 
-print processes
-print batch_randst_simulations
+
+
 
 #plots the recent simulations:
 if '-plot' in sys.argv:
     processes = set()
-    max_processes = 7
+    max_processes = 100
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
-            processes.add(subprocess.Popen(['python','pyplots/extrema.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
-            processes.add(subprocess.Popen(['python','pyplots/time_map.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
-            processes.add(subprocess.Popen(['python','pyplots/showatp.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
+            #processes.add(subprocess.Popen(['python','pyplots/extrema.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
+            #processes.add(subprocess.Popen(['python','pyplots/time_map.py','p',str(job[0]),str(job[1]),'0.00','0.00','15.00']))
+            processes.add(subprocess.Popen(['python','pyplots/showatp.py','p',str(job[0])+'0',str(job[1])+'0','0.00','0.00','15.00']))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
@@ -60,6 +60,8 @@ if '-plot' in sys.argv:
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
+print batch_randst_simulations
+print processes
 
 if '-area' in sys.argv:
     processes = set()
