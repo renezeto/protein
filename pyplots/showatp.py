@@ -54,7 +54,7 @@ def contourplt(protein):
     maxval = timemax(protein)
     minval = timemin(protein)
     plt.figure(1)
-    os.system("rm -f ./data/shape-"+f_shape+"/plots/tmp_*.png")
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*.png")
     Z, Y = np.meshgrid(np.arange(0,protein.datashape[1],1), np.arange(0,protein.datashape[0],1))
     for k in range(len(protein.dataset)): #fig.dpi method
         page = protein.dataset[k]
@@ -67,20 +67,20 @@ def contourplt(protein):
         plt.xlabel("Z position")
         plt.ylabel("Y position")
         if k<10:
-            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_00'+str(k)+'-'+str(protein.protein)+ \
+            plt.savefig('./data/shape-'+f_shape+'/plots/'+str(protein.protein)+'-tmp_00'+str(k)+'-'+str(protein.protein)+ \
                             '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
         elif k<100:
-            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_0'+str(k)+'-'+str(protein.protein)+ \
+            plt.savefig('./data/shape-'+f_shape+'/plots/'+str(protein.protein)+'-tmp_0'+str(k)+'-'+str(protein.protein)+ \
                             '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
         else:
-            plt.savefig('./data/shape-'+f_shape+'/plots/tmp_'+str(k)+'-'+str(protein.protein)+ \
+            plt.savefig('./data/shape-'+f_shape+'/plots/'+str(protein.protein)+'-tmp_'+str(k)+'-'+str(protein.protein)+ \
                             '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
-    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/tmp_*" \
+    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
     +"/plots/density_movie-"+str(protein.protein)+"-"+f_shape \
     +"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".gif")
-    os.system("rm -f ./data/shape-"+f_shape+"/plots/tmp_*.png")
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*.png")
     return 0
 
 print "Generating flourescent Min D tagging plot:"
