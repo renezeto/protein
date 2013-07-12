@@ -315,6 +315,7 @@ int main (int argc, char *argv[]) {
       printf("Printing middle slice data.\n");
     }
   }
+  printf("%f",dx);
 
   //compute grid size based on cell parameters
   if (mem_f_shape=="p") {
@@ -467,82 +468,82 @@ int main (int argc, char *argv[]) {
     fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
   }
 
-  //begin area rating
-  char *area_rating_out = new char[1024];
-  if (dx==.05) {
-    sprintf(area_rating_out, "data/shape-%s/hires-area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  }
-  else {
-    sprintf(area_rating_out, "data/shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  }
-  FILE *area_rating_file = fopen((const char *)area_rating_out,"w");
-  if (area_rating_file == NULL){
-    printf("Error: area_rating_file == null \n");
-  }
+  // //begin area rating
+  // char *area_rating_out = new char[1024];
+  // if (dx==.05) {
+  //   sprintf(area_rating_out, "data/shape-%s/hires-area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  // }
+  // else {
+  //   sprintf(area_rating_out, "data/shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  // }
+  // FILE *area_rating_file = fopen((const char *)area_rating_out,"w");
+  // if (area_rating_file == NULL){
+  //   printf("Error: area_rating_file == null \n");
+  // }
 
-  char * area_rating_out_two = new char[1024];
-  if (dx==.05) {
-    sprintf(area_rating_out_two, "data/shape-%s/hires-area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  }
-  else {
-    sprintf(area_rating_out_two, "data/shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  }
-  FILE *area_rating_file_two = fopen((const char *)area_rating_out_two,"w");
-  if (area_rating_file_two == NULL){
-    printf("Error: area_rating_file_two == null \n");
-  }
+  // char * area_rating_out_two = new char[1024];
+  // if (dx==.05) {
+  //   sprintf(area_rating_out_two, "data/shape-%s/hires-area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  // }
+  // else {
+  //   sprintf(area_rating_out_two, "data/shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  // }
+  // FILE *area_rating_file_two = fopen((const char *)area_rating_out_two,"w");
+  // if (area_rating_file_two == NULL){
+  //   printf("Error: area_rating_file_two == null \n");
+  // }
 
-  fprintf(out_file,"Finished opening area_rating file.\n");
-  set_insideArr(insideArr);
-  fprintf(out_file,"Finished with insideArr function.\n");
+  // fprintf(out_file,"Finished opening area_rating file.\n");
+  // set_insideArr(insideArr);
+  // fprintf(out_file,"Finished with insideArr function.\n");
 
-  double total_cell_volume = 0;
-  double total_cell_area = 0;
-  for (int i=0;i<Nx*Ny*Nz;i++){
-    if (insideArr[i]==true) {
-      total_cell_volume += dx*dx*dx;
-    }
-  }
-  for (int i=0;i<Nx;i++){
-    for (int j=0;j<Ny;j++){
-      for (int k=0;k<Nz;k++){
-        total_cell_area += mem_A[i*Ny*Nz+j*Nz+k];
-        if (insideArr[i*Ny*Nz+j*Nz+k]==true){
-          double area_rating = 0;
-          double area_rating_two = 0;
-          for (int i2=0;i2<Nx;i2++){
-            for (int j2=0;j2<Ny;j2++){
-              for (int k2=0;k2<Nz;k2++){
-                if(i2!=i && j2!=j && k2!=k){
-                  double dis = dx*sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
-                  area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
-                  if (dis<1.5*A){
-                    area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
-                  }
-                }
-              }
-            }
-          }
-          fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating);
-          fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_two);
-        } else {
-          fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
-          fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
-        }
-      }
-    }
-  }
-  fclose(area_rating_file_two);
-  fclose(area_rating_file);
+  // double total_cell_volume = 0;
+  // double total_cell_area = 0;
+  // for (int i=0;i<Nx*Ny*Nz;i++){
+  //   if (insideArr[i]==true) {
+  //     total_cell_volume += dx*dx*dx;
+  //   }
+  // }
+  // for (int i=0;i<Nx;i++){
+  //   for (int j=0;j<Ny;j++){
+  //     for (int k=0;k<Nz;k++){
+  //       total_cell_area += mem_A[i*Ny*Nz+j*Nz+k];
+  //       if (insideArr[i*Ny*Nz+j*Nz+k]==true){
+  //         double area_rating = 0;
+  //         double area_rating_two = 0;
+  //         for (int i2=0;i2<Nx;i2++){
+  //           for (int j2=0;j2<Ny;j2++){
+  //             for (int k2=0;k2<Nz;k2++){
+  //               if(i2!=i && j2!=j && k2!=k){
+  //                 double dis = dx*sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
+  //                 area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
+  //                 if (dis<1.5*A){
+  //                   area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         }
+  //         fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating);
+  //         fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_two);
+  //       } else {
+  //         fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
+  //         fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
+  //       }
+  //     }
+  //   }
+  // }
+  // fclose(area_rating_file_two);
+  // fclose(area_rating_file);
 
-  if(area_rating_flag==1) {
-    exit(0);
-  }
-  fprintf(out_file,"Area_rating_two file is using %g as the radius of the sphere.",A);
-  fprintf(out_file,"Finished writing to the area_rating file.\n");
-  fprintf(out_file,"Total cell volume = %g.\nTotal cell area = %g.\n",total_cell_volume,total_cell_area);
-  fflush(out_file);
-  //end area rating
+  // if(area_rating_flag==1) {
+  //   exit(0);
+  // }
+  // fprintf(out_file,"Area_rating_two file is using %g as the radius of the sphere.",A);
+  // fprintf(out_file,"Finished writing to the area_rating file.\n");
+  // fprintf(out_file,"Total cell volume = %g.\nTotal cell area = %g.\n",total_cell_volume,total_cell_area);
+  // fflush(out_file);
+  // //end area rating
   
   //begin membrane printing
   char* outfilename = new char[1024];
