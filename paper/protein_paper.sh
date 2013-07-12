@@ -1,6 +1,6 @@
 #!/bin/bash
-pdflatex paper.tex
+pdflatex paper/paper.tex
 #bibtex paper
-pdflatex paper.tex
-pdflatex paper.tex
-evince paper.pdf
+pdflatex paper/paper.tex
+pdflatex paper/paper.tex
+
