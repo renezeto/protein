@@ -31,7 +31,6 @@
   This paper is about science.
 \end{abstract}
 
-<<<<<<< HEAD
 \section{Introduction}
 \subsection{What is the MinD system and why is it important?}
 -Systm of proteins in E.Coli and other cells.
@@ -45,7 +44,7 @@
 
 \section{Methods and Initial Conditions}
 \subsection{Mathematical Model} %shouldn't be a scripty mu
-The model for the behavio r of the MinD and MinE proteins inside the cell
+The model for the behavior of the MinD and MinE proteins inside the cell
 implemented the same set of 5 reaction-diffusion equations described in the paper
 by Huang et al (equations 1, 2, 3, 4, and 5). A 3d grid was constructed in
 cartesian coordinates with a grid spacing of .05 $\mu$m. From there, we
@@ -56,12 +55,12 @@ the MinD and MinE concentrations inside the cell.
 Our simulation used the same diffusion constants and reaction rates as
 Huang et al, which are
 
-\begin{align*} %format better
+\begin{gather*} %format better
   \mathcal{D}_D = \mathcal{D}_{E}  = 2.5 \mu \textrm{m$^2$ / sec}, \\
-  \sigma_D^{\textrm{ADP $\rightarrow$ ATP}} = 1/\textrm{sec},  \sigma_D = 0.025 \mu \textrm{m/sec}, \\
-  \sigma_{dD} = 0.0015 \mu \textrm{m$^3$/sec}, \\
-  \sigma_{de} = 0.7/\textrm{sec}, \sigma_E = 0.093 \mu \textrm{$m^3$/sec}.
-\end{align*}
+  \sigma_D^{\textrm{ADP $\rightarrow$ ATP}}  = 1/\textrm{sec},  \sigma_D = 0.025 \mu \textrm{m/sec}, \\
+  \sigma_{dD}  = 0.0015 \mu \textrm{m$^3$/sec}, \\
+  \sigma_{de}  = 0.7/\textrm{sec}, \sigma_E = 0.093 \mu \textrm{m$^3$/sec}.
+\end{gather*}
 
 To test our computational model, we implemented a pill shaped cell, and
 tested using the same cell parameters as Huang et al, which were a radius
