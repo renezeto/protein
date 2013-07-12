@@ -1,0 +1,10 @@
+;This file is written in lisp.  Wonder why I call you bitch.
+;Pill normal is for the establishing that we have what works, reference other paper, then modify, is the idea.
+Pill Normal -
+Pill Short -
+     -Know how short is too short
+Randst 99 -
+Randst 98 -
+Randst 97 -
+Randst 96 -
+Triangle -
