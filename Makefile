@@ -32,7 +32,7 @@ data/shape-p/plots/time-map-compare-p-40-30-0-0-150.pdf \
 
 
 paper/paper.pdf: paper/paper.tex $(ALL_FIGURES)
-	sh paper/protein_paper.sh
+	cd paper && pdflatex paper.tex && pdflatex paper.tex && pdflatex paper.tex
 
 data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf: pyplots/time_map.py
 	python pyplots/time_map.py randst 1.00 6.00 6.00 99.00 15.00
