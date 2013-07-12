@@ -12,11 +12,11 @@ nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
 
 f_shape = sys.argv[1]
-f_param1 = sys.argv[2]
-f_param2 = sys.argv[3]
-f_param3 = sys.argv[4]
-f_param4 = sys.argv[5]
-f_param5 = sys.argv[6]
+f_param1 = int(10*(float(sys.argv[2])))
+f_param2 = int(10*(float(sys.argv[3])))
+f_param3 = int(10*(float(sys.argv[4])))
+f_param4 = int(10*(float(sys.argv[5])))
+f_param5 = int(10*(float(sys.argv[6])))
 
 def average_location(dataset):
     tsum = np.zeros_like(dataset[0])
@@ -27,17 +27,21 @@ def average_location(dataset):
 plt.figure(1)
 plt.subplot(221)
 plt.contourf(nATP.axes[1],nATP.axes[0],average_location(nATP.dataset),500)
+plt.title('nATP', fontsize=20)
 
 plt.subplot(222)
 plt.contourf(nE.axes[1],nE.axes[0],average_location(nE.dataset),500)
+plt.title('nE', fontsize=20)
 
 plt.subplot(223)
 plt.contourf(nADP.axes[1],nADP.axes[0],average_location(nADP.dataset),500)
+plt.title('nADP', fontsize=20)
 
 plt.subplot(224)
 plt.contourf(Nd.axes[1],Nd.axes[0],average_location(Nd.dataset),500)
+plt.title('Nd', fontsize=20)
 #plt.show(1)
-plt.savefig('./data/shape-'+f_shape+'/plots/time_map_compare-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
+plt.savefig('./data/shape-'+f_shape+'/plots/time-map-compare-'+f_shape+'-'+str(f_param1)+'-'+str(f_param2)+'-'+str(f_param3)+'-'+str(f_param4)+'-'+str(f_param5)+'.pdf')
 print "time_map plot generated: subplot comparison"
 
 for p in [nflE, nflD, nATP, nE, nADP, Nd]:
@@ -45,5 +49,10 @@ for p in [nflE, nflD, nATP, nE, nADP, Nd]:
     plt.contourf(p.axes[1],p.axes[0],average_location(p.dataset),500)
     plt.axes().set_aspect('equal', 'datalim')
     plt.colorbar()
-    plt.savefig('./data/shape-'+f_shape+'/plots/time_map-'+str(p.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
+    plt.savefig('./data/shape-'+f_shape+'/plots/time-map-'+str(p.protein)+'-'+f_shape+'-'+str(f_param1)+'-'+str(f_param2)+'-'+str(f_param3)+'-'+str(f_param4)+'-'+str(f_param5)+'.pdf')
     print "time_map plot generated: " + str(p.protein)
+
+
+# fig.suptitle('test title', fontsize=20)
+# plt.xlabel('xlabel', fontsize=18)
+# plt.ylabel('ylabel', fontsize=16)
