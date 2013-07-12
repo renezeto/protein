@@ -42,7 +42,7 @@ double *nATP; //min D bound to an ATP
 double *nADP; //min D bound to an ADP
 double *nE; //loose min E in cytoplasm
 double *Nd; //min D bound to ATP on the wall
-double *Nde; //min D bound to ATP and min E on the wall 
+double *Nde; //min D bound to ATP and min E on the wall
 double *f_mem;
 
 const int starting_num_guassians=20;
