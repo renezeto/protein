@@ -1,5 +1,7 @@
 from __future__ import division
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
 import sys
@@ -75,7 +77,7 @@ def contourplt(protein):
         else:
             plt.savefig('./data/shape-'+f_shape+'/plots/'+str(protein.protein)+'-tmp_'+str(k)+'-'+str(protein.protein)+ \
                             '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
-    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/-tmp_*" \
+    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
     +"/plots/density_movie-"+str(protein.protein)+"-"+f_shape \
