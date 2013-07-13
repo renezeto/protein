@@ -27,6 +27,7 @@ int area_rating_flag = 0;
 int slice_flag = 0;
 
 double dx=0.15;
+
 const double tot_time = 62;
 const double time_step = .1*dx*dx/difD; // = .0009 s if dx=.15
 const int iter = int(tot_time/time_step)+3;
@@ -151,6 +152,7 @@ double mem_f(double x, double y, double z) {
         f = abs(2*(x-(X/2))/A) - 1;
         return f;
       }
+      fflush(stdout);
       if (f>0) {
         double closest_y0 = -100.0;
         double closest_z0 = -100.0;
@@ -161,8 +163,6 @@ double mem_f(double x, double y, double z) {
             if(mem_f_shape=="TIE_fighter") f0 = f_2D_TIE_fighter(y0,z0);
             if(mem_f_shape=="triangle") f0 = f_2D_triangle(y0,z0);
             if (f0 <= 0) {
-              //printf("f0 = %g\n",f0);
-              fflush(stdout);
               //there_is_closest_point = 1; unused
               if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-closest_y0)*(y-closest_y0)+(z-closest_z0)*(z-closest_z0) ) {
                 closest_y0 = y0;
@@ -307,7 +307,7 @@ int main (int argc, char *argv[]) {
       printf("Area rating printout.\n");
     }
     if (strcmp(argv[i],"-hires")==0) {
-      dx=.05;
+      //dx=.05;
       printf("Using high resolution.\n");
     }
     if (strcmp(argv[i],"-slice")==0) {
@@ -369,104 +369,104 @@ int main (int argc, char *argv[]) {
   }
 
   //open out file to begin recording info about simulation
-  char * out_file_name = new char[1024];
-  sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
-  FILE * out_file = fopen((const char *)out_file_name,"w");
+  // char * out_file_name = new char[1024];
+  // sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
+  // FILE * out_file = fopen((const char *)out_file_name,"w");
   
-  time_t t = time(0);
-  struct tm * now = localtime( & t );
-  char * timevar = new char[1024];
-  sprintf(timevar, "%d/%d/%d at %d hours and %d minutes", now->tm_mon +1,now->tm_mday,now->tm_year +1900,now->tm_hour,now->tm_min);
-  fprintf(out_file,"This simulation was run on %s\n",timevar);
+  // time_t t = time(0);
+  // struct tm * now = localtime( & t );
+  // char * timevar = new char[1024];
+  // sprintf(timevar, "%d/%d/%d at %d hours and %d minutes", now->tm_mon +1,now->tm_mday,now->tm_year +1900,now->tm_hour,now->tm_min);
+  // fprintf(out_file,"This simulation was run on %s\n",timevar);
 
-  fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
-  for (int i=0;i<3*starting_num_guassians;i++){
-    guass[i]=0;
-  }
-  //In the following, for every set of three numbers, the 1st is y and he 2nd is z and the 3rd is quassian width
-  double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
-  double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
-  double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
-                      3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
-  double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
-                      4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
-  if (rand_seed == 99){
-    for (int i=0;i<3*5;i++){
-      guass[i]=guass99[i];
-      fprintf(out_file,"rand_seed is 99!");
-      fflush(stdout);
-    }
-  } else if (rand_seed == 98){
-    for (int i=0;i<3*5;i++){
-      guass[i]=guass98[i];
-    }
-  } else if (rand_seed == 97){
-    for (int i=0;i<3*12;i++){
-      guass[i]=guass97[i];
-    }
-  } else if (rand_seed == 96){
-    for (int i=0;i<3*16;i++){
-      guass[i]=guass96[i];
-    }
-  } else {
-    if (mem_f_shape == "randst"){
-      fprintf(out_file,"rand_seed is not 99!");
-      fflush(stdout);
-      randomize_cell_wall(guass);
-    }
-  }
-  nATP = new double[Nx*Ny*Nz];
-  nADP = new double[Nx*Ny*Nz];
-  nE = new double[Nx*Ny*Nz];
-  Nd = new double[Nx*Ny*Nz];
-  Nde = new double[Nx*Ny*Nz];
-  f_mem = new double[Nx*Ny*Nz];
-  fprintf(out_file,"For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
-          dx, tot_time, time_step, iter, iter_at_half_sec);
-  double *JxATP = new double[Nx*Ny*Nz];
-  double *JyATP = new double[Nx*Ny*Nz];
-  double *JzATP = new double[Nx*Ny*Nz];
-  double *JxADP = new double[Nx*Ny*Nz];
-  double *JyADP = new double[Nx*Ny*Nz];
-  double *JzADP = new double[Nx*Ny*Nz];
-  double *JxE = new double[Nx*Ny*Nz];
-  double *JyE = new double[Nx*Ny*Nz];
-  double *JzE = new double[Nx*Ny*Nz];
-  double *mem_A = new double[Nx*Ny*Nz];
-  bool *insideArr = new bool[Nx*Ny*Nz];
-  for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
-  bool force_to_generate_new_memA = true;
-  if (mem_f_shape=="randst") {
-    char* memA_name = new char[1024];
-    sprintf(memA_name,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
-    FILE *memAin = fopen(memA_name,"r");
-    if (!memAin || force_to_generate_new_memA) {
-      if (memAin && force_to_generate_new_memA) fclose(memAin);
-      fprintf(out_file,"There is evidently no file called %s,\n so we're going to create one and fill it with memA information for future use.\n",memA_name);
-      set_membrane(out_file, mem_f, mem_A);
-      fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.\n");
-      char* memA_out = new char[1024];
-      sprintf(memA_out,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.0f.dat",A,B,C,D,density_factor);
-      FILE *memAout = fopen((const char *)memA_out,"w");
-      for (int i=0;i<Nx*Ny*Nz;i++) {
-        fprintf(memAout, "%g\t",mem_A[i]);
-      }
-      fclose(memAout);
-      delete[] memA_out;
-      fprintf(out_file,"\nFinished printing the memA file, now we're moving on with simulation.\n");
-    } else {
-      fprintf(out_file,"We're taking the memA info from a file that already exists.\n");
-      for (int i=0;i<Nx*Ny*Nz;i++) {
-        if (fscanf(memAin, "%lg\t",&mem_A[i])!=1) {
-          fprintf(out_file,"There was a problem in trying to read into the mem_A array.\n");
-          exit(1);
-        }
-      }
-    }
-  } else {
-    set_membrane(out_file, mem_f, mem_A);
-    fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
-  }
+  // fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
+  // for (int i=0;i<3*starting_num_guassians;i++){
+  //   guass[i]=0;
+  // }
+  // //In the following, for every set of three numbers, the 1st is y and he 2nd is z and the 3rd is quassian width
+  // double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
+  // double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
+  // double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
+  //                     3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
+  // double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
+  //                     4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  // if (rand_seed == 99){
+  //   for (int i=0;i<3*5;i++){
+  //     guass[i]=guass99[i];
+  //     fprintf(out_file,"rand_seed is 99!");
+  //     fflush(stdout);
+  //   }
+  // } else if (rand_seed == 98){
+  //   for (int i=0;i<3*5;i++){
+  //     guass[i]=guass98[i];
+  //   }
+  // } else if (rand_seed == 97){
+  //   for (int i=0;i<3*12;i++){
+  //     guass[i]=guass97[i];
+  //   }
+  // } else if (rand_seed == 96){
+  //   for (int i=0;i<3*16;i++){
+  //     guass[i]=guass96[i];
+  //   }
+  // } else {
+  //   if (mem_f_shape == "randst"){
+  //     fprintf(out_file,"rand_seed is not 99!");
+  //     fflush(stdout);
+  //     randomize_cell_wall(guass);
+  //   }
+  // }
+  // nATP = new double[Nx*Ny*Nz];
+  // nADP = new double[Nx*Ny*Nz];
+  // nE = new double[Nx*Ny*Nz];
+  // Nd = new double[Nx*Ny*Nz];
+  // Nde = new double[Nx*Ny*Nz];
+  // f_mem = new double[Nx*Ny*Nz];
+  // fprintf(out_file,"For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
+  //         dx, tot_time, time_step, iter, iter_at_half_sec);
+  // double *JxATP = new double[Nx*Ny*Nz];
+  // double *JyATP = new double[Nx*Ny*Nz];
+  // double *JzATP = new double[Nx*Ny*Nz];
+  // double *JxADP = new double[Nx*Ny*Nz];
+  // double *JyADP = new double[Nx*Ny*Nz];
+  // double *JzADP = new double[Nx*Ny*Nz];
+  // double *JxE = new double[Nx*Ny*Nz];
+  // double *JyE = new double[Nx*Ny*Nz];
+  // double *JzE = new double[Nx*Ny*Nz];
+  // double *mem_A = new double[Nx*Ny*Nz];
+  // bool *insideArr = new bool[Nx*Ny*Nz];
+  // for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
+  // bool force_to_generate_new_memA = true;
+  // if (mem_f_shape=="randst") {
+  //   char* memA_name = new char[1024];
+  //   sprintf(memA_name,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
+  //   FILE *memAin = fopen(memA_name,"r");
+  //   if (!memAin || force_to_generate_new_memA) {
+  //     if (memAin && force_to_generate_new_memA) fclose(memAin);
+  //     fprintf(out_file,"There is evidently no file called %s,\n so we're going to create one and fill it with memA information for future use.\n",memA_name);
+  //     set_membrane(out_file, mem_f, mem_A);
+  //     fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.\n");
+  //     char* memA_out = new char[1024];
+  //     sprintf(memA_out,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.0f.dat",A,B,C,D,density_factor);
+  //     FILE *memAout = fopen((const char *)memA_out,"w");
+  //     for (int i=0;i<Nx*Ny*Nz;i++) {
+  //       fprintf(memAout, "%g\t",mem_A[i]);
+  //     }
+  //     fclose(memAout);
+  //     delete[] memA_out;
+  //     fprintf(out_file,"\nFinished printing the memA file, now we're moving on with simulation.\n");
+  //   } else {
+  //     fprintf(out_file,"We're taking the memA info from a file that already exists.\n");
+  //     for (int i=0;i<Nx*Ny*Nz;i++) {
+  //       if (fscanf(memAin, "%lg\t",&mem_A[i])!=1) {
+  //         fprintf(out_file,"There was a problem in trying to read into the mem_A array.\n");
+  //         exit(1);
+  //       }
+  //     }
+  //   }
+  // } else {
+  //   set_membrane(out_file, mem_f, mem_A);
+  //   fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
+  // }
 
   // //begin area rating
   // char *area_rating_out = new char[1024];
@@ -493,8 +493,20 @@ int main (int argc, char *argv[]) {
   //   printf("Error: area_rating_file_two == null \n");
   // }
 
+  // char * area_rating_out_three = new char[1024];
+  // if (dx==.05) {
+  //   sprintf(area_rating_out_three, "data/shape-%s/hires-area_rating_three-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  // }
+  // else {
+  //   sprintf(area_rating_out_three, "data/shape-%s/area_rating_three-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  // }
+  // FILE *area_rating_file_three = fopen((const char *)area_rating_out_three,"w");
+  // if (area_rating_file_three == NULL){
+  //   printf("Error: area_rating_file_three == null \n");
+  // }
+
   // fprintf(out_file,"Finished opening area_rating file.\n");
-  set_insideArr(insideArr);
+  // set_insideArr(insideArr);
   // fprintf(out_file,"Finished with insideArr function.\n");
 
   // double total_cell_volume = 0;
@@ -504,13 +516,14 @@ int main (int argc, char *argv[]) {
   //     total_cell_volume += dx*dx*dx;
   //   }
   // }
-  // for (int i=0;i<Nx;i++){
+  // int i=int(Nx/2);
   //   for (int j=0;j<Ny;j++){
   //     for (int k=0;k<Nz;k++){
   //       total_cell_area += mem_A[i*Ny*Nz+j*Nz+k];
   //       if (insideArr[i*Ny*Nz+j*Nz+k]==true){
   //         double area_rating = 0;
   //         double area_rating_two = 0;
+  //         double area_rating_three = 0;
   //         for (int i2=0;i2<Nx;i2++){
   //           for (int j2=0;j2<Ny;j2++){
   //             for (int k2=0;k2<Nz;k2++){
@@ -519,6 +532,7 @@ int main (int argc, char *argv[]) {
   //                 area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
   //                 if (dis<1.5*A){
   //                   area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
+  //                   area_rating_three += mem_A[i2*Ny*Nz+j2*Nz+k2];
   //                 }
   //               }
   //             }
@@ -526,13 +540,15 @@ int main (int argc, char *argv[]) {
   //         }
   //         fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating);
   //         fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_two);
+  //         fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_three);
   //       } else {
   //         fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
   //         fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
+  //         fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
   //       }
   //     }
   //   }
-  // }
+
   // fclose(area_rating_file_two);
   // fclose(area_rating_file);
 
@@ -543,7 +559,7 @@ int main (int argc, char *argv[]) {
   // fprintf(out_file,"Finished writing to the area_rating file.\n");
   // fprintf(out_file,"Total cell volume = %g.\nTotal cell area = %g.\n",total_cell_volume,total_cell_area);
   // fflush(out_file);
-  // //end area rating
+  //end area rating
 
   fflush(out_file);
 
@@ -1086,6 +1102,7 @@ void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z)
       }
     }
   }
+  printf("done with random mem_f and mem_A\n");
 }
 
 double find_intersection(const double fXYZ, const double fXYz, const double fXyZ, const double fXyz,
