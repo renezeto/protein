@@ -506,7 +506,7 @@ int main (int argc, char *argv[]) {
   // }
 
   // fprintf(out_file,"Finished opening area_rating file.\n");
-  // set_insideArr(insideArr);
+  set_insideArr(insideArr);
   // fprintf(out_file,"Finished with insideArr function.\n");
 
   // double total_cell_volume = 0;
@@ -1494,6 +1494,8 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
+
+  //minor bug; outside protein concentration needs to be initialized to zero
 
   for (int i=0;i<Nx*Ny*Nz;i++) {
     nADP[i] = 0;
