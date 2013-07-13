@@ -8,7 +8,6 @@
 *.pyc
 *protein*
 *protein_microscopy*
-*.pdf
 *.dat
 catalog.txt
 *.png
