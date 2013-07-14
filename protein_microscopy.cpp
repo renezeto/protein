@@ -443,19 +443,24 @@ int main (int argc, char *argv[]) {
   double *JyE = new double[Nx*Ny*Nz];
   double *JzE = new double[Nx*Ny*Nz];
   double *mem_A = new double[Nx*Ny*Nz];
+  double *normals_x = new double[Nx*Ny*Nz];
+  double *normals_y = new double[Nx*Ny*Nz];
+  double *normals_z = new double[Nx*Ny*Nz];
+  double *curvature = new double[Nx*Ny*Nz];
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
-  //bool force_to_generate_new_memA = true;
 
-  //randst breaking region begins here
-  //  if (mem_f_shape=="randst") {
-    // char* memA_name = new char[1024];
-    // sprintf(memA_name,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
-    // FILE *memAin = fopen(memA_name,"r");
+
+  //bool force_to_generate_new_memA = true;
+  // if (mem_f_shape=="randst") {
+  //   char* memA_name = new char[1024];
+  //   sprintf(memA_name,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
+  //   FILE *memAin = fopen(memA_name,"r");
   //   if (!memAin || force_to_generate_new_memA) {
   //     if (memAin && force_to_generate_new_memA) fclose(memAin);
   //     fprintf(out_file,"There is evidently no file called %s,\n so we're going to create one and fill it with memA information for future use.\n",memA_name);
-  //     set_membrane(out_file, mem_f, mem_A);
+  //     set_membrane(out_file, mem_f, mem_A, normals_x, normals_y, normals_z);
+  //     set_curvature(mem_A, normals_x, normals_y, normals_z, curvature);
   //     fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.\n");
   //     char* memA_out = new char[1024];
   //     sprintf(memA_out,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.0f.dat",A,B,C,D,density_factor);
@@ -475,18 +480,13 @@ int main (int argc, char *argv[]) {
   //       }
   //     }
   //   }
-  // }
-
-    //  else {
-  printf("starting to set membrane");
-  set_membrane(out_file, mem_f, mem_A);
-  printf("membrane set");
+  //} else {
+  set_membrane(out_file, mem_f, mem_A, normals_x, normals_y, normals_z);
+  set_curvature(mem_A, normals_x, normals_y, normals_z, curvature);
   fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
-    //  }
-  //randst breaking region ends here
+    //}
 
-
-  // //begin area rating
+  //begin curvature stuff - wip.
   // char *area_rating_out = new char[1024];
   // if (dx==.05) {
   //   sprintf(area_rating_out, "data/shape-%s/hires-area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
@@ -537,35 +537,37 @@ int main (int argc, char *argv[]) {
   // int i=int(Nx/2);
   //   for (int j=0;j<Ny;j++){
   //     for (int k=0;k<Nz;k++){
+  //       double area_rating_two = curvature[i*Ny*Nz+j*Nz+k];
   //       total_cell_area += mem_A[i*Ny*Nz+j*Nz+k];
+  //       double area_rating = 0;
+  //       double area_rating_three = 0;
   //       if (insideArr[i*Ny*Nz+j*Nz+k]==true){
-  //         double area_rating = 0;
-  //         double area_rating_two = 0;
-  //         double area_rating_three = 0;
   //         for (int i2=0;i2<Nx;i2++){
   //           for (int j2=0;j2<Ny;j2++){
   //             for (int k2=0;k2<Nz;k2++){
   //               if(i2!=i && j2!=j && k2!=k){
-  //                 double dis = dx*sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
-  //                 area_rating += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
-  //                 if (dis<1.5*A){
-  //                   area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
-  //                   area_rating_three += mem_A[i2*Ny*Nz+j2*Nz+k2];
-  //                 }
+  //                 //double dis = dx*sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
+  //                 area_rating += curvature[i2*Ny*Nz+j2*Nz+k2];
+  //                 // if (dis<1.5*A){
+  //                 //   area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
+  //                 //   area_rating_three += mem_A[i2*Ny*Nz+j2*Nz+k2];
+  //                 //}
   //               }
   //             }
   //           }
   //         }
-  //         fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating);
-  //         fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_two);
-  //         fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_three);
-  //       } else {
-  //         fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
-  //         fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
-  //         fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
   //       }
+  //       fprintf(area_rating_file,"%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating,normals_x[i*Ny*Nz+j*Nz+k],normals_y[i*Ny*Nz+j*Nz+k],normals_z[i*Ny*Nz+j*Nz+k],mem_A[i*Ny*Nz+j*Nz+k]);
+  //       fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_two,normals_x[i*Ny*Nz+j*Nz+k],normals_y[i*Ny*Nz+j*Nz+k],normals_z[i*Ny*Nz+j*Nz+k],mem_A[i*Ny*Nz+j*Nz+k]);
+  //       fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_three);
+  //       // } else {
+  //       //   fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
+  //       //   fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
+  //       //   fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
   //     }
   //   }
+
+
 
   // fclose(area_rating_file_two);
   // fclose(area_rating_file);
@@ -577,9 +579,7 @@ int main (int argc, char *argv[]) {
   // fprintf(out_file,"Finished writing to the area_rating file.\n");
   // fprintf(out_file,"Total cell volume = %g.\nTotal cell area = %g.\n",total_cell_volume,total_cell_area);
   // fflush(out_file);
-  //end area rating
-
-  fflush(out_file);
+  //end curvature stuff.
 
   //begin membrane printing
   char* outfilename = new char[1024];
@@ -629,7 +629,6 @@ int main (int argc, char *argv[]) {
   // fprintf (out_file,"Membrane set with density in it.\n");
   // fflush(out_file);
   //end mem_f printing
-
 
   set_density(nATP, nE, mem_A);
   fprintf(out_file,"nATP_starting_density = %g proteins per micron^2 \nnE_starting_density = %g proteins per micron^2 \n",
@@ -1097,7 +1096,7 @@ int main (int argc, char *argv[]) {
 
 //problem with randst is in this function. it is taking far too long to do this calculation.
 void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
-                  double mem_A[]) {
+                  double mem_A[], double normals_x[], double normals_y[], double normals_z[]) {
   clock_t old_time = clock();
   for(int xi=0;xi<Nx;xi++){
     clock_t time = clock();
@@ -1115,15 +1114,60 @@ void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z)
         double fxyZ = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
         double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
         double f = mem_f(xi*dx, yi*dx, zi*dx);
-        // if (xi == int(Nx/2)){
-        //   //printf("x = %g y = %g, z = %g, f = %g\n",xi*dx,yi*dx,zi*dx,f);
-        // }
         mem_A[xi*Ny*Nz+yi*Nz+zi] = find_intersection(fXYZ, fXYz, fXyZ, fXyz, fxYZ, fxYz, fxyZ, fxyz, f);
-        //printf(" x =%g y = %g z = %g f = %g\n",xi*dx,yi*dx,zi*dx,f);
-        //fflush(stdout);
+        double df_dx = (fXYZ + fXYz + fXyZ + fXyz - fxYZ - fxyZ - fxYz - fxyz)/(4*dx); // this is df_dx
+        double df_dy = (fXYZ + fXYz + fxYZ + fxYz - fXyZ - fxyZ - fXyz - fxyz)/(4*dx); // this is df_dy
+        double df_dz = (fXYZ + fXyZ + fxYZ + fxyZ - fXYz - fXyz - fxYz - fxyz)/(4*dx); // this is df_dz
+        double constant = sqrt(df_dx*df_dx + df_dy*df_dy + df_dz*df_dz);
+        normals_x[xi*Ny*Nz+yi*Nz+zi] = df_dx/constant;
+        normals_y[xi*Ny*Nz+yi*Nz+zi] = df_dy/constant;
+        normals_z[xi*Ny*Nz+yi*Nz+zi] = df_dz/constant;
       }
     }
   }
+}
+
+void set_curvature(double mem_A[], double normals_x[], double normals_y[], double normals_z[], double curvature[]){
+  for(int xi=0;xi<Nx;xi++){
+    printf("doing x=%d",xi);
+    fflush(stdout);
+    for(int yi=0;yi<Nx;yi++){
+      for(int zi=0;zi<Nx;zi++){
+        double curve_x=0;
+        double curve_y=0;
+        double curve_z=0;
+        //if (normals_x[xi*Ny*Nz+yi*Nz+zi]==0 && normals_y[xi*Ny*Nz+yi*Nz+zi]==0 && normals_z[xi*Ny*Nz+yi*Nz+zi]==0){
+        //  curvature[xi*Ny*Nz+yi*Nz+zi] = 0;
+        if (mem_A[xi*Ny*Nz+yi*Nz+zi]==0){
+          //printf("x=%g, y=%g, z=%g, mem_A=0!!!\n",xi*dx,yi*dx,zi*dx);
+          curvature[xi*Ny*Nz+yi*Nz+zi]=0;
+        } else {
+          double avg_normal_X = (normals_x[(xi+1)*Ny*Nz+yi*Nz+zi] + normals_x[(xi+1)*Ny*Nz+(yi+1)*Nz+zi] + normals_x[(xi+1)*Ny*Nz+(yi-1)*Nz+zi]
+                                 + normals_x[(xi+1)*Ny*Nz+yi*Nz+(zi+1)] + normals_x[(xi+1)*Ny*Nz+yi*Nz+(zi-1)])/5.0;
+          double avg_normal_x = (normals_x[(xi-1)*Ny*Nz+yi*Nz+zi] + normals_x[(xi-1)*Ny*Nz+(yi+1)*Nz+zi] + normals_x[(xi-1)*Ny*Nz+(yi-1)*Nz+zi]
+                                 + normals_x[(xi-1)*Ny*Nz+yi*Nz+(zi+1)] + normals_x[(xi-1)*Ny*Nz+yi*Nz+(zi-1)])/5.0;
+
+          double avg_normal_Z = (normals_z[xi*Ny*Nz+yi*Nz+(zi+1)] + normals_z[(xi+1)*Ny*Nz+yi*Nz+(zi+1)] + normals_z[(xi-1)*Ny*Nz+yi*Nz+(zi+1)]
+                                 + normals_z[xi*Ny*Nz+(yi+1)*Nz+(zi+1)] + normals_z[xi*Ny*Nz+(yi-1)*Nz+(zi+1)])/5.0;
+          double avg_normal_z = (normals_z[xi*Ny*Nz+yi*Nz+(zi-1)] + normals_z[(xi+1)*Ny*Nz+yi*Nz+(zi-1)] + normals_z[(xi-1)*Ny*Nz+yi*Nz+(zi-1)]
+                                 + normals_z[xi*Ny*Nz+(yi+1)*Nz+(zi-1)] + normals_z[xi*Ny*Nz+(yi-1)*Nz+(zi-1)])/5.0;
+
+          double avg_normal_Y = (normals_y[xi*Ny*Nz+(yi+1)*Nz+zi] + normals_y[(xi+1)*Ny*Nz+(yi+1)*Nz+zi] + normals_y[(xi-1)*Ny*Nz+(yi+1)*Nz+zi]
+                                 + normals_y[xi*Ny*Nz+(yi+1)*Nz+(zi+1)] + normals_y[xi*Ny*Nz+(yi+1)*Nz+(zi-1)])/5.0;
+          double avg_normal_y = (normals_y[xi*Ny*Nz+(yi-1)*Nz+zi] + normals_y[(xi+1)*Ny*Nz+(yi-1)*Nz+zi] + normals_y[(xi-1)*Ny*Nz+(yi-1)*Nz+zi]
+                                 + normals_y[xi*Ny*Nz+(yi-1)*Nz+(zi+1)] + normals_y[xi*Ny*Nz+(yi-1)*Nz+(zi-1)])/5.0;
+
+          curve_x = (avg_normal_X - avg_normal_x)/(2.0*dx);
+          curve_y = (avg_normal_Y - avg_normal_y)/(2.0*dx);
+          curve_z = (avg_normal_Z - avg_normal_z)/(2.0*dx);
+          printf("x=%g, y=%g, z=%g, curve_x=%g, curve_y=%g, curve_z=%g\n",xi*dx,yi*dx,zi*dx,curve_x,curve_y,curve_z);
+          curvature[xi*Ny*Nz+yi*Nz+zi] = curve_x + curve_y + curve_z;
+        }
+      }
+    }
+  }
+  printf("Done with that!");
+  fflush(stdout);
 }
 
 double find_intersection(const double fXYZ, const double fXYz, const double fXyZ, const double fXyz,
