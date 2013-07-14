@@ -13,7 +13,7 @@ const double difD = 2.5; // (um)^2 s^- 1
 const double difE = 2.5; // (um)^2 s^-1
 const double rate_ADP_ATP = 1; // s^-1
 const double rate_D = .025; // um s^-1
-const double rate_dD = .0015; // (um)^3 s^-1 
+const double rate_dD = .0015; // (um)^3 s^-1
 const double rate_de = .7; // s^-1
 const double rate_E = .093; // (um)^3 s^-1
 
@@ -26,8 +26,8 @@ const int n = 706; //what is this?
 int area_rating_flag = 0;
 int slice_flag = 0;
 
-double dx=0.15;
-
+//double dx=0.15;
+double dx=0.05;
 const double tot_time = 124;
 const double time_step = .1*dx*dx/difD; // = .0009 s if dx=.15
 const int iter = int(tot_time/time_step)+3;
@@ -307,7 +307,7 @@ int main (int argc, char *argv[]) {
       printf("Area rating printout.\n");
     }
     if (strcmp(argv[i],"-hires")==0) {
-      //dx=.05;
+      dx=.05;
       printf("Using high resolution.\n");
     }
     if (strcmp(argv[i],"-slice")==0) {
@@ -372,7 +372,7 @@ int main (int argc, char *argv[]) {
   char * out_file_name = new char[1024];
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
-  
+
   time_t t = time(0);
   struct tm * now = localtime( & t );
   char * timevar = new char[1024];
@@ -589,28 +589,28 @@ int main (int argc, char *argv[]) {
   //end membrane printing
 
   //begin mem_f printing for randst, tie fighter, triangle - possibly do this for other shapes if needed -- NEEDS UPDATE.
-  if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
-    char *f_file_name = new char[1024];
-    if(f_file_name==NULL) {
-      fprintf(out_file,"Error: f_file_name is null.");
-      exit(1);
-    }
-    sprintf(f_file_name,"data/shape-%s/membrane_files/f_membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat", mem_f_shape.c_str(),A,B,C,D,density_factor);
-    FILE *f_file = fopen((const char *)f_file_name,"w");
-    double x = Nx/2.0*dx;
-    for (int i=0;i<Ny;i++) {
-      for (int j=0;j<Nz;j++) {
-        fprintf(f_file,"%g\t%g\t%g\n",i*dx,j*dx,mem_f(x,i*dx,j*dx));
-      }
-    }
-    fclose(f_file);
-    fprintf(out_file,"Finished printing out the mem_f_shape function.\n");
-    fflush(stdout);
-  }
-  fprintf (out_file,"Membrane set with density in it.\n");
-  fflush(out_file);
+  // if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
+  //   char *f_file_name = new char[1024];
+  //   if(f_file_name==NULL) {
+  //     fprintf(out_file,"Error: f_file_name is null.");
+  //     exit(1);
+  //   }
+  //   sprintf(f_file_name,"data/shape-%s/membrane_files/f_membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat", mem_f_shape.c_str(),A,B,C,D,density_factor);
+  //   FILE *f_file = fopen((const char *)f_file_name,"w");
+  //   double x = Nx/2.0*dx;
+  //   for (int i=0;i<Ny;i++) {
+  //     for (int j=0;j<Nz;j++) {
+  //       fprintf(f_file,"%g\t%g\t%g\n",i*dx,j*dx,mem_f(x,i*dx,j*dx));
+  //     }
+  //   }
+  //   fclose(f_file);
+  //   fprintf(out_file,"Finished printing out the mem_f_shape function.\n");
+  //   fflush(stdout);
+  // }
+  // fprintf (out_file,"Membrane set with density in it.\n");
+  // fflush(out_file);
   //end mem_f printing
-  
+  //bkmk
   set_density(nATP, nE, mem_A);
   fprintf(out_file,"nATP_starting_density = %g proteins per micron^2 \nnE_starting_density = %g proteins per micron^2 \n",
           nATP_starting_density, nE_starting_density);
@@ -669,7 +669,7 @@ int main (int argc, char *argv[]) {
     get_next_density(mem_A, insideArr, nATP, nADP, nE, Nd, Nde, JxATP, JyATP, JzATP,
                      JxADP, JyADP, JzADP, JxE, JyE, JzE);
 
-    
+
 
     //begin status update
     if (i%percent == 0){
@@ -712,10 +712,10 @@ int main (int argc, char *argv[]) {
           sprintf(outfilenameATP, "data/shape-%s/m-nATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
         }
       }
-      
+
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
-      
+
       if (slice_flag==1) {
         for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
@@ -725,7 +725,7 @@ int main (int argc, char *argv[]) {
         }
         fclose(nATPfile);
       }
-      
+
       else {
         for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
@@ -740,7 +740,7 @@ int main (int argc, char *argv[]) {
         fclose(nATPfile);
       }
       //end nATP printing
-      
+
       //nE printing
       char *outfilenameE = new char[1000];
       if (dx==.05) {
@@ -759,7 +759,7 @@ int main (int argc, char *argv[]) {
           sprintf(outfilenameE, "data/shape-%s/m-nE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
         }
       }
-      
+
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
 
@@ -1023,7 +1023,7 @@ int main (int argc, char *argv[]) {
   if (catalog_exists==1) {
     catalog=fopen(fname,"a+b");
   }
-  else { 
+  else {
     catalog=fopen(fname,"w+b");
   }
   if (catalog!=NULL) {
@@ -1050,7 +1050,7 @@ int main (int argc, char *argv[]) {
   FILE* nEavg_file = fopen((const char *)nEavg_name,"w");
   FILE* nADPavg_file = fopen((const char *)nADPavg_name,"w");
   FILE* nDavg_file = fopen((const char *)nDavg_name,"w");
-  
+
   for (int i2=0; i2<Nx; i2++) {
     for (int j2=0; j2<Ny; j2++) {
       for (int k2=0; k2<Nz; k2++) {
@@ -1063,7 +1063,7 @@ int main (int argc, char *argv[]) {
         fprintf(nADPavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nADP_avg[i2*Ny*Nz+j2*Nz+k2]);
         fprintf(nDavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nD_avg[i2*Ny*Nz+j2*Nz+k2]);
         //x y z avg_density print to each file
-      }  
+      }
     }
   }
   fclose(nATPavg_file);
@@ -1471,36 +1471,28 @@ int set_density(double *nATP, double *nE, double *mem_A){
         if (inside(i,j,k)){
           if(k>density_divider_z){
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
+	    nADP[i*Ny*Nz+j*Nz+k] =0;
+	    Nd[i*Ny*Nz+j*Nz+k] =0;
+	    Nde[i*Ny*Nz+j*Nz+k] = 0;
           }
           else {
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left;
-          }
-        }
-      }
-    }
-  }
-
-  for (int i=0;i<Nx;i++){
-    for (int j=0;j<Ny;j++){
-      for (int k=0;k<Nz;k++){
-        if (inside(i,j,k)){
-          if(k>density_divider_z){
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
-          }
-          else {
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left;
+	    nADP[i*Ny*Nz+j*Nz+k] =0;
+	    Nd[i*Ny*Nz+j*Nz+k] =0;
+	    Nde[i*Ny*Nz+j*Nz+k] = 0;
           }
         }
+	else {
+	  nATP[i*Ny*Nz+j*Nz+k] = 0;
+	  nE[i*Ny*Nz+j*Nz+k] = 0;
+	  nADP[i*Ny*Nz+j*Nz+k] =0;
+	  Nd[i*Ny*Nz+j*Nz+k] =0;
+	  Nde[i*Ny*Nz+j*Nz+k] = 0;
+	}
       }
     }
-  }
-
-  //minor bug; outside protein concentration needs to be initialized to zero
-
-  for (int i=0;i<Nx*Ny*Nz;i++) {
-    nADP[i] = 0;
-    Nd[i] = 0;
-    Nde[i] = 0;
   }
   return 0;
 }
