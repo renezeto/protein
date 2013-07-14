@@ -26,12 +26,11 @@ const int n = 706; //what is this?
 int area_rating_flag = 0;
 int slice_flag = 0;
 
-//double dx=0.15;
-double dx=0.05;
-const double tot_time = 124;
-const double time_step = .1*dx*dx/difD; // = .0009 s if dx=.15
-const int iter = int(tot_time/time_step)+3;
-const int iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second = 556
+double dx;
+double tot_time;
+double time_step;
+int iter;
+int iter_at_half_sec;
 
 double x, y, z;
 int Nx, Ny, Nz;
@@ -315,7 +314,14 @@ int main (int argc, char *argv[]) {
       printf("Printing middle slice data.\n");
     }
   }
-  printf("%f",dx);
+
+  //these had to be moved inside int main if we're to change dx
+  tot_time = 124;
+  time_step = .1*dx*dx/difD;
+  iter = int(tot_time/time_step)+3;
+  iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second = 55
+
+  printf("%f\n",dx);
 
   //compute grid size based on cell parameters
   if (mem_f_shape=="p") {
@@ -378,11 +384,13 @@ int main (int argc, char *argv[]) {
   char * timevar = new char[1024];
   sprintf(timevar, "%d/%d/%d at %d hours and %d minutes", now->tm_mon +1,now->tm_mday,now->tm_year +1900,now->tm_hour,now->tm_min);
   fprintf(out_file,"This simulation was run on %s\n",timevar);
+  fflush(out_file);
 
   fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
   for (int i=0;i<3*starting_num_guassians;i++){
     guass[i]=0;
   }
+
   //In the following, for every set of three numbers, the 1st is y and he 2nd is z and the 3rd is quassian width
   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
@@ -415,6 +423,8 @@ int main (int argc, char *argv[]) {
       randomize_cell_wall(guass);
     }
   }
+
+
   nATP = new double[Nx*Ny*Nz];
   nADP = new double[Nx*Ny*Nz];
   nE = new double[Nx*Ny*Nz];
@@ -436,6 +446,8 @@ int main (int argc, char *argv[]) {
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
   bool force_to_generate_new_memA = true;
+
+  //randst breaking region begins here
   if (mem_f_shape=="randst") {
     char* memA_name = new char[1024];
     sprintf(memA_name,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
@@ -467,6 +479,8 @@ int main (int argc, char *argv[]) {
     set_membrane(out_file, mem_f, mem_A);
     fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
   }
+  //randst breaking region ends here
+
 
   // //begin area rating
   // char *area_rating_out = new char[1024];
@@ -588,6 +602,7 @@ int main (int argc, char *argv[]) {
   fprintf(out_file,"\nMembrane file printed.\n");
   //end membrane printing
 
+  //replace membrane.dat prints with mem_f prints for extrema.py
   //begin mem_f printing for randst, tie fighter, triangle - possibly do this for other shapes if needed -- NEEDS UPDATE.
   // if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
   //   char *f_file_name = new char[1024];
@@ -982,7 +997,7 @@ int main (int argc, char *argv[]) {
     }
   }
   //end file printing
-
+  printf("end of file printing that didn't happen\n");
   for (int i=0;i<Nx*Ny*Nz;i++){
     total_NATP += nATP[i]*dx*dx*dx;
     total_NADP += nADP[i]*dx*dx*dx;
@@ -1102,7 +1117,6 @@ void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z)
       }
     }
   }
-  printf("done with random mem_f and mem_A\n");
 }
 
 double find_intersection(const double fXYZ, const double fXYz, const double fXyZ, const double fXyz,
