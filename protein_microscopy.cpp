@@ -478,6 +478,7 @@ int main (int argc, char *argv[]) {
   // }
 
     //  else {
+  printf("starting to set membrane");
   set_membrane(out_file, mem_f, mem_A);
   printf("membrane set");
   fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
