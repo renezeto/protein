@@ -46,7 +46,7 @@ if '-plot' in sys.argv:
     max_processes = 100
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
-            processes.add(subprocess.Popen(['srun','python','pyplots/extrema.py','p','%.2f'%job[0],'%.2f'%job[1],'0.00','0.00','15.00']))
+#            processes.add(subprocess.Popen(['srun','python','pyplots/extrema.py','p','%.2f'%job[0],'%.2f'%job[1],'0.00','0.00','15.00']))
             processes.add(subprocess.Popen(['srun','python','pyplots/time_map.py','p','%.2f'%job[0],'%.2f'%job[1],'0.00','0.00','15.00']))
             processes.add(subprocess.Popen(['srun','python','pyplots/showatp.py','p','%.2f'%job[0],'%.2f'%job[1],'0.00','0.00','15.00']))
             if len(processes) >= max_processes:
@@ -54,7 +54,7 @@ if '-plot' in sys.argv:
                 processes.difference_update(p for p in processes if p.poll() is not None)
     if 'randst' in sys.argv:
         for job in batch_randst_simulations:
-            processes.add(subprocess.Popen(['srun','python','pyplots/extrema.py','randst','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'15.00']))
+#            processes.add(subprocess.Popen(['srun','python','pyplots/extrema.py','randst','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'15.00']))
             processes.add(subprocess.Popen(['srun','python','pyplots/time_map.py','randst','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'15.00']))
             processes.add(subprocess.Popen(['srun','python','pyplots/showatp.py','randst','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'15.00']))
             if len(processes) >= max_processes:

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.7.20)  12 JUL 2013 16:21
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.21)  13 JUL 2013 13:57
 entering extended mode
  %&-line parsing enabled.
 **paper.tex
@@ -199,7 +199,7 @@ File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
 Package graphics Info: Driver file: pdftex.def on input line 91.
 
 (/usr/share/texmf-texlive/tex/latex/pdftex-def/pdftex.def
-File: pdftex.def 2009/08/25 v0.04m Graphics/color for pdfTeX
+File: pdftex.def 2010/03/12 v0.04p Graphics/color for pdfTeX
 \Gread@gobject=\count107
 ))
 \Gin@req@height=\dimen111
@@ -426,52 +426,53 @@ File: ../data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf G
 raphic file (type pdf)
 
 <use ../data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf>
-<../data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf, id=2,
+<../data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf, id=3,
  578.16pt x 433.62pt>
 File: ../data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf G
 raphic file (type pdf)
 
 <use ../data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf>
-<../data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf, id=3,
+<../data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf, id=5,
  578.16pt x 433.62pt>
 File: ../data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf G
 raphic file (type pdf)
 
 <use ../data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf>
-<../data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf, id=4,
+<../data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf, id=6,
  578.16pt x 433.62pt>
 File: ../data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf G
 raphic file (type pdf)
 
 <use ../data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf>
-(./paper.bbl) [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <../data/sh
-ape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf>]
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <../data/shape-randst/plo
+ts/time-map-compare-randst-10-60-60-990-150.pdf>]
 
 LaTeX Warning: A float is stuck (cannot be placed); try class option [floatfix]
- on input line 149.
+ on input line 147.
 
-[2 <../data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf> <.
-./data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf> <../dat
-a/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf>]
-(./paper.aux) ) 
+(./paper.bbl) [2 <../data/shape-randst/plots/time-map-compare-randst-10-80-60-9
+80-150.pdf> <../data/shape-randst/plots/time-map-compare-randst-10-60-60-970-15
+0.pdf> <../data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf
+>] (./paper.aux) ) 
 Here is how much of TeX's memory you used:
- 4587 strings out of 493848
- 56920 string characters out of 1152823
- 130022 words of memory out of 3000000
- 7816 multiletter control sequences out of 15000+50000
+ 4590 strings out of 493848
+ 56972 string characters out of 1152823
+ 130291 words of memory out of 3000000
+ 7819 multiletter control sequences out of 15000+50000
  8703 words of font info for 33 fonts, out of 3000000 for 9000
  714 hyphenation exceptions out of 8191
  34i,13n,33p,266b,251s stack positions out of 5000i,500n,10000p,200000b,50000s
-</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx9.p
-fb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/sh
-are/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-te
-xlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/
-type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/public/
-amsfonts/cm/cmr9.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/c
-msy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
-Output written on paper.pdf (2 pages, 5296300 bytes).
+</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx
+9.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr
+/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf
+-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fon
+ts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/publ
+ic/amsfonts/cm/cmr9.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/c
+m/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy7.pfb
+>
+Output written on paper.pdf (2 pages, 16574738 bytes).
 PDF statistics:
- 131 PDF objects out of 1000 (max. 8388607)
+ 7190 PDF objects out of 7423 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  21 words of extra memory for PDF output out of 10000 (max. 10000000)
 

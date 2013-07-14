@@ -1549,6 +1549,8 @@ int set_density(double *nATP, double *nE, double *mem_A){
     }
   }
 
+  //minor bug; outside protein concentration needs to be initialized to zero
+
   for (int i=0;i<Nx*Ny*Nz;i++) {
     nADP[i] = 0;
     Nd[i] = 0;

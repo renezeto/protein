@@ -56,7 +56,9 @@ def contourplt(protein):
     maxval = timemax(protein)
     minval = timemin(protein)
     plt.figure(1)
-    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*.png")
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*" \
+    +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
+    +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
     Z, Y = np.meshgrid(np.arange(0,protein.datashape[1],1), np.arange(0,protein.datashape[0],1))
     for k in range(len(protein.dataset)): #fig.dpi method
         page = protein.dataset[k]
@@ -82,7 +84,9 @@ def contourplt(protein):
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
     +"/plots/density_movie-"+str(protein.protein)+"-"+f_shape \
     +"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".gif")
-    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*.png")
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*" \
+    +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
+    +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
     return 0
 
 print "Generating flourescent Min D tagging plot:"
