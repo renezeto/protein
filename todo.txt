@@ -1,8 +1,24 @@
-;This file is written in lisp.  Wonder why I call you bitch.
+;This file is written in lisp. 
 ;Pill normal is for the establishing that we have what works, reference other paper, then modify, is the idea.
 Pill Normal -
 Pill Short -
+     Run for longer to see periods of oscillations and if they die out.
+     -Test a 4.00 3.50 and maybe a 4.00 3.75
+     -Test with very lopsided density see if settles down into same max intensity oscillations
      -Know how short is too short
+     -Are the movies in the plots right now microscopy view or otherwise?  Important to know if going to compare densities of proteins close to walls.
+          Look up distance that the aversion can take place over, so how far does cell have to be to "push away" other cells?  Then look at cell densities
+          that distance from walls.
+     -Look at a larger amount of density and see if settles down to different (more extreme difference) values.
+     -The time map plots seem inconsistent in that some show the highest
+densities on the poles, some in the centers, some on just one pole.
+For these want to run starting from a time when the proteins are
+evenly spread out (so between two maxima) and stop at a similar pointe
+at the end.
+   -The time map plots that I believe show the max density to be in the middle of the cell!  Show this definately and then play with plotting every time it goes above a certain density of protein, so maybe its the extreme nature of the oscillations that stop the polymer.
+
+Look more at ranst plots.  Investigate with both the interplay with the different protein plots.  Try to verify the qualitative story told in the other paper.
+
 Randst 99 -
 Randst 98 -
 Randst 97 -

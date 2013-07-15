@@ -95,6 +95,7 @@ time; and an animated view that showed the actual dispersion of
 protein concentrations in the cell over time. 
 \section{Specific Results}
 %-Datahjhuj and plots that show concrete results. Pill normal is for the establishing that we have what works, reference  other paper, then modify, is the idea.
+\section{Pill Shape}
 Pill Normal section - 
 Our goal with this project was to test whether or not the computational model developed by
 Huang et al was consistent with the newer experimental results (squishing E
@@ -104,15 +105,73 @@ Coli) produced by Mannick et al. We generally see that:
 - - example: nflD randst 1 6 6 99 tri-polar zones with tri-polar concentrations
 - - nflE the same
 - There is some time delay between where different protein types appear.
-- 
+
+The pills with larger cylindrical widths, 4.00 3.00 (the wider pill shapes)
+exhibit oscillations with maxima reached on either side (half period
+times) 30s, 70s, 110s, so first half oscillation occured in 30s, the
+next two in 40s
+
+The 4.00 2.00 pills exhibit a similar pattern, but max out at times
+25s,55s,85s,115s, so thirty seconds each half period.  Seemed once again that
+the first oscillation had a higher max density, then settled down.  I
+wonder if extremely increasing the starting condition density
+lopsidedness will still yield a settle down pattern with the same max
+densities?  Is this dependent on shape/size?
+
+The 4.00 0.50 pill seemed to show oscillations of 20 second half
+periods very consistently.  Density maximum did not seem to lose
+intensity.  Seemed to be the same each oscillation.
+
+The difference between the center and max pole densities of the nflD
+do not seem to be very extreme.  Wonder if you do a comparison of the
+max density versus center density somehow.  Really ask how it would
+effect the polymer that's supposed to build.  Are there definded
+limits on how extreme this difference can be?  If the oscillations
+settle down into the same density difference for each cell shape, how
+can polymer build?  Also with this, when look at the periods and max
+denisty/min density ratio, consider the size dimensions of the pill
+shape and see if can see a mathematical relation.
+
+The nflE 4.00 0.50 shows a very large difference in center highest density
+versus pole highest density (during a maxima).  Is this perhaps the
+protein that's more important.
+
+Looking at the extrema plots - one very interesting thing is the 4.00
+2.00 ATP extrema, which shows the extrema only in the center of the
+cell.  The other proteins for this shape show the extrema to be at the
+ends.  Also, it seems the 4.00 3.00 cell shapes for these plots are
+missing.  Very interesting to see if there is a certain protein that
+has its maxima in the center of the cell, while the others have maxima
+elsewhere.  Tells a story that could maybe relate to the other shapes.
+
+Also, try starting the cells with density only in the corner.  Now the
+extrema go down the center of the cell, see if there would remain a
+lopsided nature of the oscillations if you started it like this instead.
+
+The very long cells have very long periods
+
+The time map plots seem inconsistent in that some show the highest
+densities on the poles, some in the centers, some on just one pole.
+For these want to run starting from a time when the proteins are
+evenly spread out (so between two maxima) and stop at a similar pointe
+at the end.
+
+The time map plots that I believe though sometimes show that the max
+density time-wise is actually in the middle of the cell!  Make sure we
+have a good, longer view of this being true.
 
 
+Important
 
 
 Pill Short -
      -Know how short is too short
 
 Randst 99 -
+
+\section{Randst shape}
+There are sudden bursts in the nflE protein plots, at the poles. Their
+density maxima build very quickly then diffuse more slowly.
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf}
