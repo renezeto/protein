@@ -1,4 +1,4 @@
-;This file is written in lisp. 
+;This file is written in lisp.
 ;Pill normal is for the establishing that we have what works, reference other paper, then modify, is the idea.
 Pill Normal -
 Pill Short -
@@ -13,11 +13,11 @@ Pill Short -
      -The time map plots seem inconsistent in that some show the highest
 densities on the poles, some in the centers, some on just one pole.
 For these want to run starting from a time when the proteins are
-evenly spread out (so between two maxima) and stop at a similar pointe
+evenly spread out (so between two maxima) and stop at a similar point
 at the end.
    -The time map plots that I believe show the max density to be in the middle of the cell!  Show this definately and then play with plotting every time it goes above a certain density of protein, so maybe its the extreme nature of the oscillations that stop the polymer.
 
-Look more at ranst plots.  Investigate with both the interplay with the different protein plots.  Try to verify the qualitative story told in the other paper.
+Look more at randst plots.  Investigate with both the interplay with the different protein plots.  Try to verify the qualitative story told in the other paper.
 
    -Start the randst so that density is max at the pole to start
    (the bottom), now its only on the side and that doesn't work as
@@ -34,3 +34,28 @@ Randst 98 -
 Randst 97 -
 Randst 96 -
 Triangle -
+
+
+Official to do:
+-Once you get data, time_map needs to be run with more selective beginning and ending
+-Try time_map with cuttoff minimum densities
+
+Run everything below for twice as long as we did before.
+
+pill:
+4.00 3.75
+4.00 3.50
+4.00 3.00
+4.00 2.00
+4.00 0.50
+4.00 2.00 - Very lopsided density (like 500)
+4.00 0.50 - Very lopsided density (like 500)
+
+Randst:
+96 - As before
+96 - With density max starting in one corner
+97 - As before
+97 - With denisty max filling the little bump on the left
+97 - With density max starting in bottom pole
+98 - As before but run for three times as long
+99 - As before
