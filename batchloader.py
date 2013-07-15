@@ -9,18 +9,20 @@ import time
 batch_randst_simulations = []
 i=1
 
-batch_pill_simulations = [
-    [10.00, 0.50], \
-        [4.00, 0.50], \
-        [4.00, 2.00], \
-        [4.00, 3.00] ]
+# batch_pill_simulations = [
+#     [10.00, 0.50], \
+#         [4.00, 0.50], \
+#         [4.00, 2.00], \
+#         [4.00, 3.00] ]
 
-batch_randst_simulations = [
-    [1.00,6.00,6.00,99.00], \
-    [1.00,8.00,6.00,98.00], \
-    [1.00,6.00,8.00,98.00], \
-    [1.00,6.00,6.00,97.00], \
-    [1.00,6.00,6.00,96.00]
+batch_pill_simulations = [
+    [4.00,3.75,0.00,0.00,15.00], \
+    [4.00,3.50,0.00,0.00,15.00], \
+    [4.00,3.00,0.00,0.00,15.00], \
+    [4.00,2.00,0.00,0.00,15.00], \
+    [4.00,0.50,0.00,0.00,15.00], \
+    [4.00,2.00,0.00,0.00,500.00], \
+    [4.00,0.50,0.00,0.00,500.00], \
     ]
 
 #simulation subprocess management:
@@ -29,13 +31,13 @@ if '-sim' in sys.argv:
     max_processes = 100
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
-            processes.add(subprocess.Popen(['srun','./protein_microscopy','p','%.2f'%job[0],'%.2f'%job[1],'0.00','0.00','15.00']))
+            processes.add(subprocess.Popen(['srun','./protein_microscopy','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
     if 'randst' in sys.argv:
         for job in batch_randst_simulations:
-            processes.add(subprocess.Popen(['srun','./protein_microscopy','randst','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'15.00']))
+            processes.add(subprocess.Popen(['srun','./protein_microscopy','randst','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
@@ -46,9 +48,9 @@ if '-plot' in sys.argv:
     max_processes = 100
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
-#            processes.add(subprocess.Popen(['srun','python','pyplots/extrema.py','p','%.2f'%job[0],'%.2f'%job[1],'0.00','0.00','15.00']))
-            processes.add(subprocess.Popen(['srun','python','pyplots/time_map.py','p','%.2f'%job[0],'%.2f'%job[1],'0.00','0.00','15.00']))
-            processes.add(subprocess.Popen(['srun','python','pyplots/showatp.py','p','%.2f'%job[0],'%.2f'%job[1],'0.00','0.00','15.00']))
+#            processes.add(subprocess.Popen(['srun','python','pyplots/extrema','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['srun','python','pyplots/time_map','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['srun','python','pyplots/showatp.py','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
