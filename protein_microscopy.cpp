@@ -1438,9 +1438,9 @@ int set_density(double *nATP, double *nE, double *mem_A){
   //  printf("Total inside = %d\nTotal nATP should be = %f\n NE per cell = %f\n", count_inside,count_inside*NE_per_cell, NE_per_cell);
   //.
   //double r2,U,V; unused
-  int right_most_point_z=0;
+  int right_most_point_z=0; //left and right most points for z
   int left_most_point_z=Nz;
-  int right_most_point_y=0;
+  int right_most_point_y=0; //"left" and "right" most points for y, in terms of magnitude (right = larger y value)
   int left_most_point_y=Ny;
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
@@ -1464,6 +1464,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
   }
 
   int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
+  int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/3);
 
   //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
   int gridpoints_left = 0;
