@@ -1,5 +1,6 @@
 \documentclass[letterpaper,twocolumn,amsmath,amssymb,pre]{revtex4-1}
 \usepackage{graphicx}% Include figure files
+\usepackage{animate}
 \usepackage{dcolumn}% Align table columns on decimal point
 \usepackage{bm}% bold math
 \usepackage{color}
@@ -170,9 +171,14 @@ Pill Short -
 Randst 99 -
 
 \section{Randst shape}
+whats the difference between the extremes in density at different
+places (like the density max at the poles and at the rims in the
+center).  Still need to do this.
+
 There are sudden bursts in the nflE protein plots, at the poles. Their
 density maxima build very quickly then diffuse more slowly.
 
+\subsection{randst-96}
 The star shape (randst-96) Shows oscillations in nflD horizontally,
 two poles to two poles.  There is sometimes a small amount of lag
 between the upper maxima moving horizontally and the lower.  Half
@@ -180,14 +186,61 @@ periods take roughly 25s. Dimensions are roughly 5.00 by 5.00?  Check
 this.  The nflE short bursts do develop lag between when the top and
 the bottom go off.  Should coordinate this with the nflD lag.
 
+Tried to see if there is a time correlation between nflE and nflD but
+the maxima seem to appear in the poles at roughly the same time.
+
+Watched Nd and nE simulations next to each other at same time.  Both
+have maxima that build up right at the walls (in the corners) and then
+subside.  It's clear that the nE density bursts appear directly after
+the Nd bursts.  The Nd bursts are subsiding as the nE bursts are
+rising up.  The Nd reaches a time maxima just before the nE.  This is
+true in each corner, so that when the maxima are lopsided top to
+bottom - when the top right corner maximizes first, say, the interplay
+between nE and Nd remains very clear in those corners where and when
+maxima occur.
+
+Watched nATP and nADP together.  nATP maxima seem to follow slightly
+after nADP maxima.  This is not surprising since in rotation nATP
+follows after nADP.  nATP maxima is more spread out - inbetween pole
+maxima there is more spread out maxima in the center.  This should
+show itself in the time map plotting.  About this - the percentage
+difference seem to be the same between the non-max places and max
+places, roughly, its just that the nATP seems to have a max region
+that covers a wider area throughout the oscillation (or at least in
+between the maxima points in the oscillation).
+
+Also watched the Nd next to the nATP.  The Nd maximize more extreme in
+the corners up against the walls.  The nATP density follows the Nd
+maxima, it looks like the nATP maxima follows the Nd.  So if the Nd
+appears somewhere (in a corner) then the nATP will travel there to
+follow.
+
+
+\subsection{randst-97}
 Randst 97 nflE starts with small maxima, not much difference at all,
 then actually builds to high maxima at the poles.
-
+\subsection{randst-99}
 Randst 99 (sort of triangle) is roughly dimensions of 3.5 by 3.5?
 nflD oscillations appear to be half periods of 25s as well.  Maxima appear
 at the poles and in the interim there are weak maxima in center pole.
-
+\subsection{randst-98}
 Funny randst shape 98 shows nflD oscillations of about 30s or so.
+
+nADP and nATP side by side.  nADP maximizes in the corners right
+before the nATP maxima follows.  Makes sense looking at equations.
+Once again the nATP maxima is more spread out, where maxima in nADP
+appear more just at walls.
+
+Nd and nATP side by side.  Nd maximizes at walls and the nATP moves in
+to follow it
+
+Nd and nE side by side.  Nd maximizes in corners and then the nE also
+maximizes in the corners.  The nE maxima appear in these sort of quick
+bursts in the corners, along with a slower broader movements away from
+that corner after the burst and into the next, where another sharp
+burst occurs.  The Nd bursts occurs after the Nd as subsided in that
+corner, and really by the time the burst maximizes, the Nd is already
+on its way over and starting to build on the otehr side.
 
 Randst nflD doesn't show much oscillation at all, but we start it so
 that the density is not max at the pole.
@@ -196,26 +249,26 @@ that the density is not max at the pole.
 
 
 
-\begin{figure}
-  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf}
-  \caption{randst 99}
-  %\label{}
-\end{figure}
-\begin{figure}
-  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf}
-  \caption{randst 98}
-  %\label{fig:pair-distribution-3}
-\end{figure}
-\begin{figure}
-  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf}
-  \caption{randst 97}
-  %\label{fig:pair-distribution-3}
-\end{figure}
-\begin{figure}
-  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf}
-  \caption{randst 96}
-  %\label{fig:pair-distribution-3}
-\end{figure}
+%% \begin{figure}
+%%   \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf}
+%%   \caption{randst 99}
+%%   %\label{}
+%% \end{figure}
+%% \begin{figure}
+%%   \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf}
+%%   \caption{randst 98}
+%%   %\label{fig:pair-distribution-3}
+%% \end{figure}
+%% \begin{figure}
+%%   \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf}
+%%   \caption{randst 97}
+%%   %\label{fig:pair-distribution-3}
+%% \end{figure}
+%% \begin{figure}
+%%   \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf}
+%%   \caption{randst 96}
+%%   %\label{fig:pair-distribution-3}
+%% \end{figure}
 
 Randst 98 -
 
@@ -230,6 +283,10 @@ Triangle -
 -Discussion of conceptual reasons of why we see what we see
 -Plots that are more interpretive (area-rating)
 -Some sort of predictive claim?
+
+\section{animate?}
+\animategraphics[height=2.8in,autoplay,controls]{12}{../data/shape-randst/plots/movie-density-Nd-96/animate_}{0}{120}
+
 
 
 \section{Conclusion}
