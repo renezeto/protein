@@ -13,7 +13,7 @@ const double difD = 2.5; // (um)^2 s^- 1
 const double difE = 2.5; // (um)^2 s^-1
 const double rate_ADP_ATP = 1; // s^-1
 const double rate_D = .025; // um s^-1
-const double rate_dD = .0015; // (um)^3 s^-1 
+const double rate_dD = .0015; // (um)^3 s^-1
 const double rate_de = .7; // s^-1
 const double rate_E = .093; // (um)^3 s^-1
 
@@ -26,12 +26,11 @@ const int n = 706; //what is this?
 int area_rating_flag = 0;
 int slice_flag = 0;
 
-double dx=0.15;
-
-const double tot_time = 124;
-const double time_step = .1*dx*dx/difD; // = .0009 s if dx=.15
-const int iter = int(tot_time/time_step)+3;
-const int iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second = 556
+double dx;
+double tot_time;
+double time_step;
+int iter;
+int iter_at_half_sec;
 
 double x, y, z;
 int Nx, Ny, Nz;
@@ -315,7 +314,14 @@ int main (int argc, char *argv[]) {
       printf("Printing middle slice data.\n");
     }
   }
-  printf("%f",dx);
+
+  //these had to be moved inside int main if we're to change dx
+  tot_time = 124;
+  time_step = .1*dx*dx/difD;
+  iter = int(tot_time/time_step)+3;
+  iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second = 55
+
+  printf("%f\n",dx);
 
   //compute grid size based on cell parameters
   if (mem_f_shape=="p") {
@@ -372,17 +378,19 @@ int main (int argc, char *argv[]) {
   char * out_file_name = new char[1024];
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
-  
+
   time_t t = time(0);
   struct tm * now = localtime( & t );
   char * timevar = new char[1024];
   sprintf(timevar, "%d/%d/%d at %d hours and %d minutes", now->tm_mon +1,now->tm_mday,now->tm_year +1900,now->tm_hour,now->tm_min);
   fprintf(out_file,"This simulation was run on %s\n",timevar);
+  fflush(out_file);
 
   fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
   for (int i=0;i<3*starting_num_guassians;i++){
     guass[i]=0;
   }
+
   //In the following, for every set of three numbers, the 1st is y and he 2nd is z and the 3rd is quassian width
   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
@@ -415,6 +423,8 @@ int main (int argc, char *argv[]) {
       randomize_cell_wall(guass);
     }
   }
+
+
   nATP = new double[Nx*Ny*Nz];
   nADP = new double[Nx*Ny*Nz];
   nE = new double[Nx*Ny*Nz];
@@ -439,42 +449,8 @@ int main (int argc, char *argv[]) {
   double *curvature = new double[Nx*Ny*Nz];
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
-  bool force_to_generate_new_memA = true;
-  if (mem_f_shape=="randst") {
-    char* memA_name = new char[1024];
-    sprintf(memA_name,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
-    FILE *memAin = fopen(memA_name,"r");
-    if (!memAin || force_to_generate_new_memA) {
-      if (memAin && force_to_generate_new_memA) fclose(memAin);
-      fprintf(out_file,"There is evidently no file called %s,\n so we're going to create one and fill it with memA information for future use.\n",memA_name);
-      set_membrane(out_file, mem_f, mem_A, normals_x, normals_y, normals_z);
-      set_curvature(mem_A, normals_x, normals_y, normals_z, curvature);
-      fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.\n");
-      char* memA_out = new char[1024];
-      sprintf(memA_out,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.0f.dat",A,B,C,D,density_factor);
-      FILE *memAout = fopen((const char *)memA_out,"w");
-      for (int i=0;i<Nx*Ny*Nz;i++) {
-        fprintf(memAout, "%g\t",mem_A[i]);
-      }
-      fclose(memAout);
-      delete[] memA_out;
-      fprintf(out_file,"\nFinished printing the memA file, now we're moving on with simulation.\n");
-    } else {
-      fprintf(out_file,"We're taking the memA info from a file that already exists.\n");
-      for (int i=0;i<Nx*Ny*Nz;i++) {
-        if (fscanf(memAin, "%lg\t",&mem_A[i])!=1) {
-          fprintf(out_file,"There was a problem in trying to read into the mem_A array.\n");
-          exit(1);
-        }
-      }
-    }
-  } else {
-    set_membrane(out_file, mem_f, mem_A, normals_x, normals_y, normals_z);
-    set_curvature(mem_A, normals_x, normals_y, normals_z, curvature);
-    fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
-  }
 
-  // //begin area rating
+  ////begin area rating
   char *area_rating_out = new char[1024];
   if (dx==.05) {
     sprintf(area_rating_out, "data/shape-%s/hires-area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
@@ -598,27 +574,28 @@ int main (int argc, char *argv[]) {
   fprintf(out_file,"\nMembrane file printed.\n");
   //end membrane printing
 
+  //replace membrane.dat prints with mem_f prints for extrema.py
   //begin mem_f printing for randst, tie fighter, triangle - possibly do this for other shapes if needed -- NEEDS UPDATE.
-  if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
-    char *f_file_name = new char[1024];
-    if(f_file_name==NULL) {
-      fprintf(out_file,"Error: f_file_name is null.");
-      exit(1);
-    }
-    sprintf(f_file_name,"data/shape-%s/membrane_files/f_membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat", mem_f_shape.c_str(),A,B,C,D,density_factor);
-    FILE *f_file = fopen((const char *)f_file_name,"w");
-    double x = Nx/2.0*dx;
-    for (int i=0;i<Ny;i++) {
-      for (int j=0;j<Nz;j++) {
-        fprintf(f_file,"%g\t%g\t%g\n",i*dx,j*dx,mem_f(x,i*dx,j*dx));
-      }
-    }
-    fclose(f_file);
-    fprintf(out_file,"Finished printing out the mem_f_shape function.\n");
-    fflush(stdout);
-  }
-  fprintf (out_file,"Membrane set with density in it.\n");
-  fflush(out_file);
+  // if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
+  //   char *f_file_name = new char[1024];
+  //   if(f_file_name==NULL) {
+  //     fprintf(out_file,"Error: f_file_name is null.");
+  //     exit(1);
+  //   }
+  //   sprintf(f_file_name,"data/shape-%s/membrane_files/f_membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat", mem_f_shape.c_str(),A,B,C,D,density_factor);
+  //   FILE *f_file = fopen((const char *)f_file_name,"w");
+  //   double x = Nx/2.0*dx;
+  //   for (int i=0;i<Ny;i++) {
+  //     for (int j=0;j<Nz;j++) {
+  //       fprintf(f_file,"%g\t%g\t%g\n",i*dx,j*dx,mem_f(x,i*dx,j*dx));
+  //     }
+  //   }
+  //   fclose(f_file);
+  //   fprintf(out_file,"Finished printing out the mem_f_shape function.\n");
+  //   fflush(stdout);
+  // }
+  // fprintf (out_file,"Membrane set with density in it.\n");
+  // fflush(out_file);
   //end mem_f printing
 
   set_density(nATP, nE, mem_A);
@@ -679,7 +656,7 @@ int main (int argc, char *argv[]) {
     get_next_density(mem_A, insideArr, nATP, nADP, nE, Nd, Nde, JxATP, JyATP, JzATP,
                      JxADP, JyADP, JzADP, JxE, JyE, JzE);
 
-    
+
 
     //begin status update
     if (i%percent == 0){
@@ -722,10 +699,10 @@ int main (int argc, char *argv[]) {
           sprintf(outfilenameATP, "data/shape-%s/m-nATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
         }
       }
-      
+
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
-      
+
       if (slice_flag==1) {
         for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
@@ -735,7 +712,7 @@ int main (int argc, char *argv[]) {
         }
         fclose(nATPfile);
       }
-      
+
       else {
         for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
@@ -750,7 +727,7 @@ int main (int argc, char *argv[]) {
         fclose(nATPfile);
       }
       //end nATP printing
-      
+
       //nE printing
       char *outfilenameE = new char[1000];
       if (dx==.05) {
@@ -769,7 +746,7 @@ int main (int argc, char *argv[]) {
           sprintf(outfilenameE, "data/shape-%s/m-nE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
         }
       }
-      
+
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
 
@@ -992,7 +969,7 @@ int main (int argc, char *argv[]) {
     }
   }
   //end file printing
-
+  printf("end of file printing that didn't happen\n");
   for (int i=0;i<Nx*Ny*Nz;i++){
     total_NATP += nATP[i]*dx*dx*dx;
     total_NADP += nADP[i]*dx*dx*dx;
@@ -1033,7 +1010,7 @@ int main (int argc, char *argv[]) {
   if (catalog_exists==1) {
     catalog=fopen(fname,"a+b");
   }
-  else { 
+  else {
     catalog=fopen(fname,"w+b");
   }
   if (catalog!=NULL) {
@@ -1060,7 +1037,7 @@ int main (int argc, char *argv[]) {
   FILE* nEavg_file = fopen((const char *)nEavg_name,"w");
   FILE* nADPavg_file = fopen((const char *)nADPavg_name,"w");
   FILE* nDavg_file = fopen((const char *)nDavg_name,"w");
-  
+
   for (int i2=0; i2<Nx; i2++) {
     for (int j2=0; j2<Ny; j2++) {
       for (int k2=0; k2<Nz; k2++) {
@@ -1073,7 +1050,7 @@ int main (int argc, char *argv[]) {
         fprintf(nADPavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nADP_avg[i2*Ny*Nz+j2*Nz+k2]);
         fprintf(nDavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nD_avg[i2*Ny*Nz+j2*Nz+k2]);
         //x y z avg_density print to each file
-      }  
+      }
     }
   }
   fclose(nATPavg_file);
@@ -1084,6 +1061,8 @@ int main (int argc, char *argv[]) {
   return 0;
 }
 
+
+//problem with randst is in this function. it is taking far too long to do this calculation.
 void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
                   double mem_A[], double normals_x[], double normals_y[], double normals_z[]) {
   clock_t old_time = clock();
@@ -1103,7 +1082,6 @@ void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z)
         double fxyZ = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
         double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
         double f = mem_f(xi*dx, yi*dx, zi*dx);
-
         mem_A[xi*Ny*Nz+yi*Nz+zi] = find_intersection(fXYZ, fXYz, fXyZ, fXyz, fxYZ, fxYz, fxyZ, fxyz, f);
         double df_dx = (fXYZ + fXYz + fXyZ + fXyz - fxYZ - fxyZ - fxYz - fxyz)/(4*dx); // this is df_dx
         double df_dy = (fXYZ + fXYz + fxYZ + fxYz - fXyZ - fxyZ - fXyz - fxyz)/(4*dx); // this is df_dy
@@ -1115,7 +1093,6 @@ void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z)
       }
     }
   }
-  printf("done with random mem_f and mem_A\n");
 }
 
 void set_curvature(double mem_A[], double normals_x[], double normals_y[], double normals_z[], double curvature[]){
@@ -1128,7 +1105,7 @@ void set_curvature(double mem_A[], double normals_x[], double normals_y[], doubl
         double curve_y=0;
         double curve_z=0;
         if (mem_A[xi*Ny*Nz+yi*Nz+zi]==0){
-          printf("x=%g, y=%g, z=%g, mem_A=0!!!\n",xi*dx,yi*dx,zi*dx);
+          //printf("x=%g, y=%g, z=%g, mem_A=0!!!\n",xi*dx,yi*dx,zi*dx);
           curvature[xi*Ny*Nz+yi*Nz+zi]=0;
         } else {
           double avg_normal_X = (normals_x[(xi+1)*Ny*Nz+yi*Nz+zi] + normals_x[(xi+1)*Ny*Nz+(yi+1)*Nz+zi] + normals_x[(xi+1)*Ny*Nz+(yi-1)*Nz+zi]
@@ -1525,36 +1502,28 @@ int set_density(double *nATP, double *nE, double *mem_A){
         if (inside(i,j,k)){
           if(k>density_divider_z){
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
+	    nADP[i*Ny*Nz+j*Nz+k] =0;
+	    Nd[i*Ny*Nz+j*Nz+k] =0;
+	    Nde[i*Ny*Nz+j*Nz+k] = 0;
           }
           else {
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left;
-          }
-        }
-      }
-    }
-  }
-
-  for (int i=0;i<Nx;i++){
-    for (int j=0;j<Ny;j++){
-      for (int k=0;k<Nz;k++){
-        if (inside(i,j,k)){
-          if(k>density_divider_z){
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
-          }
-          else {
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left;
+	    nADP[i*Ny*Nz+j*Nz+k] =0;
+	    Nd[i*Ny*Nz+j*Nz+k] =0;
+	    Nde[i*Ny*Nz+j*Nz+k] = 0;
           }
         }
+	else {
+	  nATP[i*Ny*Nz+j*Nz+k] = 0;
+	  nE[i*Ny*Nz+j*Nz+k] = 0;
+	  nADP[i*Ny*Nz+j*Nz+k] =0;
+	  Nd[i*Ny*Nz+j*Nz+k] =0;
+	  Nde[i*Ny*Nz+j*Nz+k] = 0;
+	}
       }
     }
-  }
-
-  //minor bug; outside protein concentration needs to be initialized to zero
-
-  for (int i=0;i<Nx*Ny*Nz;i++) {
-    nADP[i] = 0;
-    Nd[i] = 0;
-    Nde[i] = 0;
   }
   return 0;
 }
