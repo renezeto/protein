@@ -19,6 +19,16 @@ at the end.
 
 Look more at ranst plots.  Investigate with both the interplay with the different protein plots.  Try to verify the qualitative story told in the other paper.
 
+   -Start the randst so that density is max at the pole to start
+   (the bottom), now its only on the side and that doesn't work as
+   well
+   -Start the star shape Randst 96 with density max only in one corner, now it starts with it on the side and so there's an equal max in the two poles on the right.
+
+   -nflE has short burst maxima in the poles, mostly right along the walls.
+   -Randst 97 with density max starting on the bottom of cell.  And then also with density max starting in the left little bump.
+
+   -Want to run everything twice as long.
+
 Randst 99 -
 Randst 98 -
 Randst 97 -
