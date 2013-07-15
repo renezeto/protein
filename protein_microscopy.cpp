@@ -1511,7 +1511,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
   }
 
   int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
-  int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/3);
+  //int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/3);
 
   //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
   int gridpoints_left = 0;
@@ -1522,7 +1522,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           gridpoints_total++;
-          if (k<density_divider_z) {
+          if (k<=density_divider_z) {
             gridpoints_left++;
           }
           else {
@@ -1548,7 +1548,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(j>density_divider_y && k>density_divider_z){
+          if(k>density_divider_z){
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
             nADP[i*Ny*Nz+j*Nz+k] =0;

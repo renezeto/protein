@@ -9,7 +9,7 @@
 *protein*
 *protein_microscopy*
 *.dat
-catalog.txt
+*catalog.txt*
 *.png
 *.pdf
 *.gif
