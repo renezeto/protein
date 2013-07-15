@@ -41,6 +41,8 @@ Official to do:
 -Try time_map with cuttoff minimum densities
 
 Run everything below for twice as long as we did before.
+Run everything with both slices and non-slices
+Add the Nde movies and plots.  We now plot everything else but these.
 
 pill:
 4.00 3.75
