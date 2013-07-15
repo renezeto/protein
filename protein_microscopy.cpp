@@ -316,7 +316,7 @@ int main (int argc, char *argv[]) {
   }
 
   //these had to be moved inside int main if we're to change dx
-  tot_time = 124;
+  tot_time = 248; //4 periods ish
   time_step = .1*dx*dx/difD;
   iter = int(tot_time/time_step)+3;
   iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second = 55
@@ -1438,6 +1438,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
   //  printf("Total inside = %d\nTotal nATP should be = %f\n NE per cell = %f\n", count_inside,count_inside*NE_per_cell, NE_per_cell);
   //.
   //double r2,U,V; unused
+
   int right_most_point_z=0; //left and right most points for z
   int left_most_point_z=Nz;
   int right_most_point_y=0; //"left" and "right" most points for y, in terms of magnitude (right = larger y value)
@@ -1501,28 +1502,28 @@ int set_density(double *nATP, double *nE, double *mem_A){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(k>density_divider_z){
+          if(j>density_divider_y && k>density_divider_z){
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
-	    nADP[i*Ny*Nz+j*Nz+k] =0;
-	    Nd[i*Ny*Nz+j*Nz+k] =0;
-	    Nde[i*Ny*Nz+j*Nz+k] = 0;
+            nADP[i*Ny*Nz+j*Nz+k] =0;
+            Nd[i*Ny*Nz+j*Nz+k] =0;
+            Nde[i*Ny*Nz+j*Nz+k] = 0;
           }
           else {
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left;
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left;
-	    nADP[i*Ny*Nz+j*Nz+k] =0;
-	    Nd[i*Ny*Nz+j*Nz+k] =0;
-	    Nde[i*Ny*Nz+j*Nz+k] = 0;
+            nADP[i*Ny*Nz+j*Nz+k] =0;
+            Nd[i*Ny*Nz+j*Nz+k] =0;
+            Nde[i*Ny*Nz+j*Nz+k] = 0;
           }
         }
-	else {
-	  nATP[i*Ny*Nz+j*Nz+k] = 0;
-	  nE[i*Ny*Nz+j*Nz+k] = 0;
-	  nADP[i*Ny*Nz+j*Nz+k] =0;
-	  Nd[i*Ny*Nz+j*Nz+k] =0;
-	  Nde[i*Ny*Nz+j*Nz+k] = 0;
-	}
+        else {
+          nATP[i*Ny*Nz+j*Nz+k] = 0;
+          nE[i*Ny*Nz+j*Nz+k] = 0;
+          nADP[i*Ny*Nz+j*Nz+k] =0;
+          Nd[i*Ny*Nz+j*Nz+k] =0;
+          Nde[i*Ny*Nz+j*Nz+k] = 0;
+        }
       }
     }
   }
