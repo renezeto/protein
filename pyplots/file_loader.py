@@ -2,6 +2,7 @@ import numpy as np
 import sys
 import glob
 
+#get the shape an physical parameters of the cell (last argument is density lopsidedness)
 f_shape = sys.argv[1]
 f_param1 = sys.argv[2]
 f_param2 = sys.argv[3]

@@ -28,16 +28,16 @@ batch_pill_simulations = [
 #simulation subprocess management:
 if '-sim' in sys.argv:
     processes = set()
-    max_processes = 100
+    max_processes = 7
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
-            processes.add(subprocess.Popen(['srun','./protein_microscopy','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['./protein_microscopy','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
     if 'randst' in sys.argv:
         for job in batch_randst_simulations:
-            processes.add(subprocess.Popen(['srun','./protein_microscopy','randst','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['./protein_microscopy','randst','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
@@ -45,12 +45,12 @@ if '-sim' in sys.argv:
 #plots the recent simulations:
 if '-plot' in sys.argv:
     processes = set()
-    max_processes = 100
+    max_processes = 7
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
-#            processes.add(subprocess.Popen(['srun','python','pyplots/extrema','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
-            processes.add(subprocess.Popen(['srun','python','pyplots/time_map','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
-            processes.add(subprocess.Popen(['srun','python','pyplots/showatp.py','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['python','pyplots/extrema.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['python','pyplots/time_map.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['python','pyplots/showatp.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)

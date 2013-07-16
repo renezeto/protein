@@ -14,12 +14,13 @@ nE = load.data(protein="nE")
 nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
 
+#params integer-ized to deal with latex issues
 f_shape = sys.argv[1]
-f_param1 = int(10*(float(sys.argv[2])))
-f_param2 = int(10*(float(sys.argv[3])))
-f_param3 = int(10*(float(sys.argv[4])))
-f_param4 = int(10*(float(sys.argv[5])))
-f_param5 = int(10*(float(sys.argv[6])))
+f_param1 = int(100*(float(sys.argv[2])))
+f_param2 = int(100*(float(sys.argv[3])))
+f_param3 = int(100*(float(sys.argv[4])))
+f_param4 = int(100*(float(sys.argv[5])))
+f_param5 = int(100*(float(sys.argv[6])))
 
 #compute time average (removing first 10% happens in file loading)
 def average_location(dataset):

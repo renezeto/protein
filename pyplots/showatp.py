@@ -8,13 +8,7 @@ import sys
 import time
 import file_loader as load
 
-f_shape = sys.argv[1]
-f_param1 = sys.argv[2]
-f_param2 = sys.argv[3]
-f_param3 = sys.argv[4]
-f_param4 = sys.argv[5]
-f_param5 = sys.argv[6]
-
+#create data objects (see file_loader.py)
 nflE = load.data(protein="nflE")
 nflD = load.data(protein="nflD")
 nATP = load.data(protein="nATP")
@@ -22,6 +16,14 @@ nE = load.data(protein="nE")
 nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
 
+f_shape = sys.argv[1]
+f_param1 = sys.argv[2]
+f_param2 = sys.argv[3]
+f_param3 = sys.argv[4]
+f_param4 = sys.argv[5]
+f_param5 = sys.argv[6]
+
+#computes the maximum of a two dimensional array - REPLACE with method
 def maxnum(page):
     Z = [0. for i in range(page.shape[0])]
     for i in range(page.shape[0]):
@@ -29,6 +31,7 @@ def maxnum(page):
     maxval = max(Z)
     return maxval
 
+#computes the minimum of a two dimensional array - REPLACE with method
 def minnum(page):
     Z = [0. for i in range(page.shape[0])]
     for i in range(page.shape[0]):
@@ -38,6 +41,7 @@ def minnum(page):
     minval = min(Z)
     return minval
 
+#computes the global maximum over a set of two dimensional arrays (stored as files)
 def timemax(protein):
     Z = [0. for i in range(protein.tsteps)]
     for i in (range(protein.tsteps-1)):
@@ -45,6 +49,7 @@ def timemax(protein):
     maxval = max(Z)
     return maxval
 
+#computes the global minimum over a set of two dimensional arrays (stored as files)
 def timemin(protein):
     Z = [0. for i in range(protein.tsteps)]
     for i in (range(protein.tsteps-1)):
@@ -52,14 +57,20 @@ def timemin(protein):
     minval = min(Z)
     return minval
 
+#function to carry out the animation generation
 def contourplt(protein):
+    #get extrema values for color bar (global extrema in time)
     maxval = timemax(protein)
     minval = timemin(protein)
     plt.figure(1)
+
+    #shell command to clean up any previous .png's, just in case (perhaps a process was cancelled midway)
     os.system("rm -f ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
+
     Z, Y = np.meshgrid(np.arange(0,protein.datashape[1],1), np.arange(0,protein.datashape[0],1))
+    #generate a sequence of .png's for each file (printed time step). these will be used to create a gif.
     for k in range(len(protein.dataset)): #fig.dpi method
         page = protein.dataset[k]
         plt.clf()
@@ -70,20 +81,17 @@ def contourplt(protein):
         plt.title(str(protein.protein)+" volume density at time: "+str(k/2)+" sec")
         plt.xlabel("Z position")
         plt.ylabel("Y position")
-        if k<10:
-            plt.savefig('./data/shape-'+f_shape+'/plots/'+str(protein.protein)+'-tmp_00'+str(k)+'-'+str(protein.protein)+ \
-                            '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
-        elif k<100:
-            plt.savefig('./data/shape-'+f_shape+'/plots/'+str(protein.protein)+'-tmp_0'+str(k)+'-'+str(protein.protein)+ \
-                            '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
-        else:
-            plt.savefig('./data/shape-'+f_shape+'/plots/'+str(protein.protein)+'-tmp_'+str(k)+'-'+str(protein.protein)+ \
-                            '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
+        plt.savefig('./data/shape-'+f_shape+'/plots/'+str(protein.protein)+'-tmp_%03d'%k+'-'+str(protein.protein)+ \
+                        '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
+
+    #shell command to convert all of the recently generated .png's to a single .gif using convert utility
     os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
     +"/plots/density_movie-"+str(protein.protein)+"-"+f_shape \
     +"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".gif")
+
+    #shell command to clean up the .png's
     os.system("rm -f ./data/shape-"+f_shape+"/plots/"+str(protein.protein)+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
