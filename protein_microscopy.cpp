@@ -450,6 +450,45 @@ int main (int argc, char *argv[]) {
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
 
+// -  bool force_to_generate_new_memA = true;
+// -  if (mem_f_shape=="randst") {
+// -    char* memA_name = new char[1024];
+// -    sprintf(memA_name,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
+// -    FILE *memAin = fopen(memA_name,"r");
+// -    if (!memAin || force_to_generate_new_memA) {
+// -      if (memAin && force_to_generate_new_memA) fclose(memAin);
+// -      fprintf(out_file,"There is evidently no file called %s,\n so we're going to create one and fill it with memA information for future use.\n",memA_name);
+// -      set_membrane(out_file, mem_f, mem_A, normals_x, normals_y, normals_z);
+// -      set_curvature(mem_A, normals_x, normals_y, normals_z, curvature);
+// -      fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.\n");
+// -      char* memA_out = new char[1024];
+// -      sprintf(memA_out,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.0f.dat",A,B,C,D,density_factor);
+// -      FILE *memAout = fopen((const char *)memA_out,"w");
+// -      for (int i=0;i<Nx*Ny*Nz;i++) {
+// -        fprintf(memAout, "%g\t",mem_A[i]);
+// -      }
+// -      fclose(memAout);
+// -      delete[] memA_out;
+// -      fprintf(out_file,"\nFinished printing the memA file, now we're moving on with simulation.\n");
+// -    } else {
+// -      fprintf(out_file,"We're taking the memA info from a file that already exists.\n");
+// -      for (int i=0;i<Nx*Ny*Nz;i++) {
+// -        if (fscanf(memAin, "%lg\t",&mem_A[i])!=1) {
+// -          fprintf(out_file,"There was a problem in trying to read into the mem_A array.\n");
+// -          exit(1);
+// -        }
+// -      }
+// -    }
+// -  } else {
+// -    set_membrane(out_file, mem_f, mem_A, normals_x, normals_y, normals_z);
+// -    set_curvature(mem_A, normals_x, normals_y, normals_z, curvature);
+// -    fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
+// -  }
+
+  //this was missing:
+  set_membrane(out_file, mem_f, mem_A);
+  //note: I changed set_membrane temporarily to not include the normals arrays.
+
   //begin area rating
   // char *area_rating_out = new char[1024];
   // if (dx==.05) {
@@ -1106,7 +1145,7 @@ int main (int argc, char *argv[]) {
 
 //problem with randst is in this function. it is taking far too long to do this calculation.
 void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
-                  double mem_A[], double normals_x[], double normals_y[], double normals_z[]) {
+                  double mem_A[]) {
   clock_t old_time = clock();
   for(int xi=0;xi<Nx;xi++){
     clock_t time = clock();
@@ -1125,13 +1164,6 @@ void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z)
         double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
         double f = mem_f(xi*dx, yi*dx, zi*dx);
         mem_A[xi*Ny*Nz+yi*Nz+zi] = find_intersection(fXYZ, fXYz, fXyZ, fXyz, fxYZ, fxYz, fxyZ, fxyz, f);
-        double df_dx = (fXYZ + fXYz + fXyZ + fXyz - fxYZ - fxyZ - fxYz - fxyz)/(4*dx); // this is df_dx
-        double df_dy = (fXYZ + fXYz + fxYZ + fxYz - fXyZ - fxyZ - fXyz - fxyz)/(4*dx); // this is df_dy
-        double df_dz = (fXYZ + fXyZ + fxYZ + fxyZ - fXYz - fXyz - fxYz - fxyz)/(4*dx); // this is df_dz
-        double constant = sqrt(df_dx*df_dx + df_dy*df_dy + df_dz*df_dz);
-        normals_x[xi*Ny*Nz+yi*Nz+zi] = df_dx/constant;
-        normals_y[xi*Ny*Nz+yi*Nz+zi] = df_dy/constant;
-        normals_z[xi*Ny*Nz+yi*Nz+zi] = df_dz/constant;
       }
     }
   }
