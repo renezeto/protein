@@ -8,6 +8,8 @@ import sys
 import time
 import file_loader as load
 
+#wip
+
 #function to compute the local maxima of a 2 dimensional array (used for local maxima in space)
 def localmax(page):
     lmax = []
@@ -53,7 +55,6 @@ nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
 
 for p in [nflE, nflD, nATP, nE, nADP, Nd]:
-    p.pointInfo = (0,0)
     for i in p.dataset:
         if (globalmax(i) != "empty"):
             p.pointInfo = (globalmax(i)[0][0], globalmax(i)[0][1])
@@ -63,8 +64,8 @@ for p in [nflE, nflD, nATP, nE, nADP, Nd]:
 
 for p in [nflE, nflD, nATP, nE, nADP, Nd]:
     p.densityInfo = []
-    for i in p.dataset:
-        p.densityInfo += [ i[p.pointInfo[0]][p.pointInfo[1]] ]
+    for file in p.dataset:
+        p.densityInfo += [ file[p.pointInfo[0]][p.pointInfo[1]] ]
     time = np.arange(0,len(p.densityInfo)/2,.5)
     plt.figure()
     plt.plot(time,p.densityInfo)
