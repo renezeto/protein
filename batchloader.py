@@ -48,8 +48,9 @@ if '-plot' in sys.argv:
     max_processes = 7
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
-            processes.add(subprocess.Popen(['python','pyplots/extrema.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            #processes.add(subprocess.Popen(['python','pyplots/extrema.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             processes.add(subprocess.Popen(['python','pyplots/time_map.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['python','pyplots/frequency_plot.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             processes.add(subprocess.Popen(['python','pyplots/showatp.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             if len(processes) >= max_processes:
                 os.wait()
