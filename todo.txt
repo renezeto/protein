@@ -29,6 +29,8 @@ Look more at randst plots.  Investigate with both the interplay with the differe
 
    -Want to run everything twice as long.
 
+  
+
 Randst 99 -
 Randst 98 -
 Randst 97 -
@@ -41,7 +43,7 @@ Official to do:
 -Try time_map with cuttoff minimum densities
 
 Run everything below for twice as long as we did before.
-Run everything with both slices and non-slices
+Run everything with both slices and microscopy
 Add the Nde movies and plots.  We now plot everything else but these.
 
 pill:
