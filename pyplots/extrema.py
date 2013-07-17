@@ -12,9 +12,6 @@ f_param3 = int(10*(float(sys.argv[4])))
 f_param4 = int(10*(float(sys.argv[5])))
 f_param5 = int(10*(float(sys.argv[6])))
 
-#import membrane file for printing onto the plot
-cell_membrane = np.loadtxt('./data/shape-'+f_shape+'/membrane_files/membrane-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.dat')
-
 #create the protein data objects (see file_loader.py)
 nflE = load.data(protein="nflE")
 nflD = load.data(protein="nflD")
@@ -64,6 +61,9 @@ def globalmax(page):
         gmax.pop(1)
     return gmax
 
+#import membrane file for printing onto the plot
+    cell_membrane = np.loadtxt('./data/shape-'+load.f_shape+'/membrane_files/membrane-'+load.f_param1+'-'+load.f_param2+'-'+load.f_param3+'-'+load.f_param4+'-'+load.f_param5+'.dat')
+
 #returns a list of displacement vectors between points that are global maxima in space (in one data file) and
 #local maxima in time (in all the data files)
 def maxvectorplot(protein):
@@ -92,3 +92,4 @@ for p in [nflE, nflD, nATP, nE, nADP, Nd]:
     plt.scatter(unzip_membrane(cell_membrane)[0],unzip_membrane(cell_membrane)[1])
     plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'extrema-'+str(p.protein)+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.pdf')
     print "extrema plot generated: " + str(p.protein)
+
