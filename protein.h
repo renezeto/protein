@@ -36,8 +36,7 @@ int get_J(double difD, double *nATP, double *nADP, double *nE,
           double *JxATP, double *JyATP, double *JzATP,
           double *JxADP, double *JyADP, double *JzADP,
           double *JxE, double *JyE, double *JzE);
-void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z), double mem_A[],
-                  double normal_x[], double normal_y[], double normal_z[]);
+void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z), double mem_A[]);
 void set_curvature(double mem_A[], double normals_x[], double normals_y[], double normals_z[], double curvature[]);
 void set_insideArr(bool *insideArr);
 bool inside(int xi, int yi, int zi);
