@@ -53,6 +53,7 @@ nATP = load.data(protein="nATP")
 nE = load.data(protein="nE")
 nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
+Nde = load.data(protein="Nde")
 
 for p in [nflE, nflD, nATP, nE, nADP, Nd]:
     for i in p.dataset:

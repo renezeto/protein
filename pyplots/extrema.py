@@ -19,6 +19,7 @@ nATP = load.data(protein="nATP")
 nE = load.data(protein="nE")
 nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
+Nde = load.data(protein="Nde")
 
 #store the membrane info in a way that can be scatter plotted (update later with mem_f print)
 def unzip_membrane(memdat):

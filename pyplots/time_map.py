@@ -13,6 +13,7 @@ nATP = load.data(protein="nATP")
 nE = load.data(protein="nE")
 nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
+Nde = load.data(protein="Nde")
 
 #params integer-ized to deal with latex issues
 f_shape = sys.argv[1]
