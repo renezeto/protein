@@ -8,6 +8,8 @@ import sys
 import time
 import file_loader as load
 
+
+dx = .15
 #wip
 
 #function to compute the local maxima of a 2 dimensional array (used for local maxima in space)
@@ -61,13 +63,28 @@ for p in [nflE, nflD, nATP, nE, nADP, Nd]:
             break
     print p.pointInfo
 
+z = 2 + round((float(f_param1)-.15)/dx)
+y = 2 + round((float(f_param2)-.15)/dx)
+print z*dx
+print y*dx
+print "Hello"
+print z
+print y
+pointB = ()
 
 for p in [nflE, nflD, nATP, nE, nADP, Nd]:
     p.densityInfo = []
+    p.densityInfoTwo = []
+    print p.pointInfo[0]
+    print p.pointInfo[1]
     for file in p.dataset:
         p.densityInfo += [ file[p.pointInfo[0]][p.pointInfo[1]] ]
+        p.densityInfoTwo += [ file[y][z] ]
     time = np.arange(0,len(p.densityInfo)/2,.5)
     plt.figure()
     plt.plot(time,p.densityInfo)
+    plt.plot(time,p.densityInfoTwo)
+    plt.title('Max point = '+str(p.pointInfo[0]*dx)+','+str(p.pointInfo[0]*dx)
+              +'   Middle point = '+str(y*dx)+','+str(z*dx))
     plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot'+str(p.protein)+'-'+f_shape+'-'+str(f_param1)+'-'+str(f_param2)+'-'+str(f_param3)+'-'+str(f_param4)+'-'+str(f_param5)+'.pdf')
 
