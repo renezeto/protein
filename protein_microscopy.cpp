@@ -316,7 +316,7 @@ int main (int argc, char *argv[]) {
   }
 
   //these had to be moved inside int main if we're to change dx
-  tot_time = 124; //4 periods ish
+  tot_time = 248; //4 periods ish
   time_step = .1*dx*dx/difD;
   iter = int(tot_time/time_step)+3;
   iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second = 55
