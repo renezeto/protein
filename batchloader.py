@@ -31,7 +31,7 @@ if '-sim' in sys.argv:
     max_processes = 7
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
-            processes.add(subprocess.Popen(['./protein_microscopy','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['srun','./protein_microscopy','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
