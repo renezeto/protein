@@ -31,6 +31,173 @@
 \begin{abstract}
   This paper is about science.
 \end{abstract}
+\section{Introduction}
+\subsection{What is the MinD system and why is it important?}
+\subsection{How proteins move in cell}
+\section{Methods and Initial Conditions}
+The model for the behavior of the MinD and MinE proteins inside the cell
+implemented the same set of 5 reaction-diffusion equations described in the paper
+by Huang et al (equations 1, 2, 3, 4, and 5). A 3d grid was constructed in
+cartesian coordinates with a grid spacing of .05 $\mu$m. From there, we
+were able to define a cell shape on the grid, and solve the
+reaction-diffusion equations numerically to observe the time evolution of
+the MinD and MinE concentrations inside the cell.
+
+Our simulation used the same diffusion constants and reaction rates as
+Huang et al, which are
+
+\begin{gather*} %format better
+  \mathcal{D}_D = \mathcal{D}_{E}  = 2.5 \mu \textrm{m$^2$ / sec}, \\
+  \sigma_D^{\textrm{ADP $\rightarrow$ ATP}}  = 1/\textrm{sec},  \sigma_D = 0.025 \mu \textrm{m/sec}, \\
+  \sigma_{dD}  = 0.0015 \mu \textrm{m$^3$/sec}, \\
+  \sigma_{de}  = 0.7/\textrm{sec}, \sigma_E = 0.093 \mu \textrm{m$^3$/sec}.
+\end{gather*}
+
+To test our computational model, we implemented a pill shaped cell, and
+tested using the same cell parameters as Huang et al, which were a radius
+of 0.5 $\mu$m in the middle and at the spherical endcaps, and two different
+cell lengths of 4 $\mu$m and 10 $\mu$m. We found the same type of
+oscillations as in their paper using these initial conditions, verifying
+that our model works as intended. Below are snapshots of MinD and MinE
+concentrations at 5 second timestamps in the 4 $\mu$m cell:
+\newline
+\newline
+[insert 5 second time stamps of 4 $\mu$m sim]
+\newline
+\newline
+We then began to define other, non-traditional cell shapes for the purpose of
+modeling squished and perturbed E. coli cells, which were created
+experimentally in Mannick et al. To achieve this, we went with a
+cartesian lattice rather than the cylindrical lattice used in Huang et 
+al's simulations, as it allows for more flexibility in defining the 
+cell shape. Some of the cell shape models included a flattened pill
+(stadium shape), an ellipsoid, a spherical cell, and various randomly
+generated smooth shapes, such as those in the figures below. 
+\newline
+\newline
+[insert memf print of 2-3 cell shapes]
+\newline
+\newline
+To interpret the results, we generated several different plot views of
+the printed simulation data. These plots included a time averaged view
+of the protein densities in the cell; a plot tracking the location of
+protein concentrations that were global maxima in space and local maxima in 
+time; and an animated view that showed the actual dispersion of
+protein concentrations in the cell over time. 
+\subsection{Mathematical Model}
+\section{Specific Results}
+\subsection{Pill Shape}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{../data/shape-p/plots/frequency_plot_all_norm-p-40-20-0-0-150.pdf}
+  \caption{Protein density fluctuation with time against the polar
+    wall in a 4$\mu m$ by 2$\mu m$ pill shaped cell.  The wall-bound
+    proteins are shown at a point that is on the wall and the
+    cytoplasm densities are shown at a point immediately adjecent.
+    This plot is normalized so that every protein density peaks at 1}
+  \label{frequency-plot-40-20-0-0-150}
+\end{figure}
+
+\fixme{Be more exact about what exactly Nd is versus nATP, in terms of
+  the unit and dimensions.  The plotting may need to be changed}
+Figure \ref{frequency-plot-40-20-0-0-150} shows the protein density
+fluctuations at a point in space adjecent to a polar wall.  At each
+collection of peaks the proteins reach their zenith in an order that
+agrees with the qualitative picture described by
+Huang\cite{huang2003dynamic}, except for nADP peak.  The peaks start
+with a maxima of ATP-MinD accumulating at the walls \fixme{Need a
+  better way to refer to compounds}. This peak is followed by a peak
+in Nde, or ATP-MinD-MinE, as the cell is converted on the wall from
+the former to the latter compound.  As this compound splits apart and
+leaves the wall we see a peak in nE, or MinE in the cytoplasm.  This
+is then followed by a broader peak in nATP, or the MinD-ATP compound,
+as minD-ADP is (changed but I forgot the name for it) into minD-ATP in
+the cytoplasm.  The minD-ATP naturally diffuses away from the pole,
+which is shown by the broad nature of this peak.  All of these peaks
+fit the qualitative picture except for the sharp MinD-ADP peak.  One
+could except it to be a sharp peak, meaning that the MinD-ADP proteins
+do not last in the cytoplasm for very long before they are converted
+(once again forgot the name) into MinD-ATP.  The location of the peak
+in the time dimension is troubling, however, since that we would
+expect it to occur just after the peak in Nde, since the wall-bound
+MinD-ATP-MinE proteins are the ones that split up and leave the wall,
+creating both the MinE and the MinD-ADP.  One would expect to see the
+minD-ADP peak to coincide in time with the minE peak, but it instead
+coincides with the wall-bound MinD-ATP-MinE peak. (Although you can
+maybe sort of convince yourself otherwiase, really looking at it).
+
+\begin{figure}
+  \includegraphics[width=\columnwidth]{../data/shape-p/plots/frequency_plot_all_middle-p-40-20-0-0-150.pdf}
+  \caption{A comparison of protein density fluctuation with time
+    against the polar wall and at a point in the center of the
+    z-length and adjacent to the wall, in the cytoplasm.  The cell is
+    pill shaped and has dimensions of 4$\mu m$ by 2$\mu m$.  }
+  \label{frequency-plot-40-20-0-0-150}
+\end{figure}
+
+The theory states that the aversion of the (forgot name of polymer) to
+the MinD system is responsible for the polymer setting up in the
+center of the cell as opposed to at the cellular poles.\fixme{look
+  this up and write this section up properly} The theory is dependent
+on there being a significant difference in protein density between the
+center and polar regions. It is worthwhile examining this difference
+in detail.  Figure \ref{frequency-plot-40-20-0-0-150} shows a
+comparison of density fluctuation over time at a point adjacent to the
+polar cell wall and at a point adjacent to the cell wall in the center
+region of the cell.  The different proteins show different
+relationships between their maxima and minima.  The MinD-ADP show
+sharp spikes at the poles and much smaller oscillations at in the
+middle.  The values at the poles are always greater than those in the
+middle, and the polar peaks exhibit densities that are roughly 2.5
+times greater than the maxima in the center (\fixme{this factor and
+  the following factor will be put into a table of comparisons for
+  each protein and for the different cell sizes}).  The MinD-ATP
+densities show a very different trend.  For these it is the center
+density that is almost always greater than the polar density.  The
+difference in density at the pole versus the middle is a factor of
+roughly .85 (once again we'll do this more officially in a table).
+The MinE is similar to the MinD-ADP comparison.  It shows a difference
+in maxima by a factor of roughly 2.  It seems that the MinD-ATP is not
+a good candidate for polymer aversion while the MinD-ADP and MinE
+are. \fixme{I know that the idea here is wrong since I'm pretty
+  sure there's an entirely different Min system protein that is averse
+  to the polymer (minC?).  We need to look this up again and be very
+  specific about testing the idea properly.  If the MinC is attached
+  to the minD and that's the idea, then we need to plot the nflD (total
+  D) along with these other proteins, to give an idea of the density
+  of total minD (and perhaps MinC)}
+
+
+Figure \ref{frequency-plot-40-20-0-0-150} also shows that the middle density oscillates at a frequency that is
+twice that of the polar regions, which is to be expected considering
+the symmetry of the center compared to the that of the polar regions.
+Also, the difference between density maxima and minima each
+oscillation is smaller for the middle points than for the polar
+points.  This is evident from simply watching the simulation movies -
+the fluctulations are more extreme in the polar regions.
+
+We see as well
+
+The difference between the center and max pole densities of the nflD
+do not seem to be very extreme.  Wonder if you do a comparison of the
+max density versus center density somehow.  Really ask how it would
+effect the polymer that's supposed to build.  Are there definded
+limits on how extreme this difference can be?  If the oscillations
+settle down into the same density difference for each cell shape, how
+can polymer build?
+\subsection{Randst shape}
+\subsubsection{Randst-96-Star}
+\subsubsection{Randst-97-}
+\subsubsection{Randst-98-Actually Random}
+\subsubsection{Randst-99}
+\section{Interpretation of Data}
+\section{Conclusion}
+\section*{Appendix}
+\bibliography{paper}
+
+
+%%Below are NOTES for the Writing
+
+
 
 \section{Introduction}
 \subsection{What is the MinD system and why is it important?}
@@ -107,6 +274,8 @@ Coli) produced by Mannick et al. We generally see that:
 - - nflE the same
 - There is some time delay between where different protein types appear.
 
+
+
 The pills with larger cylindrical widths, 4.00 3.00 (the wider pill shapes)
 exhibit oscillations with maxima reached on either side (half period
 times) 30s, 70s, 110s, so first half oscillation occured in 30s, the
@@ -123,13 +292,7 @@ The 4.00 0.50 pill seemed to show oscillations of 20 second half
 periods very consistently.  Density maximum did not seem to lose
 intensity.  Seemed to be the same each oscillation.
 
-The difference between the center and max pole densities of the nflD
-do not seem to be very extreme.  Wonder if you do a comparison of the
-max density versus center density somehow.  Really ask how it would
-effect the polymer that's supposed to build.  Are there definded
-limits on how extreme this difference can be?  If the oscillations
-settle down into the same density difference for each cell shape, how
-can polymer build?  Also with this, when look at the periods and max
+ Also with this, when look at the periods and max
 denisty/min density ratio, consider the size dimensions of the pill
 shape and see if can see a mathematical relation.
 
@@ -249,12 +412,8 @@ that the density is not max at the pole.
 
 
 
-%% \begin{figure}
-%%   \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf}
-%%   \caption{randst 99}
-%%   %\label{}
-%% \end{figure}
-%% \begin{figure}
+
+%%\begin{figure}
 %%   \includegraphics[width=\columnwidth]{../data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf}
 %%   \caption{randst 98}
 %%   %\label{fig:pair-distribution-3}
@@ -291,10 +450,6 @@ Triangle -
 
 \section{Conclusion}
 
-
-\appendix
-
-\section*{Appendix}
 
 
 \end{document}

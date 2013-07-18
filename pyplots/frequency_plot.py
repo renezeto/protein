@@ -10,7 +10,7 @@ import time
 import file_loader as load
 
 
-dx = .15
+dx = load.dx
 #wip
 
 #function to compute the local maxima of a 2 dimensional array (used for local maxima in space)
@@ -50,6 +50,13 @@ f_param3 = sys.argv[4]
 f_param4 = sys.argv[5]
 f_param5 = sys.argv[6]
 
+par1 = str(int(10*(float(f_param1))))
+par2 = str(int(10*(float(f_param2))))
+par3 = str(int(10*(float(f_param3))))
+par4 = str(int(10*(float(f_param4))))
+par5 = str(int(10*(float(f_param5))))
+
+
 nflE = load.data(protein="nflE")
 nflD = load.data(protein="nflD")
 nATP = load.data(protein="nATP")
@@ -58,8 +65,23 @@ nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
 Nde = load.data(protein="Nde")
 
-proteins = [nflE, nflD, nATP, nE, nADP, Nd, Nde]
-proteins_strings = ["nflE", "nflD", "nATP", "nE", "nADP", "Nd", "Nde"]
+mid = False
+if "-mid" in sys.argv:
+    mid = True
+    print "The -mid flag was set so we'll add the middle point data to the plot"
+
+norm = False
+if "-norm" in sys.argv:
+    norm = True
+    print "We are normalizing the plots so the highest density for each protein will be one"
+
+
+proteins = [nATP, nE, nADP, Nd, Nde]#normally have nflD and nflE too
+proteins_strings = ["nATP", "nE", "nADP", "Nd", "Nde"] #normally "nflD" and "nflE"
+if mid:
+    proteins_strings = ["nATP", "middle-nATP","nE", "middle-nE","nADP", "middle-nADP"] #normally "nflD" and "nflE"
+
+
 
 for p in proteins:
     for i in p.dataset:
@@ -68,8 +90,8 @@ for p in proteins:
             break
     print p.pointInfo
 
-mid_z = 2 + round((float(f_param1)-.15)/dx)
-mid_y = 2 + round((float(f_param2)-.15)/dx)
+mid_z = 2 + round((float(f_param1)-dx)/dx)
+mid_y = 2 + round((float(f_param2)-dx)/dx)
 
 
 for p in proteins:
@@ -84,36 +106,38 @@ for p in proteins:
     plt.plot(time,p.densityInfoTwo)
     plt.title('Max point = '+str(p.pointInfo[0]*dx)+','+str(p.pointInfo[0]*dx)
               +'   Middle point = '+str(mid_y*dx)+','+str(mid_z*dx))
-    plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot'+str(p.protein)+'-'+f_shape+'-'+str(f_param1)+'-'+str(f_param2)+'-'+str(f_param3)+'-'+str(f_param4)+'-'+str(f_param5)+'.pdf')
 
+    plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot'+str(p.protein)+'-'+f_shape+'-'+par1+'-'+par2+'-'+par3+'-'+par4+'-'+par5+'.pdf')
 
-norm = False
-if "-norm" in sys.argv:
-    norm = True
-    print "We are normalizing the plots so the highest density for each protein will be one"
 
 plt.figure()
 for p in proteins:
     pointInfoWall = Nd.pointInfo
     if p!=Nd and p!=Nde:
-        pointInfoWall = (int(Nd.pointInfo[0]),int(Nd.pointInfo[1]))
+        pointInfoWall = (int(Nd.pointInfo[0])-1,int(Nd.pointInfo[1]))
     p.densityInfo = []
-    #p.densityInfoTwo = []
+    p.densityInfoTwo = []
     for file in p.dataset:
         p.densityInfo += [ file[pointInfoWall[0]][pointInfoWall[1]] ]
+        p.densityInfoTwo += [ file[mid_y][mid_z] ]
     if norm:
         for i in np.arange(len(p.densityInfo)):
             p.densityInfo[i]=p.densityInfo[i]/max(p.densityInfo)
     time = np.arange(0,len(p.densityInfo)/2,.5)
-    plt.plot(time,p.densityInfo)
-    #plt.legend(proteins_strings,loc='best')
-    #plt.plot(time,p.densityInfoTwo)
+    if mid:
+        if p!=Nd and p!=Nde:
+            plt.plot(time,p.densityInfo)
+            plt.plot(time,p.densityInfoTwo)
+    else:
+        plt.plot(time,p.densityInfo)
 if norm:
     plt.ylim(0,1.5)
 plt.title('Max point = '+str(pointInfoWall[0]*dx)+','+str(pointInfoWall[0]*dx))
 plt.legend(proteins_strings,loc='best')
 #pylab.legend(loc='best')
 if norm:
-    plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot_all_norm-'+f_shape+'-'+str(f_param1)+'-'+str(f_param2)+'-'+str(f_param3)+'-'+str(f_param4)+'-'+str(f_param5)+'.pdf')
+    plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot_all_norm-'+f_shape+'-'+par1+'-'+par2+'-'+par3+'-'+par4+'-'+par5+'.pdf')
+elif mid:
+    plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot_all_middle-'+f_shape+'-'+par1+'-'+par2+'-'+par3+'-'+par4+'-'+par5+'.pdf')
 else:
-    plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot_all-'+f_shape+'-'+str(f_param1)+'-'+str(f_param2)+'-'+str(f_param3)+'-'+str(f_param4)+'-'+str(f_param5)+'.pdf')
+    plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot_all-'+f_shape+'-'+par1+'-'+par2+'-'+par3+'-'+par4+'-'+par5+'.pdf')
