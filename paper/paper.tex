@@ -134,39 +134,41 @@ maybe sort of convince yourself otherwiase, really looking at it).
   \label{frequency-plot-40-20-0-0-150}
 \end{figure}
 
-The theory states that the aversion of the (forgot name of polymer) to
-the MinD system is responsible for the polymer setting up in the
-center of the cell as opposed to at the cellular poles.\fixme{look
-  this up and write this section up properly} The theory is dependent
-on there being a significant difference in protein density between the
-center and polar regions. It is worthwhile examining this difference
-in detail.  Figure \ref{frequency-plot-40-20-0-0-150} shows a
-comparison of density fluctuation over time at a point adjacent to the
-polar cell wall and at a point adjacent to the cell wall in the center
-region of the cell.  The different proteins show different
-relationships between their maxima and minima.  The MinD-ADP show
-sharp spikes at the poles and much smaller oscillations at in the
-middle.  The values at the poles are always greater than those in the
-middle, and the polar peaks exhibit densities that are roughly 2.5
-times greater than the maxima in the center (\fixme{this factor and
-  the following factor will be put into a table of comparisons for
-  each protein and for the different cell sizes}).  The MinD-ATP
-densities show a very different trend.  For these it is the center
-density that is almost always greater than the polar density.  The
-difference in density at the pole versus the middle is a factor of
-roughly .85 (once again we'll do this more officially in a table).
-The MinE is similar to the MinD-ADP comparison.  It shows a difference
-in maxima by a factor of roughly 2.  It seems that the MinD-ATP is not
-a good candidate for polymer aversion while the MinD-ADP and MinE
-are. \fixme{I know that the idea here is wrong since I'm pretty sure
-  there's an entirely different Min system protein that is averse to
-  the polymer (minC?).  We need to look this up again and be very
-  specific about testing the idea properly.  If the MinC is attached
-  to the minD and that's the idea, then we need to plot the nflD
-  (total D) along with these other proteins, to give an idea of the
-  density of total minD (and perhaps MinC).  It really would be good
-  to do a more extensive analysis here, referencing what other papers
-  say about this.}
+The theory states that the aversion of the FtsZ polymer to the MinC
+protein is responsible for the FtsZ polymer setting up in the center
+of the cell as opposed to at the cellular poles.  The MinC protein in
+turn natrually associates with the minD protein that is modelled in
+Huang's differential equations.  \fixme{look this up and write this
+  again} The theory is dependent on there being a significant
+difference in protein density between the center and polar regions. It
+is worthwhile examining this difference in detail.  Figure
+\ref{frequency-plot-40-20-0-0-150} shows a comparison of density
+fluctuation over time at a point adjacent to the polar cell wall and
+at a point adjacent to the cell wall in the center region of the cell.
+The different proteins show different relationships between their
+maxima and minima.  The MinD-ADP show sharp spikes at the poles and
+much smaller oscillations at in the middle.  The values at the poles
+are always greater than those in the middle, and the polar peaks
+exhibit densities that are roughly 2.5 times greater than the maxima
+in the center (\fixme{this factor and the following factor will be put
+  into a table of comparisons for each protein and for the different
+  cell sizes}).  The MinD-ATP densities show a very different trend.
+For these it is the center density that is almost always greater than
+the polar density.  The difference in density at the pole versus the
+middle is a factor of roughly .85 (once again we'll do this more
+officially in a table).  The MinE is similar to the MinD-ADP
+comparison.  It shows a difference in maxima by a factor of roughly 2.
+The MinC protein is associated with the minD protein, so perhaps the
+most important camparison is between the nfl-MinD (MinD protein in all
+its forms) at the ends and in the center of the pill.  This shows
+sharp spikes at the pills and a maxima difference factor of roughly
+1.25. \fixme{I'd like to analyze further what this means for the FtZ
+  polymer.  Would a difference like this really have a big effect?
+  What sort of effect should it have, looking at experimental data?
+  One thing is that Mannik (is it Mannik?) genetically deletes the
+  MinC protein and they get 73 percent proper cell division.  It
+  really would be good to do a more extensive analysis here,
+  referencing what other papers say about this.}
 
 It would be good here to add the time map plots and discuss the idea
 about the proteins spending most of their time in the center of the
@@ -199,12 +201,37 @@ radial speed infinite would help.
 \bibliography{paper}
 
 
+
+
+
+
+
+
+
+
+
 %%Below are NOTES for the Writing
 
 
 
+
+
+
+
+
+
+
+
+
+
 \section{Introduction}
+It is vital during the process of bacterial cell division for proper nucleiod occlusion that the FtsZ polymer chain develop on the cell wall in the center of the cell.  Huang et all have shown in simulation that a system of Min protein interaction within the cell will lead to a natural oscillation of the MinC protein from one cell end to the other that will leave the center free of any build up of MinC.  This will allow for the PtsZ chain to develop in the center and not at the ends, where the two nucleiods are housed.  The interaction takes place between MinE,MinD, and MinC, which naturally associates with MinD.
+They gneetically mutate the bacterial cells in order to eliminate certain proteins from them.  They eliminate MinC and SlmA.  SlmA deletion has very little effect accept for some assymetry in cell division area.  The MinC deletion shows a difference in volume division.  Only 73 percent divide with the approximate 1:1 ratio while for un deleted 99 percent do.This effect is seen in both flattened and unflattened cells, and its very similar in both, which is suprising.
+Mannik et all have shown that the formation of irregular cell shapes adversly effects the Min system's ability to maintain their regular oscillatory behavior.  They use microfabricated silicon chips that have etched microchambers and shallow channels.
+
 \subsection{What is the MinD system and why is it important?}
+
+
 -Systm of proteins in E.Coli and other cells.
 -Theorized to be instrumental in cell citokenisis. Reference experiments
 \subsection{How proteins move in cell}

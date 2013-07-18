@@ -76,10 +76,10 @@ if "-norm" in sys.argv:
     print "We are normalizing the plots so the highest density for each protein will be one"
 
 
-proteins = [nATP, nE, nADP, Nd, Nde]#normally have nflD and nflE too
+proteins = [nflD, nATP, nE, nADP, Nd, Nde]#normally have nflD and nflE too
 proteins_strings = ["nATP", "nE", "nADP", "Nd", "Nde"] #normally "nflD" and "nflE"
 if mid:
-    proteins_strings = ["nATP", "middle-nATP","nE", "middle-nE","nADP", "middle-nADP"] #normally "nflD" and "nflE"
+    proteins_strings = ["nflD", "middle-nflD", "nATP", "middle-nATP","nE", "middle-nE","nADP", "middle-nADP"] #normally "nflD" and "nflE"
 
 
 
