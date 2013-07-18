@@ -116,4 +116,4 @@ plt.legend(proteins_strings,loc='best')
 if norm:
     plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot_all_norm-'+f_shape+'-'+str(f_param1)+'-'+str(f_param2)+'-'+str(f_param3)+'-'+str(f_param4)+'-'+str(f_param5)+'.pdf')
 else:
-        plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot_all-'+f_shape+'-'+str(f_param1)+'-'+str(f_param2)+'-'+str(f_param3)+'-'+str(f_param4)+'-'+str(f_param5)+'.pdf')
+    plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.m_str+'frequency_plot_all-'+f_shape+'-'+str(f_param1)+'-'+str(f_param2)+'-'+str(f_param3)+'-'+str(f_param4)+'-'+str(f_param5)+'.pdf')
