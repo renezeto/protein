@@ -63,3 +63,8 @@ Randst:
 97 - With density max starting in bottom pole
 98 - As before but run for three times as long
 99 - As before
+
+-with frequency, implement a print out that states the time and density of each maximum (top of peak) so that can see the exact period and then also can compare density maxima at different positions in the cell.  Want eventually to add a picture showing where your looking and compare the middle of cell maxima to edge.
+-time_map - put a cutoff at 1.1*(avg density) anything below doens't add to it, and see what looks like
+-looking at the difference between our all slice plots for 15 and 500, something's wrong - the amounts of density are very different.
+-somethings wrong with the last part of the normalized plots for frequency.  They look like they're getting cut off somehow (the line at the top is flat)
