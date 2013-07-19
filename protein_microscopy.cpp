@@ -156,14 +156,13 @@ double mem_f(double x, double y, double z) {
         double closest_y0 = -100.0;
         double closest_z0 = -100.0;
         //bool there_is_closest_point=0; unused
-        for (double y0 = y-A; y0<y+A; y0+=dx) {
-          for (double z0 = z-A; z0<z+A; z0+=dx) {
-            if(mem_f_shape=="randst") f0 = f_2D_randst(y0,z0);
-            if(mem_f_shape=="TIE_fighter") f0 = f_2D_TIE_fighter(y0,z0);
-            if(mem_f_shape=="triangle") f0 = f_2D_triangle(y0,z0);
-            if (f0 <= 0) {
-              //there_is_closest_point = 1; unused
-              if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-closest_y0)*(y-closest_y0)+(z-closest_z0)*(z-closest_z0) ) {
+        for (double y0 = y-(A/2.0+2.0*dx); y0<y+(A/2.0+2.0*dx); y0+=dx) {
+          for (double z0 = z-(A/2.0+2.0*dx); z0<z+(A/2.0+2.0*dx); z0+=dx) {
+            if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-closest_y0)*(y-closest_y0)+(z-closest_z0)*(z-closest_z0) ) {
+              if(mem_f_shape=="randst") f0 = f_2D_randst(y0,z0);
+              if(mem_f_shape=="TIE_fighter") f0 = f_2D_TIE_fighter(y0,z0);
+              if(mem_f_shape=="triangle") f0 = f_2D_triangle(y0,z0);
+              if (f0 <= 0) {              //there_is_closest_point = 1; unused
                 closest_y0 = y0;
                 closest_z0 = z0;
               }
@@ -1197,7 +1196,7 @@ void set_curvature(double mem_A[], double curvature[]){
   for(int xi=0;xi<Nx;xi++){
     for(int yi=0;yi<Ny;yi++){
       for(int zi=0;zi<Nz;zi++){
-        if (mem_A[xi*Ny*Nz+yi*Nz+zi]==0 || (x+0.1)>x2 || (x-0.1)<x1 ){
+        if (mem_A[xi*Ny*Nz+yi*Nz+zi]==0 || (xi*dx+0.05)>x2 || (xi*dx-0.05)<x1 ){
           //printf("x=%g, y=%g, z=%g, mem_A=%g!!!\n",xi*dx,yi*dx,zi*dx,mem_A[xi*Ny*Nz+yi*Nz+zi]);
           curvature[xi*Ny*Nz+yi*Nz+zi]=0;
         } else {
