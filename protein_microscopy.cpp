@@ -156,14 +156,13 @@ double mem_f(double x, double y, double z) {
         double closest_y0 = -100.0;
         double closest_z0 = -100.0;
         //bool there_is_closest_point=0; unused
-        for (double y0 = y-A; y0<y+A; y0+=dx) {
-          for (double z0 = z-A; z0<z+A; z0+=dx) {
-            if(mem_f_shape=="randst") f0 = f_2D_randst(y0,z0);
-            if(mem_f_shape=="TIE_fighter") f0 = f_2D_TIE_fighter(y0,z0);
-            if(mem_f_shape=="triangle") f0 = f_2D_triangle(y0,z0);
-            if (f0 <= 0) {
-              //there_is_closest_point = 1; unused
-              if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-closest_y0)*(y-closest_y0)+(z-closest_z0)*(z-closest_z0) ) {
+        for (double y0 = y-(A/2.0+2.0*dx); y0<y+(A/2.0+2.0*dx); y0+=dx) {
+          for (double z0 = z-(A/2.0+2.0*dx); z0<z+(A/2.0+2.0*dx); z0+=dx) {
+            if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-closest_y0)*(y-closest_y0)+(z-closest_z0)*(z-closest_z0) ) {
+              if(mem_f_shape=="randst") f0 = f_2D_randst(y0,z0);
+              if(mem_f_shape=="TIE_fighter") f0 = f_2D_TIE_fighter(y0,z0);
+              if(mem_f_shape=="triangle") f0 = f_2D_triangle(y0,z0);
+              if (f0 <= 0) {              //there_is_closest_point = 1; unused
                 closest_y0 = y0;
                 closest_z0 = z0;
               }
@@ -443,10 +442,7 @@ int main (int argc, char *argv[]) {
   double *JyE = new double[Nx*Ny*Nz];
   double *JzE = new double[Nx*Ny*Nz];
   double *mem_A = new double[Nx*Ny*Nz];
-  // double *normals_x = new double[Nx*Ny*Nz];
-  // double *normals_y = new double[Nx*Ny*Nz];
-  // double *normals_z = new double[Nx*Ny*Nz];
-  // double *curvature = new double[Nx*Ny*Nz];
+  double *curvature = new double[Nx*Ny*Nz];
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
 
@@ -487,103 +483,122 @@ int main (int argc, char *argv[]) {
 
   //this was missing:
   set_membrane(out_file, mem_f, mem_A);
+  set_curvature(mem_A,curvature);
   //note: I changed set_membrane temporarily to not include the normals arrays.
 
   //begin area rating
-  // char *area_rating_out = new char[1024];
-  // if (dx==.05) {
-  //   sprintf(area_rating_out, "data/shape-%s/hires-area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // }
-  // else {
-  //   sprintf(area_rating_out, "data/shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // }
-  // FILE *area_rating_file = fopen((const char *)area_rating_out,"w");
-  // if (area_rating_file == NULL){
-  //   printf("Error: area_rating_file == null \n");
-  // }
+  printf("Starting with the area rating stuff!!!!\n");
+  fflush(stdout);
+  char *curvature_out = new char[1024];
+  if (dx==.05) {
+    sprintf(curvature_out, "data/shape-%s/hires-curvature-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  else {
+    sprintf(curvature_out, "data/shape-%s/curvature-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  FILE *curvature_file = fopen((const char *)curvature_out,"w");
+  if (curvature_file == NULL){
+    printf("Error: curvature_file == null \n");
+  }
 
-  // char * area_rating_out_two = new char[1024];
-  // if (dx==.05) {
-  //   sprintf(area_rating_out_two, "data/shape-%s/hires-area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // }
-  // else {
-  //   sprintf(area_rating_out_two, "data/shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // }
-  // FILE *area_rating_file_two = fopen((const char *)area_rating_out_two,"w");
-  // if (area_rating_file_two == NULL){
-  //   printf("Error: area_rating_file_two == null \n");
-  // }
+  char *area_rating_out = new char[1024];
+  if (dx==.05) {
+    sprintf(area_rating_out, "data/shape-%s/hires-area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  else {
+    sprintf(area_rating_out, "data/shape-%s/area_rating-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  FILE *area_rating_file = fopen((const char *)area_rating_out,"w");
+  if (area_rating_file == NULL){
+    printf("Error: area_rating_file == null \n");
+  }
 
-  // char * area_rating_out_three = new char[1024];
-  // if (dx==.05) {
-  //   sprintf(area_rating_out_three, "data/shape-%s/hires-area_rating_three-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // }
-  // else {
-  //   sprintf(area_rating_out_three, "data/shape-%s/area_rating_three-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // }
-  // FILE *area_rating_file_three = fopen((const char *)area_rating_out_three,"w");
-  // if (area_rating_file_three == NULL){
-  //   printf("Error: area_rating_file_three == null \n");
-  // }
+  char * area_rating_out_two = new char[1024];
+  if (dx==.05) {
+    sprintf(area_rating_out_two, "data/shape-%s/hires-area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  else {
+    sprintf(area_rating_out_two, "data/shape-%s/area_rating_two-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  FILE *area_rating_file_two = fopen((const char *)area_rating_out_two,"w");
+  if (area_rating_file_two == NULL){
+    printf("Error: area_rating_file_two == null \n");
+  }
 
-  // fprintf(out_file,"Finished opening area_rating file.\n");
+  char * area_rating_out_three = new char[1024];
+  if (dx==.05) {
+    sprintf(area_rating_out_three, "data/shape-%s/hires-area_rating_three-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  else {
+    sprintf(area_rating_out_three, "data/shape-%s/area_rating_three-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  }
+  FILE *area_rating_file_three = fopen((const char *)area_rating_out_three,"w");
+  if (area_rating_file_three == NULL){
+    printf("Error: area_rating_file_three == null \n");
+  }
+
+  fprintf(out_file,"Finished opening area_rating file.\n");
   set_insideArr(insideArr);
-  // fprintf(out_file,"Finished with insideArr function.\n");
+  fprintf(out_file,"Finished with insideArr function.\n");
 
-  // double total_cell_volume = 0;
-  // double total_cell_area = 0;
-  // for (int i=0;i<Nx*Ny*Nz;i++){
-  //   if (insideArr[i]==true) {
-  //     total_cell_volume += dx*dx*dx;
-  //   }
-  // }
-  // int i=int(Nx/2);
-  // printf("Hello!!!Nx=%d, x=%g, Nx/2=%d, x/2=%g\n",Nx,Nx*dx,i,Nx*dx/2.0);
-  // fflush(stdout);
-  // for (int j=0;j<Ny;j++){
-  //   for (int k=0;k<Nz;k++){
-  //     double area_rating_two = curvature[i*Ny*Nz+j*Nz+k];
-  //     total_cell_area += mem_A[i*Ny*Nz+j*Nz+k];
-  //     double area_rating = 0;
-  //     double area_rating_three = 0;
-  //     if (insideArr[i*Ny*Nz+j*Nz+k]==true){
-  //       for (int i2=0;i2<Nx;i2++){
-  //         for (int j2=0;j2<Ny;j2++){
-  //           for (int k2=0;k2<Nz;k2++){
-  //             if(i2!=i && j2!=j && k2!=k){
-  //               double dis = dx*sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
-  //               area_rating += curvature[i2*Ny*Nz+j2*Nz+k2];
-  //               if (dis<1.5*A){
-  //                 area_rating_two += mem_A[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
-  //                 area_rating_three += mem_A[i2*Ny*Nz+j2*Nz+k2];
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //     fprintf(area_rating_file,"%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating,normals_x[i*Ny*Nz+j*Nz+k],normals_y[i*Ny*Nz+j*Nz+k],normals_z[i*Ny*Nz+j*Nz+k],mem_A[i*Ny*Nz+j*Nz+k]);
-  //     fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_two,normals_x[i*Ny*Nz+j*Nz+k],normals_y[i*Ny*Nz+j*Nz+k],normals_z[i*Ny*Nz+j*Nz+k],mem_A[i*Ny*Nz+j*Nz+k]);
-  //     fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_three);
-  //   } else {
-  //     fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
-  //     fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
-  //     fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
-  //   }
-  // }
+  double total_cell_volume = 0;
+  double total_cell_area = 0;
+  for (int i=0;i<Nx*Ny*Nz;i++){
+    if (insideArr[i]==true) {
+      total_cell_volume += dx*dx*dx;
+    }
+  }
+  int i=int(Nx/2);
+  printf("Hello!!!Nx=%d, x=%g, Nx/2=%d, x/2=%g\n",Nx,Nx*dx,i,Nx*dx/2.0);
+  fflush(stdout);
+  for (int j=0;j<Ny;j++){
+    for (int k=0;k<Nz;k++){
+      total_cell_area += mem_A[i*Ny*Nz+j*Nz+k];
+      double area_rating = 0;
+      double area_rating_two = 0;
+      double area_rating_three = 0;
+      fprintf(curvature_file,"%g\t%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,curvature[i*Ny*Nz+j*Nz+k],mem_A[i*Ny*Nz+j*Nz+k]);
+      if (insideArr[i*Ny*Nz+j*Nz+k]==true){
+        for (int i2=0;i2<Nx;i2++){
+          for (int j2=0;j2<Ny;j2++){
+            for (int k2=0;k2<Nz;k2++){
+              if(i2!=i && j2!=j && k2!=k){
+                double dis = dx*sqrt((i-i2)*(i-i2)+(j-j2)*(j-j2)+(k-k2)*(k-k2));
+                area_rating += curvature[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
+                if (dis<1.5*A){
+                  area_rating_two += curvature[i2*Ny*Nz+j2*Nz+k2]/(dis*dis);
+                  area_rating_three += curvature[i2*Ny*Nz+j2*Nz+k2];
+                }
+              }
+            }
+          }
+        }
+        fprintf(area_rating_file,"%g\t%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating,mem_A[i*Ny*Nz+j*Nz+k]);
+        fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_two,mem_A[i*Ny*Nz+j*Nz+k]);
+        fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,area_rating_three);
+      } else {
+        fprintf(area_rating_file,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
+        fprintf(area_rating_file_two,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
+        fprintf(area_rating_file_three,"%g\t%g\t%g\t%g\n",i*dx,j*dx,k*dx,0.0);
+      }
+    }
+  }
+  printf("Done with the area rating stuff!!!!\n");
+  fflush(stdout);
 
+  fclose(curvature_file);
+  fclose(area_rating_file_three);
+  fclose(area_rating_file_two);
+  fclose(area_rating_file);
 
-
-  // fclose(area_rating_file_two);
-  // fclose(area_rating_file);
-
-  // if(area_rating_flag==1) {
-  //   exit(0);
-  // }
-  // fprintf(out_file,"Area_rating_two file is using %g as the radius of the sphere.",A);
-  // fprintf(out_file,"Finished writing to the area_rating file.\n");
-  // fprintf(out_file,"Total cell volume = %g.\nTotal cell area = %g.\n",total_cell_volume,total_cell_area);
-  // fflush(out_file);
+  if(area_rating_flag==1) {
+    printf("the area rating flag was on so we're quitting the simulation now!!!\n");
+    exit(0);
+  }
+  fprintf(out_file,"Area_rating_two file is using %g as the radius of the sphere.",A);
+  fprintf(out_file,"Finished writing to the area_rating file.\n");
+  fprintf(out_file,"Total cell volume = %g.\nTotal cell area = %g.\n",total_cell_volume,total_cell_area);
+  fflush(out_file);
   //end area rating
 
   fflush(out_file);
@@ -1164,49 +1179,63 @@ void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z)
         double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
         double f = mem_f(xi*dx, yi*dx, zi*dx);
         mem_A[xi*Ny*Nz+yi*Nz+zi] = find_intersection(fXYZ, fXYz, fXyZ, fXyz, fxYZ, fxYz, fxyZ, fxyz, f);
+        // if (zi>Nz/3){
+        //   printf("First x=%g, y=%g, z=%g, mem_A=%g!!!\n",xi*dx,yi*dx,zi*dx,mem_A[xi*Ny*Nz+yi*Nz+zi]);
+        // }
       }
     }
   }
 }
 
-void set_curvature(double mem_A[], double normals_x[], double normals_y[], double normals_z[], double curvature[]){
+void set_curvature(double mem_A[], double curvature[]){
+  printf("doing set curvature!!!\n");
+  fflush(stdout);
+  double X = Nx*dx;
+  double x1 = (X-A)/2.0;
+  double x2 = (X+A)/2.0;
   for(int xi=0;xi<Nx;xi++){
-    printf("doing x=%d",xi);
-    fflush(stdout);
-    for(int yi=0;yi<Nx;yi++){
-      for(int zi=0;zi<Nx;zi++){
-        double curve_x=0;
-        double curve_y=0;
-        double curve_z=0;
-        if (mem_A[xi*Ny*Nz+yi*Nz+zi]==0){
-          //printf("x=%g, y=%g, z=%g, mem_A=0!!!\n",xi*dx,yi*dx,zi*dx);
+    for(int yi=0;yi<Ny;yi++){
+      for(int zi=0;zi<Nz;zi++){
+        if (mem_A[xi*Ny*Nz+yi*Nz+zi]==0 || (xi*dx+0.05)>x2 || (xi*dx-0.05)<x1 ){
+          //printf("x=%g, y=%g, z=%g, mem_A=%g!!!\n",xi*dx,yi*dx,zi*dx,mem_A[xi*Ny*Nz+yi*Nz+zi]);
           curvature[xi*Ny*Nz+yi*Nz+zi]=0;
         } else {
-          double avg_normal_X = (normals_x[(xi+1)*Ny*Nz+yi*Nz+zi] + normals_x[(xi+1)*Ny*Nz+(yi+1)*Nz+zi] + normals_x[(xi+1)*Ny*Nz+(yi-1)*Nz+zi]
-                                 + normals_x[(xi+1)*Ny*Nz+yi*Nz+(zi+1)] + normals_x[(xi+1)*Ny*Nz+yi*Nz+(zi-1)])/5.0;
-          double avg_normal_x = (normals_x[(xi-1)*Ny*Nz+yi*Nz+zi] + normals_x[(xi-1)*Ny*Nz+(yi+1)*Nz+zi] + normals_x[(xi-1)*Ny*Nz+(yi-1)*Nz+zi]
-                                 + normals_x[(xi-1)*Ny*Nz+yi*Nz+(zi+1)] + normals_x[(xi-1)*Ny*Nz+yi*Nz+(zi-1)])/5.0;
+          // double fXYZ = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
+          // double fXYz = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi-0.5)*dx);
+          // double fXyZ = mem_f((xi+0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
+          // double fXyz = mem_f((xi+0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
+          // double fxYZ = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
+          // double fxYz = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi-0.5)*dx);
+          // double fxyZ = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
+          // double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
+          // double f = mem_f(xi*dx, yi*dx, zi*dx);
 
-          double avg_normal_Z = (normals_z[xi*Ny*Nz+yi*Nz+(zi+1)] + normals_z[(xi+1)*Ny*Nz+yi*Nz+(zi+1)] + normals_z[(xi-1)*Ny*Nz+yi*Nz+(zi+1)]
-                                 + normals_z[xi*Ny*Nz+(yi+1)*Nz+(zi+1)] + normals_z[xi*Ny*Nz+(yi-1)*Nz+(zi+1)])/5.0;
-          double avg_normal_z = (normals_z[xi*Ny*Nz+yi*Nz+(zi-1)] + normals_z[(xi+1)*Ny*Nz+yi*Nz+(zi-1)] + normals_z[(xi-1)*Ny*Nz+yi*Nz+(zi-1)]
-                                 + normals_z[xi*Ny*Nz+(yi+1)*Nz+(zi-1)] + normals_z[xi*Ny*Nz+(yi-1)*Nz+(zi-1)])/5.0;
+          // double fX = (fXYZ + fXYz + fXyZ + fXyz)/4;
+          // double fx = (fxYZ + fxYz + fxyZ + fxyz)/4;
+          // double fY = (fXYZ + fXYz + fxYZ + fxYz)/4;
+          // double fy = (fXyZ + fXyz + fxyZ + fxyz)/4;
+          // double fZ = (fXYZ + fXyZ + fxYZ + fxyZ)/4;
+          // double fz = (fXYz + fXyz + fxYz + fxyz)/4;
+          double fX = mem_f((xi+0.5)*dx, yi*dx, zi*dx);
+          double fx = mem_f((xi-0.5)*dx, yi*dx, zi*dx);
+          double fY = mem_f(xi*dx, (yi+0.5)*dx, zi*dx);
+          double fy = mem_f(xi*dx, (yi-0.5)*dx, zi*dx);
+          double fZ = mem_f(xi*dx, yi*dx, (zi+0.5)*dx);
+          double fz = mem_f(xi*dx, yi*dx, (zi-0.5)*dx);
+          double f = mem_f(xi*dx, yi*dx, zi*dx);
 
-          double avg_normal_Y = (normals_y[xi*Ny*Nz+(yi+1)*Nz+zi] + normals_y[(xi+1)*Ny*Nz+(yi+1)*Nz+zi] + normals_y[(xi-1)*Ny*Nz+(yi+1)*Nz+zi]
-                                 + normals_y[xi*Ny*Nz+(yi+1)*Nz+(zi+1)] + normals_y[xi*Ny*Nz+(yi+1)*Nz+(zi-1)])/5.0;
-          double avg_normal_y = (normals_y[xi*Ny*Nz+(yi-1)*Nz+zi] + normals_y[(xi+1)*Ny*Nz+(yi-1)*Nz+zi] + normals_y[(xi-1)*Ny*Nz+(yi-1)*Nz+zi]
-                                 + normals_y[xi*Ny*Nz+(yi-1)*Nz+(zi+1)] + normals_y[xi*Ny*Nz+(yi-1)*Nz+(zi-1)])/5.0;
+          double df_dx = (fX-fx)/dx;
+          double df_dy = (fY-fy)/dx;
+          double df_dz = (fZ-fz)/dx;
+          double constant = sqrt((df_dx)*(df_dx) + (df_dy)*(df_dy) + (df_dz)*(df_dz));
 
-          curve_x = (avg_normal_X - avg_normal_x)/(2.0*dx);
-          curve_y = (avg_normal_Y - avg_normal_y)/(2.0*dx);
-          curve_z = (avg_normal_Z - avg_normal_z)/(2.0*dx);
-          printf("x=%g, y=%g, z=%g, curve_x=%g, curve_y=%g, curve_z=%g\n",xi*dx,yi*dx,zi*dx,curve_x,curve_y,curve_z);
-          curvature[xi*Ny*Nz+yi*Nz+zi] = curve_x + curve_y + curve_z;
+          curvature[xi*Ny*Nz+yi*Nz+zi] = 4*(fX + fx + fY + fy + fZ + fz - 6*f)/dx/dx/constant;
+          //printf("x=%g, y=%g, z=%g, curvature=%g\n",xi*dx,yi*dx,zi*dx,curvature[xi*Ny*Nz+yi*Nz+zi]);
         }
       }
     }
   }
-  printf("Done with that! dx = %g\n",dx);
+  printf("Done with set curvature! dx = %g\n",dx);
   fflush(stdout);
 }
 

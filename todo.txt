@@ -29,6 +29,8 @@ Look more at randst plots.  Investigate with both the interplay with the differe
 
    -Want to run everything twice as long.
 
+  
+
 Randst 99 -
 Randst 98 -
 Randst 97 -
@@ -41,7 +43,7 @@ Official to do:
 -Try time_map with cuttoff minimum densities
 
 Run everything below for twice as long as we did before.
-Run everything with both slices and non-slices
+Run everything with both slices and microscopy
 Add the Nde movies and plots.  We now plot everything else but these.
 
 pill:
@@ -61,3 +63,12 @@ Randst:
 97 - With density max starting in bottom pole
 98 - As before but run for three times as long
 99 - As before
+
+
+-with frequency, implement a print out that states the time and density of each maximum (top of peak) so that can see the exact period and then also can compare density maxima at different positions in the cell.  Want eventually to add a picture showing where your looking and compare the middle of cell maxima to edge.
+-table with protein periods at different dimensions of pill cell.
+-also on this table the protein density maxima comparison between the middle point and the end pill point
+-make a table of the different cell dimenstions and there periods, so can compare the periods of the different pill dimensions
+-time_map - put a cutoff at 1.1*(avg density) anything below doens't add to it, and see what looks like
+-looking at the difference between our all slice plots for 15 and 500, something's wrong - the amounts of density are very different.
+-somethings wrong with the last part of the normalized plots for frequency.  They look like they're getting cut off somehow (the line at the top is flat)
