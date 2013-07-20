@@ -8,8 +8,6 @@ import os
 import sys
 import file_loader as load
 
-#bug: very memory intensive, especially with fill_between
-
 #only need these two data types for now
 NflE = load.data(protein="NflE")
 NflD = load.data(protein="NflD")
@@ -45,6 +43,7 @@ for p in proteins:
     plt.figure()
     plt.xlabel("Time")
     plt.ylabel("%s count"%p.protein)
+    plt.title("%s count vs time"%p.protein)
 
     #the list comprehensions used below are just one-liner ways to add the elements in two lists
     lowest_line = p.proteins_left
@@ -53,11 +52,16 @@ for p in proteins:
 
     time_axis = list(np.arange(0,len(p.proteins_left)*.5,.5))
 
-    # plt.fill_between(time_axis,0,lowest_line,alpha=0.5)
-    # plt.fill_between(time_axis,lowest_line,middle_line,alpha=0.5)
-    # plt.fill_between(time_axis,middle_line,top_line,alpha=0.5)
+    plt.fill_between(time_axis,0,lowest_line,alpha=0.5)
+    plt.fill_between(time_axis,lowest_line,middle_line,alpha=0.5,facecolor='green')
+    plt.fill_between(time_axis,middle_line,top_line,alpha=0.5,facecolor='red')
 
     plt.plot(time_axis,lowest_line)
     plt.plot(time_axis,middle_line)
     plt.plot(time_axis,top_line)
+
+    plt.xlim(0,max(time_axis))
+    plt.ylim(0,1.4*max(top_line))
+    split_densities_strings = ["left density", "center density", "right density"]
+    plt.legend(split_densities_strings,loc='best')
     plt.savefig('./data/shape-'+load.f_shape+'/plots/'+load.hires_str+load.m_str+'box-plot-'+str(p.protein)+'-'+load.f_shape+'-'+load.f_param1+'-'+load.f_param2+'-'+load.f_param3+'-'+load.f_param4+'-'+load.f_param5+'.pdf')
