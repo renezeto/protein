@@ -4,8 +4,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pylab
-import os
-import sys
 import file_loader as load
 
 #only need these two data types for now
@@ -62,6 +60,6 @@ for p in proteins:
 
     plt.xlim(0,max(time_axis))
     plt.ylim(0,1.4*max(top_line))
-    split_densities_strings = ["left density", "center density", "right density"]
-    plt.legend(split_densities_strings,loc='best')
+    plt.legend(["left density", "middle density", "right density"],loc='best')
+
     plt.savefig('./data/shape-'+load.f_shape+'/plots/'+load.hires_str+load.m_str+'box-plot-'+str(p.protein)+'-'+load.f_shape+'-'+load.f_param1+'-'+load.f_param2+'-'+load.f_param3+'-'+load.f_param4+'-'+load.f_param5+'.pdf')
