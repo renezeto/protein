@@ -62,4 +62,4 @@ for p in proteins:
     plt.ylim(0,1.4*max(top_line))
     plt.legend(["left density", "middle density", "right density"],loc='best')
 
-    plt.savefig('./data/shape-'+load.f_shape+'/plots/'+load.hires_str+load.m_str+'box-plot-'+str(p.protein)+'-'+load.f_shape+'-'+load.f_param1+'-'+load.f_param2+'-'+load.f_param3+'-'+load.f_param4+'-'+load.f_param5+'.pdf')
+    plt.savefig(load.print_string("box-plot",p))

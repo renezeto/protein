@@ -54,6 +54,3 @@ def print_string(plot_name,p):
     arg = [str(int(100*(float(i)))) for i in sys.argv[2:]]
     filename = "./data/shape-%s/plots/%s%s%s-%s-%s-%s-%s-%s-%s-%s.pdf"%(f_shape, hires_str, m_str, plot_name, p.protein, f_shape, arg[0], arg[1], arg[2], arg[3], arg[4])
     return filename
-
-p = data(protein="nATP")
-print p.axes

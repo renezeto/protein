@@ -29,4 +29,3 @@ for p in [NflE, NflD, nATP, nE, nADP, Nd]:
     plt.axes().set_aspect('equal', 'datalim')
     plt.colorbar()
     plt.savefig(load.print_string("time-map",p))
-    print "time_map plot generated: " + str(p.protein)
