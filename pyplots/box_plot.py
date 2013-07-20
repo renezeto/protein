@@ -41,23 +41,23 @@ for p in proteins:
         p.proteins_mid += [mid_sum]
         p.proteins_right += [right_sum]
 
-        #plot them and save the figures.
-        plt.figure()
-        plt.xlabel("Time")
-        plt.ylabel("%s count"%p.protein)
+    #plot them and save the figures.
+    plt.figure()
+    plt.xlabel("Time")
+    plt.ylabel("%s count"%p.protein)
 
-        #the list comprehensions used below are just one-liner ways to add the elements in two lists
-        lowest_line = p.proteins_left
-        middle_line = [i+j for (i,j) in zip(lowest_line,p.proteins_mid)]
-        top_line = [i+j for (i,j) in zip(middle_line,p.proteins_right)]
+    #the list comprehensions used below are just one-liner ways to add the elements in two lists
+    lowest_line = p.proteins_left
+    middle_line = [i+j for (i,j) in zip(lowest_line,p.proteins_mid)]
+    top_line = [i+j for (i,j) in zip(middle_line,p.proteins_right)]
 
-        time_axis = list(np.arange(0,len(p.proteins_left)*.5,.5))
+    time_axis = list(np.arange(0,len(p.proteins_left)*.5,.5))
 
-        # plt.fill_between(time_axis,0,lowest_line,alpha=0.5)
-        # plt.fill_between(time_axis,lowest_line,middle_line,alpha=0.5)
-        # plt.fill_between(time_axis,middle_line,top_line,alpha=0.5)
+    # plt.fill_between(time_axis,0,lowest_line,alpha=0.5)
+    # plt.fill_between(time_axis,lowest_line,middle_line,alpha=0.5)
+    # plt.fill_between(time_axis,middle_line,top_line,alpha=0.5)
 
-        plt.plot(time_axis,lowest_line)
-        plt.plot(time_axis,middle_line)
-        plt.plot(time_axis,top_line)
-        plt.savefig('./data/shape-'+load.f_shape+'/plots/'+load.hires_str+load.m_str+'box-plot-'+str(p.protein)+'-'+load.f_shape+'-'+load.f_param1+'-'+load.f_param2+'-'+load.f_param3+'-'+load.f_param4+'-'+load.f_param5+'.pdf')
+    plt.plot(time_axis,lowest_line)
+    plt.plot(time_axis,middle_line)
+    plt.plot(time_axis,top_line)
+    plt.savefig('./data/shape-'+load.f_shape+'/plots/'+load.hires_str+load.m_str+'box-plot-'+str(p.protein)+'-'+load.f_shape+'-'+load.f_param1+'-'+load.f_param2+'-'+load.f_param3+'-'+load.f_param4+'-'+load.f_param5+'.pdf')
