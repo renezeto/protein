@@ -314,7 +314,7 @@ int main (int argc, char *argv[]) {
   }
 
   tot_time = 2500; //sec
-  time_step = dx*dx/difD;//sec
+  time_step = .1*dx*dx/difD;//sec; if I change this at all, the program breaks??
   iter = int(tot_time/time_step);
   printout_iterations = int(5.0/time_step); //approximately 5 seconds between each printout
   printf("%f, %f, %d, %d",tot_time,time_step,iter,printout_iterations);
