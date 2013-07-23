@@ -15,6 +15,7 @@
 *.gif
 # for latex:
 *.aux
+*.log
 *.bbl
 *.blg
 *Notes.bib
