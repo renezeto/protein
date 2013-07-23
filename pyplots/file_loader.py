@@ -13,15 +13,15 @@ f_param5 = sys.argv[6]
 dx=.15
 
 #initialize as empty lists incase arguments not present in sys.argv
-hires_str=''
-m_str=''
+hires_str=""
+m_str=""
 
 #change them to print the correct file names if arguments present
 if "-hires" in sys.argv:
     dx=.05
-    hires_str='hires-'
+    hires_str="hires-"
 if "-slice" not in sys.argv:
-    m_str='m-'
+    m_str="m-"
 
 #data object, to create in another plot: proteinname=data(protein="proteinname")
 class data(object):
@@ -29,16 +29,15 @@ class data(object):
         self.protein = protein
         self.filenames = self.get_filenames(protein)
         self.tsteps = len(self.filenames)
-        self.dataset = np.array([np.loadtxt(self.filenames[i]) for i in range(self.tsteps)])
-        self.datashape = [self.dataset[0].shape[n] for n in range(len(self.dataset[0].shape))]
-        self.datasize = [self.datashape[n]*dx for n in range(len(self.datashape))]
-        self.axes = [np.arange(0,self.datasize[n],dx) for n in range(len(self.datashape))]
+        self.dataset = np.array([np.loadtxt(file) for file in self.filenames])
+        self.datashape = self.dataset[0].shape
+        self.axes = [[i*dx for i in range(self.datashape[1])],[j*dx for j in range(self.datashape[0])]]
 
 #loads the files for creating the data object.
     @staticmethod
     def get_filenames(protein):
         dat_filenames = []
-        for fn in glob.iglob('./data/shape-'+f_shape+'/'+hires_str+m_str+protein+'-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'*.dat'):
+        for fn in glob.iglob("./data/shape-"+f_shape+"/"+hires_str+m_str+protein+"-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+"*.dat"):
             dat_filenames.append(fn)
         dat_filenames = sorted(dat_filenames)
         i=0 #pop the first 10% of file names to let things equillibriate a bit
@@ -50,3 +49,8 @@ class data(object):
             exit(1)
         else:
             return dat_filenames
+
+def print_string(plot_name,p):
+    arg = [str(int(100*(float(i)))) for i in sys.argv[2:]]
+    filename = "./data/shape-%s/plots/%s%s%s-%s-%s-%s-%s-%s-%s-%s.pdf"%(f_shape, hires_str, m_str, plot_name, p.protein, f_shape, arg[0], arg[1], arg[2], arg[3], arg[4])
+    return filename
