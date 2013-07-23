@@ -4,7 +4,7 @@
 \#*
 *.gif
 *.tmp.sh
-*.py~
+*~
 *.pyc
 *protein*
 *protein_microscopy*
@@ -13,3 +13,8 @@
 *.png
 *.pdf
 *.gif
+# for latex:
+*.aux
+*.bbl
+*.blg
+*Notes.bib
