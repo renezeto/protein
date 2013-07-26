@@ -48,7 +48,7 @@ for p in proteins:
     middle_line = [i+j for (i,j) in zip(lowest_line,p.proteins_mid)]
     top_line = [i+j for (i,j) in zip(middle_line,p.proteins_right)]
 
-    time_axis = list(np.arange(0,len(p.proteins_left)*.5,.5))
+    time_axis = list(np.arange(0,len(p.proteins_left)*5,5))
 
     plt.fill_between(time_axis,0,lowest_line,alpha=0.5)
     plt.fill_between(time_axis,lowest_line,middle_line,alpha=0.5,facecolor='green')

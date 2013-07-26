@@ -55,6 +55,9 @@ pill:
 4.00 2.00 - Very lopsided density (like 500)
 4.00 0.50 - Very lopsided density (like 500)
 
+Weds Jul 24: I have re-run all of the simulations, but nflE and nflD are now NflE and NflD, and the subsequent plots show counts rather than densities. The individual nATP are either densities or counts depending on whether or not the first letter is capitalized. Working on running the slice data, then will be running randst. Since the program now sims for 10x as long, the box plots need to be re-run for just one period.
+
+
 Randst:
 96 - As before
 96 - With density max starting in one corner

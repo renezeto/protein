@@ -38,6 +38,7 @@ int Nx, Ny, Nz;
 string mem_f_shape;
 double A, B, C, D;
 
+//N denotes protein number, n denotes protein number density
 double *nATP; //min D bound to an ATP
 double *nADP; //min D bound to an ADP
 double *nE; //loose min E in cytoplasm

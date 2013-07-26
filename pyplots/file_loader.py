@@ -46,6 +46,7 @@ class data(object):
             i+=1
         if (dat_filenames == []):
             print "File loading error: filename list is empty."
+            print "./data/shape-"+f_shape+"/"+hires_str+m_str+protein+"-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+"*.dat"
             exit(1)
         else:
             return dat_filenames
