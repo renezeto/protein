@@ -49,9 +49,9 @@ if '-plot' in sys.argv:
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
             #processes.add(subprocess.Popen(['python','pyplots/extrema.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
-            processes.add(subprocess.Popen(['srun','python','pyplots/time_map.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
-            processes.add(subprocess.Popen(['srun','python','pyplots/box_plot.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
-            processes.add(subprocess.Popen(['srun','python','pyplots/density_movie.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4]]))
+            processes.add(subprocess.Popen(['srun','python','pyplots/time_map.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4],'-slice']))
+            processes.add(subprocess.Popen(['srun','python','pyplots/box_plot.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4],'-slice']))
+            processes.add(subprocess.Popen(['srun','python','pyplots/density_movie.py','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4],'-slice']))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
