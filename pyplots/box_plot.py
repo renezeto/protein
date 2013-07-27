@@ -18,6 +18,7 @@ def oscillation_period(density_list):
             peaklist += [i[0]]
     return (peaklist[0], peaklist[1])
 
+#load protein data.
 NflE = load.data(protein="NflE")
 NflD = load.data(protein="NflD")
 nATP = load.data(protein="nATP")
@@ -26,7 +27,10 @@ nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
 Nde = load.data(protein="Nde")
 
+#proteins is the main protein list. this program makes one graph for each element in proteins
 proteins = [NflE, NflD]
+
+#sub proteins are the individual, optionally-plotted proteins.
 sub_proteins_D = [nATP, nADP, Nd, Nde]
 sub_proteins_E = [nE, Nde]
 
