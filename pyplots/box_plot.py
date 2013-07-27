@@ -9,6 +9,7 @@ import file_loader as load
 
 #works, but also a work in progress.
 
+#returns the indicies of the first two peaks.
 def oscillation_period(density_list):
     peaklist = []
     index_position_pairs = list(enumerate(density_list))
@@ -54,17 +55,17 @@ for p in proteins:
         p.proteins_mid += [mid_sum]
         p.proteins_right += [right_sum]
 
-    #gather the individual proteins to stick on the same graph as NflD or NflE.
+    #gather the individual proteins to stick on the same graph as NflE.
     if p==NflE:
         for individual_proteins in sub_proteins_E:
-            #the following 3 lines convert densities to counts (i.e. nATP to NATP) so the graphs make sense
+            #density to numbe rconversion for nE.
             dV = 1
             if individual_proteins == nE:
                 dV = load.dx**3
+            #use the same method as before to store proteins in each bo.x
             individual_proteins.proteins_left = []
             individual_proteins.proteins_mid = []
             individual_proteins.proteins_right = []
-
             for file in individual_proteins.dataset:
                 left_sum = 0
                 mid_sum = 0
@@ -84,15 +85,17 @@ for p in proteins:
                           nE.proteins_mid, Nde.proteins_mid, \
                           nE.proteins_right, Nde.proteins_right]
 
+    #gather the individual proteins to stick on the same graph as NflD.
     if p==NflD:
         for individual_proteins in sub_proteins_D:
+            #density to number conversion for nATP and nADP.
             dV = 1
             if (individual_proteins == nATP) or (individual_proteins == nADP):
                 dV = load.dx**3
+            #use the same method as before to store proteins in each box.
             individual_proteins.proteins_left = []
             individual_proteins.proteins_mid = []
             individual_proteins.proteins_right = []
-
             for file in individual_proteins.dataset:
                 left_sum = 0
                 mid_sum = 0
@@ -108,11 +111,15 @@ for p in proteins:
                 individual_proteins.proteins_left += [left_sum*dV]
                 individual_proteins.proteins_mid += [mid_sum*dV]
                 individual_proteins.proteins_right += [right_sum*dV]
+        #store them in one big list for plotting purposes later. the order is important, since we will be
+        #adding each element in this list to the one before it, starting with the first one (for the stacked plot)
         NflD.lines = [nATP.proteins_left, nADP.proteins_left, Nd.proteins_left, Nde.proteins_left, \
                           nATP.proteins_mid, nADP.proteins_mid, Nd.proteins_mid, Nde.proteins_mid, \
                           nATP.proteins_right, nADP.proteins_right, Nd.proteins_right, Nde.proteins_right]
 
-    #calculate the period
+    #calculate the indicies of the first period or so
+    #if -all and -short are both not present in the system arguments,
+    #plot all of the data.
     (start, end) = (0, -1)
     if ("-all" in sys.argv) or ("-short" in sys.argv):
         (start, end) = oscillation_period(p.proteins_mid)
@@ -123,17 +130,22 @@ for p in proteins:
     plt.ylabel("%s count"%p.protein)
     plt.title("%s count vs time"%p.protein)
 
+    #plot_lines is the list where we will store each line to be plotted. the first element is set to
+    #NflD/NflE.lines[0], which was defined in the above loop. the list comprehension just adds the ith
+    #list to the (i-1)th list.
     plot_lines = [p.lines[0]]
     for i in range(1,len(p.lines)):
         plot_lines += [[j+k for (j,k) in zip(plot_lines[i-1], p.lines[i])]]
 
-    #the list comprehensions used below are just one-liner ways to add the elements in two lists
+    #use the same method to get NflD/E stacked on top of each other. lowest = left, mid = mid, top = right
     lowest_line = p.proteins_left
     middle_line = [i+j for (i,j) in zip(lowest_line,p.proteins_mid)]
     top_line = [i+j for (i,j) in zip(middle_line,p.proteins_right)]
 
+    #create a time axis
     time_axis = list(np.arange(0,len(p.proteins_left)*5,5))
 
+    #matplotlib method for filling in color between two lines. left = blue, mid = green, right = red.
     plt.fill_between(time_axis[start:end],0,lowest_line[start:end],alpha=0.5)
     plt.fill_between(time_axis[start:end],lowest_line[start:end],middle_line[start:end],alpha=0.5,facecolor="green")
     plt.fill_between(time_axis[start:end],middle_line[start:end],top_line[start:end],alpha=0.5,facecolor="red")
@@ -142,12 +154,14 @@ for p in proteins:
     plt.plot(time_axis[start:end],middle_line[start:end],color="green",linewidth=0.5)
     plt.plot(time_axis[start:end],top_line[start:end],color="red",linewidth=0.5)
 
+    #if -all is present, include all the lines, not just the usual 3, and flag it in the file name
     all_string = ""
     if "-all" in sys.argv:
         for line in plot_lines:
             plt.plot(time_axis[start:end],line[start:end],color="black",linewidth=0.5)
         all_string = "-all"
 
+    #if short is present, flag it in the file name
     short_string = ""
     if "-short" in sys.argv:
         short_string = "-short"
