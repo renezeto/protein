@@ -8,6 +8,8 @@ import pylab
 import file_loader as load
 
 #works, but also a work in progress.
+#flags: -all: includes all the proteins of type D/E on the D/E graph, and truncates the graph to 1 period for readability
+#       -short: truncates the graph to 1 period for readability.
 
 #returns the indicies of the first two peaks.
 def oscillation_period(density_list):
