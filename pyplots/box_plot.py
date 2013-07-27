@@ -9,11 +9,13 @@ import file_loader as load
 
 #works, but also a work in progress.
 
-# def oscillation_period(density_list):
-#     index_position_pairs = list(enumerate(density_list))
-#     for i in index_position_pairs:
-#         if (abs(i[1]-max(density_list)) < .01*max(density_list)):
-#             print i
+def oscillation_period(density_list):
+    peaklist = []
+    index_position_pairs = list(enumerate(density_list))
+    for i in index_position_pairs:
+        if (abs(i[1]-max(density_list)) < .01*max(density_list)):
+            peaklist += [i[0]]
+    return (peaklist[0], peaklist[1])
 
 NflE = load.data(protein="NflE")
 NflD = load.data(protein="NflD")
@@ -111,7 +113,9 @@ for p in proteins:
                           nATP.proteins_right, nADP.proteins_right, Nd.proteins_right, Nde.proteins_right]
 
     #calculate the period
-    #oscillation_period(p.proteins_mid)
+    (start, end) = (0, -1)
+    if "-all" in sys.argv:
+        (start, end) = oscillation_period(p.proteins_mid)
 
     #plot them and save the figures.
     plt.figure()
@@ -130,21 +134,21 @@ for p in proteins:
 
     time_axis = list(np.arange(0,len(p.proteins_left)*5,5))
 
-    plt.fill_between(time_axis,0,lowest_line,alpha=0.5)
-    plt.fill_between(time_axis,lowest_line,middle_line,alpha=0.5,facecolor="green")
-    plt.fill_between(time_axis,middle_line,top_line,alpha=0.5,facecolor="red")
+    plt.fill_between(time_axis[start:end],0,lowest_line[start:end],alpha=0.5)
+    plt.fill_between(time_axis[start:end],lowest_line[start:end],middle_line[start:end],alpha=0.5,facecolor="green")
+    plt.fill_between(time_axis[start:end],middle_line[start:end],top_line[start:end],alpha=0.5,facecolor="red")
 
-    plt.plot(time_axis,lowest_line,color="blue",linewidth=0.5)
-    plt.plot(time_axis,middle_line,color="green",linewidth=0.5)
-    plt.plot(time_axis,top_line,color="red",linewidth=0.5)
+    plt.plot(time_axis[start:end],lowest_line[start:end],color="blue",linewidth=0.5)
+    plt.plot(time_axis[start:end],middle_line[start:end],color="green",linewidth=0.5)
+    plt.plot(time_axis[start:end],top_line[start:end],color="red",linewidth=0.5)
 
     all_string = ""
     if "-all" in sys.argv:
         for line in plot_lines:
-            plt.plot(time_axis,line,color="black",linewidth=0.5)
+            plt.plot(time_axis[start:end],line[start:end],color="black",linewidth=0.5)
         all_string = "-all"
 
-    plt.xlim(0,max(time_axis))
-    plt.ylim(0,1.4*max(top_line))
+    plt.xlim(time_axis[start],max(time_axis[start:end]))
+    plt.ylim(0,1.4*max(top_line[start:end]))
     #plt.legend(["left density", "middle density", "right density"],loc="best")
-    plt.savefig(load.print_string("box-plot"+all_string,p))
+    plt.savefig(load.print_string("box-plot-yes"+all_string,p))
