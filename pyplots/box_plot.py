@@ -114,7 +114,7 @@ for p in proteins:
 
     #calculate the period
     (start, end) = (0, -1)
-    if "-all" in sys.argv:
+    if ("-all" in sys.argv) or ("-short" in sys.argv):
         (start, end) = oscillation_period(p.proteins_mid)
 
     #plot them and save the figures.
@@ -148,7 +148,11 @@ for p in proteins:
             plt.plot(time_axis[start:end],line[start:end],color="black",linewidth=0.5)
         all_string = "-all"
 
+    short_string = ""
+    if "-short" in sys.argv:
+        short_string = "-short"
+
     plt.xlim(time_axis[start],max(time_axis[start:end]))
     plt.ylim(0,1.4*max(top_line[start:end]))
     #plt.legend(["left density", "middle density", "right density"],loc="best")
-    plt.savefig(load.print_string("box-plot-yes"+all_string,p))
+    plt.savefig(load.print_string("box-plot"+short_string+all_string,p))
