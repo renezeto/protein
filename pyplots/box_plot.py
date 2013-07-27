@@ -7,7 +7,14 @@ import sys
 import pylab
 import file_loader as load
 
-#only need these two data types for now
+#works, but also a work in progress.
+
+# def oscillation_period(density_list):
+#     index_position_pairs = list(enumerate(density_list))
+#     for i in index_position_pairs:
+#         if (abs(i[1]-max(density_list)) < .01*max(density_list)):
+#             print i
+
 NflE = load.data(protein="NflE")
 NflD = load.data(protein="NflD")
 nATP = load.data(protein="nATP")
@@ -71,7 +78,9 @@ for p in proteins:
                 individual_proteins.proteins_left += [left_sum*dV]
                 individual_proteins.proteins_mid += [mid_sum*dV]
                 individual_proteins.proteins_right += [right_sum*dV]
-        NflE.lines = [nE.proteins_left, Nde.proteins_left, nE.proteins_mid, Nde.proteins_mid, nE.proteins_right, Nde.proteins_right]
+        NflE.lines = [nE.proteins_left, Nde.proteins_left, \
+                          nE.proteins_mid, Nde.proteins_mid, \
+                          nE.proteins_right, Nde.proteins_right]
 
     if p==NflD:
         for individual_proteins in sub_proteins_D:
@@ -97,7 +106,12 @@ for p in proteins:
                 individual_proteins.proteins_left += [left_sum*dV]
                 individual_proteins.proteins_mid += [mid_sum*dV]
                 individual_proteins.proteins_right += [right_sum*dV]
-        NflD.lines = [nATP.proteins_left, nADP.proteins_left, Nd.proteins_left, Nde.proteins_left, nATP.proteins_mid, nADP.proteins_mid, Nd.proteins_mid, Nde.proteins_mid, nATP.proteins_right, nADP.proteins_right, Nd.proteins_right, Nde.proteins_right]
+        NflD.lines = [nATP.proteins_left, nADP.proteins_left, Nd.proteins_left, Nde.proteins_left, \
+                          nATP.proteins_mid, nADP.proteins_mid, Nd.proteins_mid, Nde.proteins_mid, \
+                          nATP.proteins_right, nADP.proteins_right, Nd.proteins_right, Nde.proteins_right]
+
+    #calculate the period
+    #oscillation_period(p.proteins_mid)
 
     #plot them and save the figures.
     plt.figure()
@@ -124,12 +138,13 @@ for p in proteins:
     plt.plot(time_axis,middle_line,color="green",linewidth=0.5)
     plt.plot(time_axis,top_line,color="red",linewidth=0.5)
 
+    all_string = ""
     if "-all" in sys.argv:
         for line in plot_lines:
             plt.plot(time_axis,line,color="black",linewidth=0.5)
+        all_string = "-all"
 
     plt.xlim(0,max(time_axis))
     plt.ylim(0,1.4*max(top_line))
     #plt.legend(["left density", "middle density", "right density"],loc="best")
-
-    plt.savefig(load.print_string("box-plot",p))
+    plt.savefig(load.print_string("box-plot"+all_string,p))
