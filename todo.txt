@@ -67,6 +67,7 @@ Randst:
 98 - As before but run for three times as long
 99 - As before
 
+Mon Jul 29: Test randst 96 running right now. Started at 9:28 am. Marker: 15.01 density.
 
 -with frequency, implement a print out that states the time and density of each maximum (top of peak) so that can see the exact period and then also can compare density maxima at different positions in the cell.  Want eventually to add a picture showing where your looking and compare the middle of cell maxima to edge.
 -table with protein periods at different dimensions of pill cell.

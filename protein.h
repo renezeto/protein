@@ -1,22 +1,3 @@
-
-
-/* struct densities { */
-/* public: */
-/*   densities(int xnum, int ynum, int znum, double mydx); // allocates the arrays */
-/*   //densities(double size, double mydx); // allocates the arrays */
-/*   ~densities(); // free all the arrays */
-/*   int Nx, Ny, Nz; */
-/*   double dx; */
-/*   double *Nd, *Nde, *nATP; */
-/* private: */
-/*   density(const density &); */
-/*   void operator=(const density &); */
-/* }; */
-/*
-extern const int Nx;
-extern const int Ny;
-extern const int Nz;
-*/
 extern double *nATP;
 extern double *nADP;
 extern double *nE;
