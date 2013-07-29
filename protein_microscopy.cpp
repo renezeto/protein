@@ -30,7 +30,7 @@ double dx;
 double tot_time;
 double time_step;
 int iter;
-int iter_at_half_sec;
+int printout_iterations;
 
 double x, y, z;
 int Nx, Ny, Nz;
@@ -38,6 +38,7 @@ int Nx, Ny, Nz;
 string mem_f_shape;
 double A, B, C, D;
 
+//N denotes protein number, n denotes protein number density
 double *nATP; //min D bound to an ATP
 double *nADP; //min D bound to an ADP
 double *nE; //loose min E in cytoplasm
@@ -297,7 +298,6 @@ int main (int argc, char *argv[]) {
   D = atof(argv[5]);
   density_factor = atof(argv[6]);
   dx=.15;
-  //flags I want: -area, -hires, -slice
 
   for (int i=0; i<argc; i++) {
     if (strcmp(argv[i],"-area")==0) {
@@ -314,13 +314,12 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  //these had to be moved inside int main if we're to change dx
-  tot_time = 124; //4 periods ish
-  time_step = .1*dx*dx/difD;
-  iter = int(tot_time/time_step)+3;
-  iter_at_half_sec = int(0.5/time_step)+1; //# of iteratings at a half second = 55
-
-  printf("%f\n",dx);
+  tot_time = 2500; //sec
+  time_step = .1*dx*dx/difD;//sec; if I change this at all, the program breaks??
+  iter = int(tot_time/time_step);
+  printout_iterations = int(5.0/time_step); //approximately 5 seconds between each printout
+  printf("%f, %f, %d, %d",tot_time,time_step,iter,printout_iterations);
+  double dV = dx*dx*dx;
 
   //compute grid size based on cell parameters
   if (mem_f_shape=="p") {
@@ -431,7 +430,7 @@ int main (int argc, char *argv[]) {
   Nde = new double[Nx*Ny*Nz];
   f_mem = new double[Nx*Ny*Nz];
   fprintf(out_file,"For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
-          dx, tot_time, time_step, iter, iter_at_half_sec);
+          dx, tot_time, time_step, iter, printout_iterations);
   double *JxATP = new double[Nx*Ny*Nz];
   double *JyATP = new double[Nx*Ny*Nz];
   double *JzATP = new double[Nx*Ny*Nz];
@@ -445,41 +444,6 @@ int main (int argc, char *argv[]) {
   double *curvature = new double[Nx*Ny*Nz];
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
-
-// -  bool force_to_generate_new_memA = true;
-// -  if (mem_f_shape=="randst") {
-// -    char* memA_name = new char[1024];
-// -    sprintf(memA_name,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",A,B,C,D,density_factor);
-// -    FILE *memAin = fopen(memA_name,"r");
-// -    if (!memAin || force_to_generate_new_memA) {
-// -      if (memAin && force_to_generate_new_memA) fclose(memAin);
-// -      fprintf(out_file,"There is evidently no file called %s,\n so we're going to create one and fill it with memA information for future use.\n",memA_name);
-// -      set_membrane(out_file, mem_f, mem_A, normals_x, normals_y, normals_z);
-// -      set_curvature(mem_A, normals_x, normals_y, normals_z, curvature);
-// -      fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.\n");
-// -      char* memA_out = new char[1024];
-// -      sprintf(memA_out,"data/shape-randst/membrane_files/memA-%4.02f-%4.02f-%4.02f-%4.02f-%4.0f.dat",A,B,C,D,density_factor);
-// -      FILE *memAout = fopen((const char *)memA_out,"w");
-// -      for (int i=0;i<Nx*Ny*Nz;i++) {
-// -        fprintf(memAout, "%g\t",mem_A[i]);
-// -      }
-// -      fclose(memAout);
-// -      delete[] memA_out;
-// -      fprintf(out_file,"\nFinished printing the memA file, now we're moving on with simulation.\n");
-// -    } else {
-// -      fprintf(out_file,"We're taking the memA info from a file that already exists.\n");
-// -      for (int i=0;i<Nx*Ny*Nz;i++) {
-// -        if (fscanf(memAin, "%lg\t",&mem_A[i])!=1) {
-// -          fprintf(out_file,"There was a problem in trying to read into the mem_A array.\n");
-// -          exit(1);
-// -        }
-// -      }
-// -    }
-// -  } else {
-// -    set_membrane(out_file, mem_f, mem_A, normals_x, normals_y, normals_z);
-// -    set_curvature(mem_A, normals_x, normals_y, normals_z, curvature);
-// -    fprintf (out_file,"\nFinished with set_membrane function. Now we have a mem_A.");
-// -  }
 
   //this was missing:
   set_membrane(out_file, mem_f, mem_A);
@@ -726,10 +690,10 @@ int main (int argc, char *argv[]) {
     //end status update
 
     //begin file printing
-    if (i%iter_at_half_sec == 0) {
+    if (i%printout_iterations == 0) {
       fprintf(out_file,"Printing at iteration number = %d\n",i);
       //if(i>30){exit(1);}
-      //int k = i/iter_at_half_sec;
+      //int k = i/printout_iterations;
 
       //begin nATP printing.
       char *outfilenameATP = new char[1000];
@@ -992,8 +956,7 @@ int main (int argc, char *argv[]) {
       if (slice_flag==1) {
         for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
-            const double dV = dx*dx*dx;
-            fprintf(NflEfile, "%1.2f ", dV*nE[(int(Nx/2))*Ny*Nz+a*Nz+b] + Nde[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+            fprintf(NflEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + Nde[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           }
           fprintf(NflEfile, "\n");
         }
@@ -1005,8 +968,7 @@ int main (int argc, char *argv[]) {
           for (int b=0;b<Nz;b++){
             double NflEsum = 0;
             for (int c=0;c<Nx;c++){
-              const double dV = dx*dx*dx;
-              NflEsum += dV*nE[c*Ny*Nz+a*Nz+b] + Nde[c*Ny*Nz+a*Nz+b];
+              NflEsum += nE[c*Ny*Nz+a*Nz+b]*dV + Nde[c*Ny*Nz+a*Nz+b];
             }
             fprintf(NflEfile, "%1.2f ", NflEsum);
           }
@@ -1041,8 +1003,7 @@ int main (int argc, char *argv[]) {
       if (slice_flag==1) {
         for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
-            const double dV =dx*dx*dx;
-            fprintf(NflDfile, "%1.2f ", Nde[(int(Nx/2))*Ny*Nz+a*Nz+b] + dV*nADP[(int(Nx/2))*Ny*Nz+a*Nz+b] + dV*nATP[(int(Nx/2))*Ny*Nz+a*Nz+b] + Nd[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+            fprintf(NflDfile, "%1.2f ", Nde[(int(Nx/2))*Ny*Nz+a*Nz+b] + nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + Nd[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           }
           fprintf(NflDfile, "\n");
         }
@@ -1054,8 +1015,7 @@ int main (int argc, char *argv[]) {
           for (int b=0;b<Nz;b++){
             double NflDsum = 0;
             for (int c=0;c<Nx;c++){
-              const double dV = dx*dx*dx;
-              NflDsum += Nde[c*Ny*Nz+a*Nz+b] + dV*nADP[c*Ny*Nz+a*Nz+b] + dV*nATP[c*Ny*Nz+a*Nz+b] + Nd[c*Ny*Nz+a*Nz+b];
+              NflDsum += Nde[c*Ny*Nz+a*Nz+b] + nADP[c*Ny*Nz+a*Nz+b]*dV + nATP[c*Ny*Nz+a*Nz+b]*dV + Nd[c*Ny*Nz+a*Nz+b];
             }
             fprintf(NflDfile, "%1.2f ", NflDsum);
           }
@@ -1526,12 +1486,6 @@ int get_next_density(double *mem_A, bool *insideArr, double *nATP, double *nADP,
     }
   }
   return 0;
-}
-
-double ran(){
-  const long unsigned int x=0;
-  static MTRand my_mtrand(x); // always use the same random number generator (for debugging)!
-  return my_mtrand.randExc(); // which is the range of [0,1)
 }
 
 int set_density(double *nATP, double *nE, double *mem_A){
