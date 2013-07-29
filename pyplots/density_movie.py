@@ -98,6 +98,7 @@ def contourplt(protein):
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
     return 0
 
+contourplt(Nde)
 print "Generating flourescent Min D tagging plot:"
 contourplt(NflD)
 print "Done! Generating flourescent Min E tagging plot:"
