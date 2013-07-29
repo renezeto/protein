@@ -618,7 +618,7 @@ int main (int argc, char *argv[]) {
 
   set_density(nATP, nE, mem_A);
   fflush(out_file);
-
+  printf("density set.\n");
   // double bef_total_NATP=0;
   // double bef_total_NADP=0;
   // double bef_total_NE=0;
@@ -1585,8 +1585,10 @@ int set_density(double *nATP, double *nE, double *mem_A){
           Nd[i*Ny*Nz+j*Nz+k] =0;
           Nde[i*Ny*Nz+j*Nz+k] = 0;
         }
+        printf("inside set density, coords: %d %d %d.\n", i, j, k);
       }
     }
   }
+  printf("out of loop\n");
   return 0;
 }
