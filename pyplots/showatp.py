@@ -15,6 +15,7 @@ nATP = load.data(protein="nATP")
 nE = load.data(protein="nE")
 nADP = load.data(protein="nADP")
 Nd = load.data(protein="Nd")
+Nde = load.data(protein="Nde")
 
 f_shape = sys.argv[1]
 f_param1 = sys.argv[2]
@@ -97,16 +98,18 @@ def contourplt(protein):
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
     return 0
 
-print "Generating flourescent Min D tagging plot:"
-contourplt(nflD)
-print "Done! Generating flourescent Min E tagging plot:"
-contourplt(nflE)
-print "Generating nATP plot:"
-contourplt(nATP)
-print "Done! Generating nE plot:"
-contourplt(nE)
-print "Done! Generating nADP plot:"
-contourplt(nADP)
-print "Done! Generating nD plot:"
-contourplt(Nd)
+# print "Generating flourescent Min D tagging plot:"
+# contourplt(nflD)
+# print "Done! Generating flourescent Min E tagging plot:"
+# contourplt(nflE)
+# print "Generating nATP plot:"
+# contourplt(nATP)
+# print "Done! Generating nE plot:"
+# contourplt(nE)
+# print "Done! Generating nADP plot:"
+# contourplt(nADP)
+# print "Done! Generating nD plot:"
+# contourplt(Nd)
+# print "Finished generating plots."
+contourplt(Nde)
 print "Finished generating plots."
