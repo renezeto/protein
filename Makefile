@@ -3,13 +3,13 @@ CXXFLAGS = -g -Wall -Werror
 .SUFFIXES: .tex .dvi .ps .bib .bbl .pdf .fig .eps .aux .jpg .png .svg \
 		.gp .mf .2602gf .pl .xgr
 
-all: sim paper
+all: sim paper/paper.pdf
 
 clean: rm -f protein_microscopy paper/paper.pdf
 
 sim: protein_microscopy
 
-paper: paper/paper.tex $(ALL_FIGURES)
+paper/paper.pdf: paper/paper.tex $(ALL_FIGURES)
 	pdflatex paper/paper.tex && bibtex paper/paper.bib
 
 ALL_FIGURES = \
