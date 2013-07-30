@@ -10,7 +10,7 @@ clean: rm -f protein_microscopy paper/paper.pdf
 sim: protein_microscopy
 
 paper/paper.pdf: paper/paper.tex $(ALL_FIGURES)
-	pdflatex paper/paper.tex && bibtex paper/paper.bib
+	cd paper && pdflatex paper.tex && bibtex paper && pdflatex paper.tex && pdflatex paper.tex
 
 ALL_FIGURES = \
 	data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf \
