@@ -154,6 +154,9 @@ for p in proteins:
 
     #matplotlib method for filling in color between two lines. left = blue, mid = green, right = red.
     if "-all" not in sys.argv:
+        plt.plot(time_axis[start:end],lowest_line[start:end],color="blue",linewidth=0.5)
+        plt.plot(time_axis[start:end],middle_line[start:end],color="green",linewidth=0.5)
+        plt.plot(time_axis[start:end],top_line[start:end],color="red",linewidth=0.5)
         plt.fill_between(time_axis[start:end],0,lowest_line[start:end],alpha=0.5)
         plt.fill_between(time_axis[start:end],lowest_line[start:end],middle_line[start:end],alpha=0.5,facecolor="green")
         plt.fill_between(time_axis[start:end],middle_line[start:end],top_line[start:end],alpha=0.5,facecolor="red")
@@ -163,26 +166,29 @@ for p in proteins:
         plt.fill_between(time_axis[start:end],plot_lines[0][start:end],plot_lines[1][start:end],alpha=0.5,facecolor="blue")
         plt.fill_between(time_axis[start:end],plot_lines[1][start:end],plot_lines[2][start:end],alpha=0.75,facecolor="blue")
         plt.fill_between(time_axis[start:end],plot_lines[2][start:end],plot_lines[3][start:end],alpha=1.0,facecolor="blue")
+
         plt.fill_between(time_axis[start:end],plot_lines[3][start:end],plot_lines[4][start:end],alpha=0.25,facecolor="red")
         plt.fill_between(time_axis[start:end],plot_lines[4][start:end],plot_lines[5][start:end],alpha=0.5,facecolor="red")
         plt.fill_between(time_axis[start:end],plot_lines[5][start:end],plot_lines[6][start:end],alpha=0.75,facecolor="red")
         plt.fill_between(time_axis[start:end],plot_lines[6][start:end],plot_lines[7][start:end],alpha=1.0,facecolor="red")
+
         plt.fill_between(time_axis[start:end],plot_lines[7][start:end],plot_lines[8][start:end],alpha=0.25,facecolor="green")
         plt.fill_between(time_axis[start:end],plot_lines[8][start:end],plot_lines[9][start:end],alpha=0.5,facecolor="green")
         plt.fill_between(time_axis[start:end],plot_lines[9][start:end],plot_lines[10][start:end],alpha=0.75,facecolor="green")
         plt.fill_between(time_axis[start:end],plot_lines[10][start:end],plot_lines[11][start:end],alpha=1.0,facecolor="green")
+
         plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.25,color="blue",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.5,color="blue",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.75,color="blue",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="blue",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.25,color="red",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.5,color="red",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.75,color="red",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="red",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.25,color="green",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.5,color="green",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.75,color="green",linewidth=0.5)
-        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="green",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[1][start:end],alpha=0.5,color="blue",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[2][start:end],alpha=0.75,color="blue",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[3][start:end],alpha=1.0,color="blue",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[4][start:end],alpha=0.25,color="red",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[5][start:end],alpha=0.5,color="red",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[6][start:end],alpha=0.75,color="red",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[7][start:end],alpha=1.0,color="red",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[8][start:end],alpha=0.25,color="green",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[9][start:end],alpha=0.5,color="green",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[10][start:end],alpha=0.75,color="green",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[11][start:end],alpha=1.0,color="green",linewidth=0.5)
         plt.legend(["nATP proteins left", "nADP proteins left", "Nd proteins left", "Nde proteins left", \
                           "nATP proteins mid", "nADP proteins mid", "Nd proteins mid", "Nde proteins mid", \
                           "nATP proteins right", "nADP proteins right", "Nd proteins right", "Nde proteins right"],loc="best")
@@ -202,15 +208,11 @@ for p in proteins:
         plt.plot(time_axis[start:end],plot_lines[5][start:end],alpha=1.0,color="green",linewidth=0.5)
         plt.legend(["nE proteins left", "Nde proteins left", "nE proteins mid", "Nde proteins mid","nE proteins right", "Nde proteins right"])
 
-    plt.plot(time_axis[start:end],lowest_line[start:end],color="blue",linewidth=0.5)
-    plt.plot(time_axis[start:end],middle_line[start:end],color="green",linewidth=0.5)
-    plt.plot(time_axis[start:end],top_line[start:end],color="red",linewidth=0.5)
-
     #if -all is present, include all the lines, not just the usual 3, and flag it in the file name
     all_string = ""
     if "-all" in sys.argv:
-        for line in plot_lines:
-            plt.plot(time_axis[start:end],line[start:end],color="black",linewidth=0.5)
+        # for line in plot_lines:
+        #     plt.plot(time_axis[start:end],line[start:end],color="black",linewidth=0.5)
         all_string = "-all"
 
     #if short is present, flag it in the file name
