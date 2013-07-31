@@ -183,9 +183,9 @@ for p in proteins:
         plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.5,color="green",linewidth=0.5)
         plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=0.75,color="green",linewidth=0.5)
         plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="green",linewidth=0.5)
-        plt.legend(["nATP proteins left", "nADP proteins left", "Nd proteins left", "Nde proteins left", \
-                          "nATP proteins mid", "nADP proteins mid", "Nd proteins mid", "Nde proteins mid", \
-                          "nATP proteins right", "nADP proteins right", "Nd proteins right", "Nde proteins right"],loc="best")
+        # plt.legend(["nATP proteins left", "nADP proteins left", "Nd proteins left", "Nde proteins left", \
+        #                   "nATP proteins mid", "nADP proteins mid", "Nd proteins mid", "Nde proteins mid", \
+        #                   "nATP proteins right", "nADP proteins right", "Nd proteins right", "Nde proteins right"],loc="best")
 
     if ("-all" in sys.argv) and (p==NflE):
         plt.fill_between(time_axis[start:end],[0]*(end-start),plot_lines[0][start:end],alpha=0.3,facecolor="blue")
@@ -223,3 +223,41 @@ for p in proteins:
     if "-all" not in sys.argv:
         plt.legend(["left density", "middle density", "right density"],loc="best")
     plt.savefig(load.print_string("box-plot"+short_string+all_string,p))
+
+    plt.figure()
+    plt.xlabel("Time")
+    plt.ylabel("%s count"%p.protein)
+    plt.title("%s count vs time at end caps of cell"%p.protein)
+
+    if ("-all" in sys.argv) and (p==NflD):
+        plt.fill_between(time_axis[start:end],[0]*(end-start),plot_lines[0][start:end],alpha=1.0,facecolor="blue")
+        plt.fill_between(time_axis[start:end],plot_lines[0][start:end],plot_lines[1][start:end],alpha=1.0,facecolor="red")
+        plt.fill_between(time_axis[start:end],plot_lines[1][start:end],plot_lines[2][start:end],alpha=1.0,facecolor="green")
+        plt.fill_between(time_axis[start:end],plot_lines[2][start:end],plot_lines[3][start:end],alpha=1.0,facecolor="gold")
+        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="blue",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="red",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="green",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="gold",linewidth=0.5)
+        plt.legend(["nATP proteins", "nADP proteins", "Nd proteins", "Nde proteins"],loc="best")
+
+    if ("-all" in sys.argv) and (p==NflE):
+        plt.fill_between(time_axis[start:end],[0]*(end-start),plot_lines[0][start:end],alpha=1.0,facecolor="blue")
+        plt.fill_between(time_axis[start:end],plot_lines[0][start:end],plot_lines[1][start:end],alpha=1.0,facecolor="blue")
+        plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="blue",linewidth=0.5)
+        plt.plot(time_axis[start:end],plot_lines[1][start:end],alpha=1.0,color="blue",linewidth=0.5)
+        plt.legend(["nE proteins", "Nde proteins"],loc="best")
+
+    all_string = ""
+    if "-all" in sys.argv:
+        for i in range(4):
+            plt.plot(time_axis[start:end],plot_lines[i][start:end],color="black",linewidth=0.5)
+        all_string = "-all"
+
+    #if short is present, flag it in the file name
+    short_string = ""
+    if "-short" in sys.argv:
+        short_string = "-short"
+
+    plt.xlim(time_axis[start],max(time_axis[start:end]))
+    plt.ylim(0,1.4*max(top_line[start:end]))
+    plt.savefig(load.print_string("endcap-plot"+short_string+all_string,p))
