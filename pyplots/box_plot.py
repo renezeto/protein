@@ -33,7 +33,7 @@ Nde = load.data(protein="Nde")
 proteins = [NflE, NflD]
 
 #sub proteins are the individual, optionally-plotted proteins.
-sub_proteins_D = [nATP, nADP, Nd, Nde]
+sub_proteins_D = [nADP, nATP, Nd, Nde]
 sub_proteins_E = [nE, Nde]
 
 for p in proteins:
@@ -119,9 +119,9 @@ for p in proteins:
                 individual_proteins.proteins_right += [right_sum*dV]
         #store them in one big list for plotting purposes later. the order is important, since we will be
         #adding each element in this list to the one before it, starting with the first one (for the stacked plot)
-        NflD.lines = [nATP.proteins_left, nADP.proteins_left, Nd.proteins_left, Nde.proteins_left, \
-                          nATP.proteins_mid, nADP.proteins_mid, Nd.proteins_mid, Nde.proteins_mid, \
-                          nATP.proteins_right, nADP.proteins_right, Nd.proteins_right, Nde.proteins_right]
+        NflD.lines = [nADP.proteins_left, nATP.proteins_left, Nd.proteins_left, Nde.proteins_left, \
+                          nADP.proteins_mid, nATP.proteins_mid, Nd.proteins_mid, Nde.proteins_mid, \
+                          nADP.proteins_right, nATP.proteins_right, Nd.proteins_right, Nde.proteins_right]
 
     #calculate the indicies of the first period or so
     #if -all and -short are both not present in the system arguments,
@@ -192,9 +192,9 @@ for p in proteins:
         plt.plot(time_axis[start:end],plot_lines[10][start:end],alpha=0.75,color="green",linewidth=0.5)
         plt.plot(time_axis[start:end],plot_lines[11][start:end],alpha=1.0,color="green",linewidth=0.5)
 
-        plt.legend(["nATP proteins left", "nADP proteins left", "Nd proteins left", "Nde proteins left", \
-                          "nATP proteins mid", "nADP proteins mid", "Nd proteins mid", "Nde proteins mid", \
-                          "nATP proteins right", "nADP proteins right", "Nd proteins right", "Nde proteins right"],loc=9,ncol=2)
+        plt.legend(["nADP proteins left", "nATP proteins left", "Nd proteins left", "Nde proteins left", \
+                          "nADP proteins mid", "nATP proteins mid", "Nd proteins mid", "Nde proteins mid", \
+                          "nADP proteins right", "nATP proteins right", "Nd proteins right", "Nde proteins right"],loc=9,ncol=2)
 
 
     if ("-all" in sys.argv) and (p==NflE):
@@ -248,7 +248,7 @@ for p in proteins:
         plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="red",linewidth=0.5)
         plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="green",linewidth=0.5)
         plt.plot(time_axis[start:end],plot_lines[0][start:end],alpha=1.0,color="gold",linewidth=0.5)
-        plt.legend(["nATP proteins", "nADP proteins", "Nd proteins", "Nde proteins"],loc="best")
+        plt.legend(["nADP proteins", "nATP proteins", "Nd proteins", "Nde proteins"],loc="best")
 
     if ("-all" in sys.argv) and (p==NflE):
         plt.fill_between(time_axis[start:end],[0]*(end-start),plot_lines[0][start:end],alpha=1.0,facecolor="blue")
