@@ -14,11 +14,11 @@ import file_loader as load
 #returns the indicies of the first two peaks.
 def oscillation_period(density_list):
     peaklist = []
-    index_position_pairs = list(enumerate(density_list))
-    for i in index_position_pairs:
-        if (abs(i[1]-max(density_list)) < .01*max(density_list)):
-            peaklist += [i[0]]
-    return (peaklist[0], peaklist[1])
+    index_position = list(enumerate(density_list))
+    for i in range(1,len(index_position)-1):
+        if (index_position[i][1]>index_position[i-1][1]) and (index_position[i][1]>index_position[i+1][1]):
+            peaklist += [index_position[i][0]]
+    return (peaklist[0], peaklist[2])
 
 #load protein data.
 NflE = load.data(protein="NflE")
@@ -38,8 +38,12 @@ sub_proteins_E = [nE, Nde]
 
 for p in proteins:
     #pick a relatively arbitrary box divider
-    divider_left = round(p.datashape[1]/3)
-    divider_right = round(p.datashape[1]*2/3)
+    divider_left = round(p.datashape[0]/2)-1
+    divider_right = p.datashape[1] - (round(p.datashape[0]/2)-1)
+    print "Here!"
+    print p.datashape[1]
+    print divider_right
+    print divider_left
     p.proteins_left = []
     p.proteins_mid = []
     p.proteins_right = []
@@ -128,7 +132,8 @@ for p in proteins:
     #plot all of the data.
     (start, end) = (0, -1)
     if ("-all" in sys.argv) or ("-short" in sys.argv):
-        (start, end) = oscillation_period(p.proteins_mid)
+        (start, end) = oscillation_period(proteins[0].proteins_mid)
+        print oscillation_period(proteins[0].proteins_mid)
 
     #plot them and save the figures.
     plt.figure()
