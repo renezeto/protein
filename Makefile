@@ -12,7 +12,6 @@ sim: protein_microscopy
 paper/paper.pdf: paper/paper.tex $(ALL_FIGURES)
 	cd paper && pdflatex paper.tex && bibtex paper && pdflatex paper.tex && pdflatex paper.tex
 
-
 ALL_FIGURES = \
 	data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf \
 	data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf \
