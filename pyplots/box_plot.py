@@ -38,12 +38,13 @@ sub_proteins_E = [nE, Nde]
 
 for p in proteins:
     #pick a relatively arbitrary box divider
-    divider_left = round(p.datashape[0]/2)-1
-    divider_right = p.datashape[1] - (round(p.datashape[0]/2)-1)
+    divider_left = 2 + (round(p.datashape[0]/2)-2)
+    divider_right = p.datashape[1] - (round(p.datashape[0]/2)-2)-1
     print "Here!"
     print p.datashape[1]
-    print divider_right
+    print p.datashape[0]
     print divider_left
+    print divider_right
     p.proteins_left = []
     p.proteins_mid = []
     p.proteins_right = []
@@ -272,7 +273,7 @@ for p in proteins:
     short_string = ""
     if "-short" in sys.argv:
         short_string = "-short"
-
-    plt.xlim(time_axis[start],max(time_axis[start:end]))
-    plt.ylim(0,1.4*max(top_line[start:end]))
-    plt.savefig(load.print_string("endcap-plot"+short_string+all_string,p))
+    if "-all" in sys.argv:
+        plt.xlim(time_axis[start],max(time_axis[start:end]))
+        plt.ylim(0,1.4*max(top_line[start:end]))
+        plt.savefig(load.print_string("endcap-plot"+short_string+all_string,p))

@@ -57,8 +57,8 @@ par4 = str(int(10*(float(f_param4))))
 par5 = str(int(10*(float(f_param5))))
 
 
-nflE = load.data(protein="nflE")
-nflD = load.data(protein="nflD")
+NflE = load.data(protein="NflE")
+NflD = load.data(protein="NflD")
 nATP = load.data(protein="nATP")
 nE = load.data(protein="nE")
 nADP = load.data(protein="nADP")
@@ -76,10 +76,10 @@ if "-norm" in sys.argv:
     print "We are normalizing the plots so the highest density for each protein will be one"
 
 
-proteins = [nflD, nATP, nE, nADP, Nd, Nde]#normally have nflD and nflE too
-proteins_strings = ["nATP", "nE", "nADP", "Nd", "Nde"] #normally "nflD" and "nflE"
+proteins = [NflD, nATP, nE, nADP, Nd, Nde]#normally have NflD and NflE too
+proteins_strings = ["nATP", "nE", "nADP", "Nd", "Nde"] #normally "NflD" and "NflE"
 if mid:
-    proteins_strings = ["nflD", "middle-nflD", "nATP", "middle-nATP","nE", "middle-nE","nADP", "middle-nADP"] #normally "nflD" and "nflE"
+    proteins_strings = ["NflD", "middle-NflD", "nATP", "middle-nATP","nE", "middle-nE","nADP", "middle-nADP"] #normally "NflD" and "NflE"
 
 
 

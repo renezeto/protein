@@ -670,87 +670,141 @@ int main (int argc, char *argv[]) {
     FILE *Divisionsfile = fopen((const char *)outfilenameDivisions,"w");
     delete[] outfilenameDivisions;
 
-    char *compare_wall_cyto_filename = new char[1000];
+    char *compare_end_middle_filename = new char[1000];
     if (dx==.05) {
-      sprintf(compare_wall_cyto_filename,"data/shape-%s/hires-m-compare-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
+      sprintf(compare_end_middle_filename,"data/shape-%s/hires-m-compare-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
     } else {
-      sprintf(compare_wall_cyto_filename,"data/shape-%s/m-compare-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
+      sprintf(compare_end_middle_filename,"data/shape-%s/m-compare-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
     }
 
-    FILE *compare_wall_cyto_file = fopen((const char*)compare_wall_cyto_filename,"w");
-    delete[] compare_wall_cyto_filename;
+    FILE *compare_end_middle_file = fopen((const char*)compare_end_middle_filename,"w");
+    delete[] compare_end_middle_filename;
 
+    double tot_wall_right = 0;
+    double tot_wall_middle = 0;
+    for (int a=0;a<Nx;a++) {
+      for (int b=0;b<Ny;b++) {
+        for (int c=0;c<Nz;c++) {
+          if (c>right_divider) {
+            tot_wall_right += mem_A[a*Ny*Nz+b*Nz+c];
+          }
+          else if ((left_divider<c) && (c<=right_divider)) {
+            tot_wall_middle += mem_A[a*Ny*Nz+b*Nz+c];
+          }
+        }
+      }
+    }
 
+    int period_condition = 0;
+    double last_tot_MinD_right = -0.01;
+    double last_last_tot_MinD_right = -0.02;
+    double tot_wall_MinD_right=0;
+    double tot_wall_MinD_middle=0;
 
-    fprintf(compare_wall_cyto_file,"Hello!!!");
-    fclose(compare_wall_cyto_file);
-
-    for (int i=0;i<100;i++){
+    for (int i=0;i<10000;i++){
       get_J(difD, nATP, nADP, nE, JxATP, JyATP,
             JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
       get_next_density(mem_A, insideArr, nATP, nADP, nE, Nd, Nde, JxATP, JyATP, JzATP,
                        JxADP, JyADP, JzADP, JxE, JyE, JzE);
 
-      double NATPtotal_right = 0;
-      double NADPtotal_right = 0;
-      double Ndtotal_right = 0;
-      double Ndetotal_right = 0;
-      double NEtotal_right = 0;
-      double NflDtotal_right = 0;
-      double NflEtotal_right = 0;
+      last_last_tot_MinD_right = last_tot_MinD_right;
+      last_tot_MinD_right = tot_wall_MinD_right;
+      tot_wall_MinD_right=0;
+      tot_wall_MinD_middle=0;
 
-      double NATPtotal_mid = 0;
-      double NADPtotal_mid = 0;
-      double Ndtotal_mid = 0;
-      double Ndetotal_mid = 0;
-      double NEtotal_mid = 0;
-      double NflDtotal_mid = 0;
-      double NflEtotal_mid = 0;
-
-      double NATPtotal_left = 0;
-      double NADPtotal_left = 0;
-      double Ndtotal_left = 0;
-      double Ndetotal_left = 0;
-      double NEtotal_left = 0;
-      double NflDtotal_left = 0;
-      double NflEtotal_left = 0;
-
-      for (int a=0;a<Nx;a++){
-        for (int b=0;b<Ny;b++){
-          for (int c=0;c<Nz;c++){
-            if (c < left_divider){
-              NATPtotal_left += dV*nATP[a*Ny*Nz+b*Nz+c];
-              NADPtotal_left += dV*nADP[a*Ny*Nz+b*Nz+c];
-              Ndtotal_left += Nd[a*Ny*Nz+b*Nz+c];
-              Ndetotal_left += Nde[a*Ny*Nz+b*Nz+c];
-              NEtotal_left += dV*nE[a*Ny*Nz+b*Nz+c];
-              NflDtotal_left += dV*nATP[a*Ny*Nz+b*Nz+c] + dV*nADP[a*Ny*Nz+b*Nz+c] + Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-              NflEtotal_left += dV*nE[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-            } else if (c > right_divider){
-              NATPtotal_right += dV*nATP[a*Ny*Nz+b*Nz+c];
-              NADPtotal_right += dV*nADP[a*Ny*Nz+b*Nz+c];
-              Ndtotal_right += Nd[a*Ny*Nz+b*Nz+c];
-              Ndetotal_right += Nde[a*Ny*Nz+b*Nz+c];
-              NEtotal_right += dV*nE[a*Ny*Nz+b*Nz+c];
-              NflDtotal_right += dV*nATP[a*Ny*Nz+b*Nz+c] + dV*nADP[a*Ny*Nz+b*Nz+c] + Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-              NflEtotal_right += dV*nE[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-            } else {
-              NATPtotal_mid += dV*nATP[a*Ny*Nz+b*Nz+c];
-              NADPtotal_mid += dV*nADP[a*Ny*Nz+b*Nz+c];
-              Ndtotal_mid += Nd[a*Ny*Nz+b*Nz+c];
-              Ndetotal_mid += Nde[a*Ny*Nz+b*Nz+c];
-              NEtotal_mid += dV*nE[a*Ny*Nz+b*Nz+c];
-              NflDtotal_mid += dV*nATP[a*Ny*Nz+b*Nz+c] + dV*nADP[a*Ny*Nz+b*Nz+c] + Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-              NflEtotal_mid += dV*nE[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
+      for (int a=0;a<Nx;a++) {
+        for (int b=0;b<Ny;b++) {
+          for (int c=0;c<Nz;c++) {
+            if (c>right_divider) {
+              tot_wall_MinD_right += Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
+            }
+            else if ((left_divider<c) && (c<=right_divider)) {
+              tot_wall_MinD_middle += Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
             }
           }
         }
       }
-      fprintf(Divisionsfile, "%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\n",
-              NATPtotal_left, NADPtotal_left, Ndtotal_left, Ndetotal_left, NEtotal_left, NflDtotal_left, NflEtotal_left,
-              NATPtotal_mid, NADPtotal_mid, Ndtotal_mid, Ndetotal_mid, NEtotal_mid, NflDtotal_mid, NflEtotal_mid,
-              NATPtotal_right, NADPtotal_right, Ndtotal_right, Ndetotal_right, NEtotal_right, NflDtotal_right, NflEtotal_right);
+
+      if (tot_wall_MinD_right < last_tot_MinD_right && last_last_tot_MinD_right < last_tot_MinD_right) {
+        period_condition+=1;
+      }
+      if (period_condition == 3) {
+        break;
+      }
+
+      if (period_condition == 1  || period_condition ==2) {
+        double ave_MinD_per_wall_right = tot_wall_MinD_right/tot_wall_right;
+        double ave_MinD_per_wall_middle = tot_wall_MinD_middle/tot_wall_middle;
+
+
+        printf("ave_MinD_per_wall_right = %1.2f ave_MinD_per_wall_middle = %1.2f\n",ave_MinD_per_wall_right, ave_MinD_per_wall_middle);
+        printf("tot_wall_MinD_right = %1.2f tot_wall_MinD_middle = %1.2f\n",tot_wall_MinD_right, tot_wall_MinD_middle);
+        printf("tot_wall_right = %1.2f tot_wall_middle = %1.2f\n",tot_wall_right, tot_wall_middle);
+
+        fprintf(compare_end_middle_file,"%1.2f\t%1.2f\n",ave_MinD_per_wall_right,ave_MinD_per_wall_middle);
+
+        double NATPtotal_right = 0;
+        double NADPtotal_right = 0;
+        double Ndtotal_right = 0;
+        double Ndetotal_right = 0;
+        double NEtotal_right = 0;
+        double NflDtotal_right = 0;
+        double NflEtotal_right = 0;
+
+        double NATPtotal_mid = 0;
+        double NADPtotal_mid = 0;
+        double Ndtotal_mid = 0;
+        double Ndetotal_mid = 0;
+        double NEtotal_mid = 0;
+        double NflDtotal_mid = 0;
+        double NflEtotal_mid = 0;
+
+        double NATPtotal_left = 0;
+        double NADPtotal_left = 0;
+        double Ndtotal_left = 0;
+        double Ndetotal_left = 0;
+        double NEtotal_left = 0;
+        double NflDtotal_left = 0;
+        double NflEtotal_left = 0;
+
+        for (int a=0;a<Nx;a++){
+          for (int b=0;b<Ny;b++){
+            for (int c=0;c<Nz;c++){
+              if (c < left_divider){
+                NATPtotal_left += dV*nATP[a*Ny*Nz+b*Nz+c];
+                NADPtotal_left += dV*nADP[a*Ny*Nz+b*Nz+c];
+                Ndtotal_left += Nd[a*Ny*Nz+b*Nz+c];
+                Ndetotal_left += Nde[a*Ny*Nz+b*Nz+c];
+                NEtotal_left += dV*nE[a*Ny*Nz+b*Nz+c];
+                NflDtotal_left += dV*nATP[a*Ny*Nz+b*Nz+c] + dV*nADP[a*Ny*Nz+b*Nz+c] + Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
+                NflEtotal_left += dV*nE[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
+              } else if (c > right_divider){
+                NATPtotal_right += dV*nATP[a*Ny*Nz+b*Nz+c];
+                NADPtotal_right += dV*nADP[a*Ny*Nz+b*Nz+c];
+                Ndtotal_right += Nd[a*Ny*Nz+b*Nz+c];
+                Ndetotal_right += Nde[a*Ny*Nz+b*Nz+c];
+                NEtotal_right += dV*nE[a*Ny*Nz+b*Nz+c];
+                NflDtotal_right += dV*nATP[a*Ny*Nz+b*Nz+c] + dV*nADP[a*Ny*Nz+b*Nz+c] + Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
+                NflEtotal_right += dV*nE[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
+              } else {
+                NATPtotal_mid += dV*nATP[a*Ny*Nz+b*Nz+c];
+                NADPtotal_mid += dV*nADP[a*Ny*Nz+b*Nz+c];
+                Ndtotal_mid += Nd[a*Ny*Nz+b*Nz+c];
+                Ndetotal_mid += Nde[a*Ny*Nz+b*Nz+c];
+                NEtotal_mid += dV*nE[a*Ny*Nz+b*Nz+c];
+                NflDtotal_mid += dV*nATP[a*Ny*Nz+b*Nz+c] + dV*nADP[a*Ny*Nz+b*Nz+c] + Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
+                NflEtotal_mid += dV*nE[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
+              }
+            }
+          }
+        }
+        fprintf(Divisionsfile, "%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\n",
+                NATPtotal_left, NADPtotal_left, Ndtotal_left, Ndetotal_left, NEtotal_left, NflDtotal_left, NflEtotal_left,
+                NATPtotal_mid, NADPtotal_mid, Ndtotal_mid, Ndetotal_mid, NEtotal_mid, NflDtotal_mid, NflEtotal_mid,
+                NATPtotal_right, NADPtotal_right, Ndtotal_right, Ndetotal_right, NEtotal_right, NflDtotal_right, NflEtotal_right);
+      }
     }
+    fclose(compare_end_middle_file);
     fclose(Divisionsfile);
 
   } else {
@@ -1670,7 +1724,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
           Nd[i*Ny*Nz+j*Nz+k] =0;
           Nde[i*Ny*Nz+j*Nz+k] = 0;
         }
-        printf("inside set density, coords: %d %d %d.\n", i, j, k);
+        //printf("inside set density, coords: %d %d %d.\n", i, j, k);
       }
     }
   }
