@@ -658,8 +658,27 @@ int main (int argc, char *argv[]) {
   // double* nD_avg = new double[Nx*Ny*Nz];
 
   if (time_res_flag==1) {
-    int left_divider = int(B/dx) + 2;
-    int right_divider = Nz - (int(B/dx) + 2);
+    double off_center = C;
+    int left_divider = Nz - int(off_center/dx);
+    int right_divider = Nz + int(off_center/dx);
+    char *divider_and_cell_filename = new char[1000];
+    if (dx==.05) {
+      sprintf(divider_and_cell_filename,"data/shape-%s/hires-m-cell-dividers-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,off_center,D,density_factor);
+    } else {
+      sprintf(divider_and_cell_filename,"data/shape-%s/m-cell-dividers-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,off_center,D,density_factor);
+    }
+    FILE * divider_and_cell_file = fopen((const char*) divider_and_cell_filename, "w");
+
+    fprintf(divider_and_cell_file,"0.0 0.0 0.0 %03.2f\n0 0 0 %03.2f\n",left_divider*dx,right_divider*dx);
+    for(int a=0;a<Nx;a++) {
+      for(int b=0;b<Ny;b++) {
+        for(int c=0;c<Nz;c++) {
+          fprintf(divider_and_cell_file,"%03.2f\t%03.2f\t%03.2f\t%f\n",a*dx,b*dx,c*dx,mem_A[a*Ny*Nz+b*Nz+c]);
+        }
+      }
+    }
+    fclose(divider_and_cell_file);
+
     char *outfilenameDivisions = new char[1000];
     if (dx==.05) {
       sprintf(outfilenameDivisions, "data/shape-%s/hires-m-divisions-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
@@ -701,7 +720,7 @@ int main (int argc, char *argv[]) {
     double tot_wall_MinD_right=0;
     double tot_wall_MinD_middle=0;
 
-    for (int i=0;i<10000;i++){
+    for (int i=0;i<iter;i++){
       get_J(difD, nATP, nADP, nE, JxATP, JyATP,
             JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
       get_next_density(mem_A, insideArr, nATP, nADP, nE, Nd, Nde, JxATP, JyATP, JzATP,
@@ -727,19 +746,20 @@ int main (int argc, char *argv[]) {
 
       if (tot_wall_MinD_right < last_tot_MinD_right && last_last_tot_MinD_right < last_tot_MinD_right) {
         period_condition+=1;
+        printf("tot = %f last tot = %f last_last tot = %f\n", tot_wall_MinD_right, last_tot_MinD_right, last_last_tot_MinD_right);
+        fflush(stdout);
       }
-      if (period_condition == 3) {
+      if (period_condition == 7) {
         break;
       }
-
-      if (period_condition == 1  || period_condition ==2) {
+      if (period_condition == 5 && period_condition == 6) {
         double ave_MinD_per_wall_right = tot_wall_MinD_right/tot_wall_right;
         double ave_MinD_per_wall_middle = tot_wall_MinD_middle/tot_wall_middle;
 
 
-        printf("ave_MinD_per_wall_right = %1.2f ave_MinD_per_wall_middle = %1.2f\n",ave_MinD_per_wall_right, ave_MinD_per_wall_middle);
-        printf("tot_wall_MinD_right = %1.2f tot_wall_MinD_middle = %1.2f\n",tot_wall_MinD_right, tot_wall_MinD_middle);
-        printf("tot_wall_right = %1.2f tot_wall_middle = %1.2f\n",tot_wall_right, tot_wall_middle);
+        // printf("ave_MinD_per_wall_right = %1.2f ave_MinD_per_wall_middle = %1.2f\n",ave_MinD_per_wall_right, ave_MinD_per_wall_middle);
+        // printf("tot_wall_MinD_right = %1.2f tot_wall_MinD_middle = %1.2f\n",tot_wall_MinD_right, tot_wall_MinD_middle);
+        // printf("tot_wall_right = %1.2f tot_wall_middle = %1.2f\n",tot_wall_right, tot_wall_middle);
 
         fprintf(compare_end_middle_file,"%1.2f\t%1.2f\n",ave_MinD_per_wall_right,ave_MinD_per_wall_middle);
 
@@ -806,7 +826,6 @@ int main (int argc, char *argv[]) {
     }
     fclose(compare_end_middle_file);
     fclose(Divisionsfile);
-
   } else {
     for (int i=0;i<iter;i++){
       get_J(difD, nATP, nADP, nE, JxATP, JyATP,

@@ -14,7 +14,6 @@ import file_loader as load
 #returns the indicies of the first two peaks.
 
 hires_str = ""
-m_str = ""
 if "-hires" in sys.argv:
     dx=.05
     hires_str="hires-"
@@ -27,65 +26,104 @@ f_param3 = sys.argv[4]
 f_param4 = sys.argv[5]
 f_param5 = sys.argv[6]
 
-div_file =  "./data/shape-"+f_shape+"/m"+hires_str+"-divisions-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".dat"
+div_file =  "./data/shape-"+f_shape+"/"+hires_str+"m-divisions-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".dat"
 
-compare_file = "./data/shape-"+f_shape+"/m"+hires_str+"-compare-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".dat"
+compare_file = "./data/shape-"+f_shape+"/"+hires_str+"m-compare-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".dat"
 
+divider_file = "./data/shape-"+f_shape+"/"+hires_str+"m-cell-dividers-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".dat"
 
+print div_file
 div_data = np.loadtxt(div_file)
 compare_data = np.loadtxt(compare_file)
+#divider_data = np.loadtxt(divider_file)
+
 
 #create a time axis
 time_axis = np.arange(0,len(div_data[:,0]))
 
-indices_from_file = [1,2,3,7,8,9,10,14,15,16,17]
+indices_from_cpp_D = [1,2,3,7,8,9,10,14,15,16,17]
 
 b=0
-plot_lines = [div_data[:,0]]
-for a in indices_from_file:#[]range(1,len(div_data[0,:])):
-    plot_lines += [[j+k for (j,k) in zip(plot_lines[b], div_data[:,a])]]
+plot_lines_D = [div_data[:,0]]
+for a in indices_from_cpp_D:
+    plot_lines_D += [[j+k for (j,k) in zip(plot_lines_D[b], div_data[:,a])]]
     print a
     b+=1
 
 
 plt.figure()
 plt.xlabel("Time")
-plt.ylabel("Ave Number of Proteins Per Area")
-plt.title("Ave Number of Proteins Per Area Vs Time")
+plt.ylabel("Ave Number of MinD Proteins Per Area")
+plt.title("Ave Number of MinD Proteins Per Area Vs Time")
 
-plt.fill_between(time_axis,[0]*len(time_axis),plot_lines[0],alpha=0.25,facecolor="blue")
-plt.fill_between(time_axis,plot_lines[0],plot_lines[1],alpha=0.5,facecolor="blue")
-plt.fill_between(time_axis,plot_lines[1],plot_lines[2],alpha=0.75,facecolor="blue")
-plt.fill_between(time_axis,plot_lines[2],plot_lines[3],alpha=1.0,facecolor="blue")
+plt.fill_between(time_axis,[0]*len(time_axis),plot_lines_D[0],alpha=0.25,facecolor="blue")
+plt.fill_between(time_axis,plot_lines_D[0],plot_lines_D[1],alpha=0.5,facecolor="blue")
+plt.fill_between(time_axis,plot_lines_D[1],plot_lines_D[2],alpha=0.75,facecolor="blue")
+plt.fill_between(time_axis,plot_lines_D[2],plot_lines_D[3],alpha=1.0,facecolor="blue")
 
-plt.fill_between(time_axis,plot_lines[3],plot_lines[4],alpha=0.25,facecolor="red")
-plt.fill_between(time_axis,plot_lines[4],plot_lines[5],alpha=0.5,facecolor="red")
-plt.fill_between(time_axis,plot_lines[5],plot_lines[6],alpha=0.75,facecolor="red")
-plt.fill_between(time_axis,plot_lines[6],plot_lines[7],alpha=1.0,facecolor="red")
+plt.fill_between(time_axis,plot_lines_D[3],plot_lines_D[4],alpha=0.25,facecolor="red")
+plt.fill_between(time_axis,plot_lines_D[4],plot_lines_D[5],alpha=0.5,facecolor="red")
+plt.fill_between(time_axis,plot_lines_D[5],plot_lines_D[6],alpha=0.75,facecolor="red")
+plt.fill_between(time_axis,plot_lines_D[6],plot_lines_D[7],alpha=1.0,facecolor="red")
 
-plt.fill_between(time_axis,plot_lines[7],plot_lines[8],alpha=0.25,facecolor="green")
-plt.fill_between(time_axis,plot_lines[8],plot_lines[9],alpha=0.5,facecolor="green")
-plt.fill_between(time_axis,plot_lines[9],plot_lines[10],alpha=0.75,facecolor="green")
-plt.fill_between(time_axis,plot_lines[10],plot_lines[11],alpha=1.0,facecolor="green")
+plt.fill_between(time_axis,plot_lines_D[7],plot_lines_D[8],alpha=0.25,facecolor="green")
+plt.fill_between(time_axis,plot_lines_D[8],plot_lines_D[9],alpha=0.5,facecolor="green")
+plt.fill_between(time_axis,plot_lines_D[9],plot_lines_D[10],alpha=0.75,facecolor="green")
+plt.fill_between(time_axis,plot_lines_D[10],plot_lines_D[11],alpha=1.0,facecolor="green")
 
-plt.plot(time_axis,plot_lines[0],alpha=0.25,color="blue",linewidth=0.5)
-plt.plot(time_axis,plot_lines[1],alpha=0.5,color="blue",linewidth=0.5)
-plt.plot(time_axis,plot_lines[2],alpha=0.75,color="blue",linewidth=0.5)
-plt.plot(time_axis,plot_lines[3],alpha=1.0,color="blue",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[0],alpha=0.25,color="blue",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[1],alpha=0.5,color="blue",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[2],alpha=0.75,color="blue",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[3],alpha=1.0,color="blue",linewidth=0.5)
 
-plt.plot(time_axis,plot_lines[4],alpha=0.25,color="red",linewidth=0.5)
-plt.plot(time_axis,plot_lines[5],alpha=0.5,color="red",linewidth=0.5)
-plt.plot(time_axis,plot_lines[6],alpha=0.75,color="red",linewidth=0.5)
-plt.plot(time_axis,plot_lines[7],alpha=1.0,color="red",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[4],alpha=0.25,color="red",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[5],alpha=0.5,color="red",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[6],alpha=0.75,color="red",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[7],alpha=1.0,color="red",linewidth=0.5)
 
-plt.plot(time_axis,plot_lines[8],alpha=0.25,color="green",linewidth=0.5)
-plt.plot(time_axis,plot_lines[9],alpha=0.5,color="green",linewidth=0.5)
-plt.plot(time_axis,plot_lines[10],alpha=0.75,color="green",linewidth=0.5)
-plt.plot(time_axis,plot_lines[11],alpha=1.0,color="green",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[8],alpha=0.25,color="green",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[9],alpha=0.5,color="green",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[10],alpha=0.75,color="green",linewidth=0.5)
+plt.plot(time_axis,plot_lines_D[11],alpha=1.0,color="green",linewidth=0.5)
 
 
-plt.savefig("./data/shape-"+f_shape+"/plots/m"+hires_str+"-divisions-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".pdf")
+plt.savefig("./data/shape-"+f_shape+"/plots/m"+hires_str+"-divisions-MinD-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".pdf")
 
+indices_from_cpp_E = [4,10,11,17,18]
+
+b=0
+plot_lines_E = [div_data[:,3]]
+for a in indices_from_cpp_E:
+    plot_lines_E += [[j+k for (j,k) in zip(plot_lines_E[b], div_data[:,a])]]
+    print a
+    b+=1
+
+plt.figure()
+plt.xlabel("Time")
+plt.ylabel("Ave Number of MinE Proteins Per Area")
+plt.title("Ave Number of MinE Proteins Per Area Vs Time")
+
+plt.fill_between(time_axis,[0]*len(time_axis),plot_lines_E[0],alpha=0.25,facecolor="blue")
+plt.fill_between(time_axis,plot_lines_E[0],plot_lines_E[1],alpha=0.5,facecolor="blue")
+
+plt.fill_between(time_axis,plot_lines_E[1],plot_lines_E[2],alpha=0.25,facecolor="red")
+plt.fill_between(time_axis,plot_lines_E[2],plot_lines_E[3],alpha=0.5,facecolor="red")
+
+plt.fill_between(time_axis,plot_lines_E[3],plot_lines_E[4],alpha=0.25,facecolor="green")
+plt.fill_between(time_axis,plot_lines_E[4],plot_lines_E[5],alpha=0.5,facecolor="green")
+
+plt.plot(time_axis,plot_lines_E[0],alpha=0.25,color="blue",linewidth=0.5)
+plt.plot(time_axis,plot_lines_E[1],alpha=0.5,color="blue",linewidth=0.5)
+
+plt.plot(time_axis,plot_lines_E[2],alpha=0.25,color="red",linewidth=0.5)
+plt.plot(time_axis,plot_lines_E[3],alpha=0.5,color="red",linewidth=0.5)
+
+plt.plot(time_axis,plot_lines_E[4],alpha=0.25,color="green",linewidth=0.5)
+plt.plot(time_axis,plot_lines_E[5],alpha=0.5,color="green",linewidth=0.5)
+
+
+
+plt.savefig("./data/shape-"+f_shape+"/plots/m"+hires_str+"-divisions-MinE-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".pdf")
 #     if ("-all" in sys.argv) and (p==NflD):
 #         plt.fill_between(time_axis[start:end],[0]*(end-start),plot_lines[0][start:end],alpha=1.0,facecolor="blue")
 #         plt.fill_between(time_axis[start:end],plot_lines[0][start:end],plot_lines[1][start:end],alpha=1.0,facecolor="red")
