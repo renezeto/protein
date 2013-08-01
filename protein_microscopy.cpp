@@ -670,6 +670,21 @@ int main (int argc, char *argv[]) {
     FILE *Divisionsfile = fopen((const char *)outfilenameDivisions,"w");
     delete[] outfilenameDivisions;
 
+    char *compare_wall_cyto_filename = new char[1000];
+    if (dx==.05) {
+      sprintf(compare_wall_cyto_filename,"data/shape-%s/hires-m-compare-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
+    } else {
+      sprintf(compare_wall_cyto_filename,"data/shape-%s/m-compare-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
+    }
+
+    FILE *compare_wall_cyto_file = fopen((const char*)compare_wall_cyto_filename,"w");
+    delete[] compare_wall_cyto_filename;
+
+
+
+    fprintf(compare_wall_cyto_file,"Hello!!!");
+    fclose(compare_wall_cyto_file);
+
     for (int i=0;i<100;i++){
       get_J(difD, nATP, nADP, nE, JxATP, JyATP,
             JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
@@ -1121,9 +1136,9 @@ int main (int argc, char *argv[]) {
     // fprintf(out_file,"total after N is = %f\n",total_N);
     // fflush(out_file);
     // fprintf(out_file,"Program has Run!!");
-      fclose(out_file);
     }
   }
+  fclose(out_file);
   //printing to the root directory so we have a shortlist of what we've done.
   char *fname = new char[1024];
   sprintf(fname,"catalog.txt");
