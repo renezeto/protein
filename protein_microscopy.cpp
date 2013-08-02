@@ -752,7 +752,7 @@ int main (int argc, char *argv[]) {
       if (period_condition == 7) {
         break;
       }
-      if (period_condition == 5 && period_condition == 6) {
+      if (period_condition == 5 || period_condition == 6) {
         double ave_MinD_per_wall_right = tot_wall_MinD_right/tot_wall_right;
         double ave_MinD_per_wall_middle = tot_wall_MinD_middle/tot_wall_middle;
 
