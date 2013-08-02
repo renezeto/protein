@@ -659,8 +659,8 @@ int main (int argc, char *argv[]) {
 
   if (time_res_flag==1) {
     double off_center = C;
-    int left_divider = Nz - int(off_center/dx);
-    int right_divider = Nz + int(off_center/dx);
+    int left_divider = Nz/2 - int(off_center/dx);
+    int right_divider = Nz/2 + int(off_center/dx);
     char *divider_and_cell_filename = new char[1000];
     if (dx==.05) {
       sprintf(divider_and_cell_filename,"data/shape-%s/hires-m-cell-dividers-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,off_center,D,density_factor);
@@ -749,10 +749,10 @@ int main (int argc, char *argv[]) {
         printf("tot = %f last tot = %f last_last tot = %f\n", tot_wall_MinD_right, last_tot_MinD_right, last_last_tot_MinD_right);
         fflush(stdout);
       }
-      if (period_condition == 7) {
+      if (period_condition == 6) {
         break;
       }
-      if (period_condition == 5 || period_condition == 6) {
+      if (period_condition == 4 || period_condition == 5) {
         double ave_MinD_per_wall_right = tot_wall_MinD_right/tot_wall_right;
         double ave_MinD_per_wall_middle = tot_wall_MinD_middle/tot_wall_middle;
 
@@ -818,10 +818,10 @@ int main (int argc, char *argv[]) {
             }
           }
         }
-        fprintf(Divisionsfile, "%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\n",
+        fprintf(Divisionsfile, "%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\n",
                 NATPtotal_left, NADPtotal_left, Ndtotal_left, Ndetotal_left, NEtotal_left, NflDtotal_left, NflEtotal_left,
                 NATPtotal_mid, NADPtotal_mid, Ndtotal_mid, Ndetotal_mid, NEtotal_mid, NflDtotal_mid, NflEtotal_mid,
-                NATPtotal_right, NADPtotal_right, Ndtotal_right, Ndetotal_right, NEtotal_right, NflDtotal_right, NflEtotal_right);
+                NATPtotal_right, NADPtotal_right, Ndtotal_right, Ndetotal_right, NEtotal_right, NflDtotal_right, NflEtotal_right, time_step*i);
       }
     }
     fclose(compare_end_middle_file);
