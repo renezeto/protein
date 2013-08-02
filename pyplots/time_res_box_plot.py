@@ -139,6 +139,8 @@ plt.plot(time_axis,plot_lines_E[3],alpha=0.5,color="red",linewidth=0.5)
 plt.plot(time_axis,plot_lines_E[4],alpha=0.25,color="green",linewidth=0.5)
 plt.plot(time_axis,plot_lines_E[5],alpha=0.5,color="green",linewidth=0.5)
 
+plt.ylim(0,1.1*plot_lines_D[5][100])
+plt.legend(["NE proteins left", "Nde proteins left", "NE proteins middle", "Nde proteins middle", "NE proteins right", "Nde proteins right"],loc=9,ncol=2,prop={'size':14})
 
 
 plt.savefig("./data/shape-"+f_shape+"/plots/m"+hires_str+"-divisions-MinE-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".pdf")
