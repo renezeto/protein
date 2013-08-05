@@ -23,7 +23,6 @@ double density_factor;
 
 int area_rating_flag = 0;
 int slice_flag = 0;
-
 int dump_flag = 0;
 
 char* hires_flag_str = new char[1024];
@@ -351,10 +350,6 @@ int main (int argc, char *argv[]) {
     if (strcmp(argv[i],"-dump")==0) {
       dump_flag = 1;
       printf("Printing all 501 data files.\n");
-    }
-    if (strcmp(argv[i],"-timeres")==0) {
-      printf("Printing high time resolution data\n");
-      time_res_flag = 1;
     }
   }
 
@@ -687,7 +682,6 @@ int main (int argc, char *argv[]) {
   fflush(out_file);
   printf("density set.\n");
 
-
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
@@ -742,53 +736,30 @@ int main (int argc, char *argv[]) {
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
 
-    FILE *compare_end_middle_file = fopen((const char*)compare_end_middle_filename,"w");
-    delete[] compare_end_middle_filename;
-
-    double tot_wall_right = 0;
-    double tot_wall_middle = 0;
-    for (int a=0;a<Nx;a++) {
-      for (int b=0;b<Ny;b++) {
-        for (int c=0;c<Nz;c++) {
-          if (c>right_divider) {
-            tot_wall_right += mem_A[a*Ny*Nz+b*Nz+c];
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(nATPfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           }
-          else if ((left_divider<c) && (c<=right_divider)) {
-            tot_wall_middle += mem_A[a*Ny*Nz+b*Nz+c];
-          }
+          fprintf(nATPfile, "\n");
         }
+        fclose(nATPfile);
       }
-    }
 
-    int period_condition = 0;
-    double last_tot_MinD_right = -0.01;
-    double last_last_tot_MinD_right = -0.02;
-    double tot_wall_MinD_right=0;
-    double tot_wall_MinD_middle=0;
-
-    for (int i=0;i<iter;i++){
-      get_J(difD, nATP, nADP, nE, JxATP, JyATP,
-            JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
-      get_next_density(mem_A, insideArr, nATP, nADP, nE, Nd, Nde, JxATP, JyATP, JzATP,
-                       JxADP, JyADP, JzADP, JxE, JyE, JzE);
-
-      last_last_tot_MinD_right = last_tot_MinD_right;
-      last_tot_MinD_right = tot_wall_MinD_right;
-      tot_wall_MinD_right=0;
-      tot_wall_MinD_middle=0;
-
-      for (int a=0;a<Nx;a++) {
-        for (int b=0;b<Ny;b++) {
-          for (int c=0;c<Nz;c++) {
-            if (c>right_divider) {
-              tot_wall_MinD_right += Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double nATPsum = 0;
+            for (int c=0;c<Nx;c++){
+              nATPsum += nATP[c*Ny*Nz+a*Nz+b];
             }
-            else if ((left_divider<c) && (c<=right_divider)) {
-              tot_wall_MinD_middle += Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-            }
+            fprintf(nATPfile, "%1.2f ", nATPsum);
           }
+          fprintf(nATPfile, "\n");
         }
+        fclose(nATPfile);
       }
+      //end nATP printing
 
       //nE printing
       char *outfilenameE = new char[1000];
@@ -796,30 +767,31 @@ int main (int argc, char *argv[]) {
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
 
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(nATPfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(nATPfile, "\n");
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(nEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           }
-          fclose(nATPfile);
+          fprintf(nEfile, "\n");
         }
+        fclose(nEfile);
+      }
 
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double nATPsum = 0;
-              for (int c=0;c<Nx;c++){
-                nATPsum += nATP[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(nATPfile, "%1.2f ", nATPsum);
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double nEsum = 0;
+            for (int c=0;c<Nx;c++){
+              nEsum += nE[c*Ny*Nz+a*Nz+b];
             }
-            fprintf(nATPfile, "\n");
+            fprintf(nEfile, "%1.2f ", nEsum);
           }
-          fclose(nATPfile);
+          fprintf(nEfile, "\n");
         }
-        //end nATP printing
+        fclose(nEfile);
+      }
+      //end nE printing
+
 
       //nADP printing
       char *outfilenameADP = new char[1000];
@@ -827,24 +799,30 @@ int main (int argc, char *argv[]) {
       FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
       delete[] outfilenameADP;
 
-        //nADP printing
-        char *outfilenameADP = new char[1000];
-        if (dx==.05) {
-          if (slice_flag==1) {
-            sprintf(outfilenameADP, "data/shape-%s/hires-nADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(nADPfile, "%1.2f ", nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           }
-          else {
-            sprintf(outfilenameADP, "data/shape-%s/hires-m-nADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
+          fprintf(nADPfile, "\n");
         }
-        else {
-          if (slice_flag==1) {
-            sprintf(outfilenameADP, "data/shape-%s/nADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
+        fclose(nADPfile);
+      }
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double nADPsum = 0;
+            for (int c=0;c<Nx;c++){
+              nADPsum += nADP[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(nADPfile, "%1.2f ", nADPsum);
           }
-          else {
-            sprintf(outfilenameADP, "data/shape-%s/m-nADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
+          fprintf(nADPfile, "\n");
         }
+        fclose(nADPfile);
+      }
+      //end nADP printing
 
       //begin ND printing
       char *outfilenameD = new char[1000];
@@ -919,8 +897,11 @@ int main (int argc, char *argv[]) {
           for (int b=0;b<Nz;b++){
             fprintf(NflEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + NDE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           }
-          fclose(NflEfile);
+          fprintf(NflEfile, "\n");
         }
+        fclose(NflEfile);
+      }
+
       else {
         for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
@@ -928,9 +909,9 @@ int main (int argc, char *argv[]) {
             for (int c=0;c<Nx;c++){
               NflEsum += nE[c*Ny*Nz+a*Nz+b]*dV + NDE[c*Ny*Nz+a*Nz+b];
             }
-            fprintf(NflEfile, "\n");
+            fprintf(NflEfile, "%1.2f ", NflEsum);
           }
-          fclose(NflEfile);
+          fprintf(NflEfile, "\n");
         }
         fclose(NflEfile);
       }
@@ -947,8 +928,11 @@ int main (int argc, char *argv[]) {
           for (int b=0;b<Nz;b++){
             fprintf(NflDfile, "%1.2f ", NDE[(int(Nx/2))*Ny*Nz+a*Nz+b] + nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + ND[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           }
-          fclose(NflDfile);
+          fprintf(NflDfile, "\n");
         }
+        fclose(NflDfile);
+      }
+
       else {
         for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
@@ -956,9 +940,9 @@ int main (int argc, char *argv[]) {
             for (int c=0;c<Nx;c++){
               NflDsum += NDE[c*Ny*Nz+a*Nz+b] + nADP[c*Ny*Nz+a*Nz+b]*dV + nATP[c*Ny*Nz+a*Nz+b]*dV + ND[c*Ny*Nz+a*Nz+b];
             }
-            fprintf(NflDfile, "\n");
+            fprintf(NflDfile, "%1.2f ", NflDsum);
           }
-          fclose(NflDfile);
+          fprintf(NflDfile, "\n");
         }
         fclose(NflDfile);
       }
@@ -986,7 +970,7 @@ int main (int argc, char *argv[]) {
       }
       fprintf(time_map,"\n");
     }
-
+  
     fclose(time_map);
     delete[] timename;
   }
