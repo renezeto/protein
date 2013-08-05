@@ -34,6 +34,9 @@ double time_step; //simulation time step
 int iter; //total # of iterations
 int printout_iterations; //iterations between file printout
 
+int box_divider_left;
+int box_divider_right;
+
 double x, y, z;
 int Nx, Ny, Nz; //number of gridpoints in each direction
 
@@ -362,8 +365,8 @@ int main (int argc, char *argv[]) {
     Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*B/dx) + 4;
     Nz = ceil((A + 2*B)/dx) + 4;
-    // int box_divider_left = ceil((Nz*dx-A)/2);
-    // int box_divider_right = ceil(A+(Nz*dx-A)/2);
+    box_divider_left = int(Nz/3);//ceil((Nz*dx-A)/2);
+    box_divider_right = int(Nz/3); //ceil(A+(Nz*dx-A)/2);
   }
   if (mem_f_shape=="b") {
     Nx = ceil(A/dx) + 4;
@@ -481,11 +484,11 @@ int main (int argc, char *argv[]) {
   //initialize plot structs - 1kB prob too small
   const int numProteins = 5;
 
-  protein* nATP_plot = new protein[1024*1024];
-  protein* nE_plot = new protein[1024*1024];
-  protein* nADP_plot = new protein[1024*1024];
-  protein* NDE_plot = new protein[1024*1024];
-  protein* ND_plot = new protein[1024*1024];
+  protein* nATP_plot = new protein;
+  protein* nE_plot = new protein;
+  protein* nADP_plot = new protein;
+  protein* NDE_plot = new protein;
+  protein* ND_plot = new protein;
 
   protein* proteinList[numProteins] = { nATP_plot, nADP_plot, nE_plot, ND_plot, NDE_plot };
   double* accessGlobals[numProteins] = { nATP, nADP, nE, ND, NDE };
@@ -493,6 +496,9 @@ int main (int argc, char *argv[]) {
   for (int pNum=0; pNum<numProteins; pNum++) {
     proteinList[pNum]->sum = new double[Ny*Nz];
     proteinList[pNum]->name = new char[1024];
+    proteinList[pNum]->numLeft = new double[iter];
+    proteinList[pNum]->numMid = new double[iter];
+    proteinList[pNum]->numRight = new double[iter];
   }
 
   sprintf(proteinList[0]->name,"nATP");
@@ -501,10 +507,8 @@ int main (int argc, char *argv[]) {
   sprintf(proteinList[3]->name,"ND");
   sprintf(proteinList[4]->name,"NDE");
 
-
   set_membrane(out_file, mem_f, mem_A);
   set_curvature(mem_A,curvature);
-
 
   //begin area rating
   printf("Starting with the area rating stuff!!!!\n");
@@ -699,430 +703,483 @@ int main (int argc, char *argv[]) {
           else { 
             proteinList[pNum]->sum[a*Nz+b] += accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
           }
-          }
         }
-
       }
-
-      //begin file printing
-      if ((dump_flag == 1) && (i%printout_iterations == 0)) {
-        fprintf(out_file,"Printing at iteration number = %d\n",i);
-
-        int k = i/printout_iterations;
-
-        //begin nATP printing.
-        char *outfilenameATP = new char[1024];
-        sprintf(outfilenameATP, "data/shape-%s/%s%snATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
-        FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
-        delete[] outfilenameATP;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(nATPfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(nATPfile, "\n");
-          }
-          fclose(nATPfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double nATPsum = 0;
-              for (int c=0;c<Nx;c++){
-                nATPsum += nATP[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(nATPfile, "%1.2f ", nATPsum);
-            }
-            fprintf(nATPfile, "\n");
-          }
-          fclose(nATPfile);
-        }
-        //end nATP printing
-
-        //nE printing
-        char *outfilenameE = new char[1000];
-        sprintf(outfilenameE, "data/shape-%s/%s%snE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
-        FILE *nEfile = fopen((const char *)outfilenameE,"w");
-        delete[] outfilenameE;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(nEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(nEfile, "\n");
-          }
-          fclose(nEfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double nEsum = 0;
-              for (int c=0;c<Nx;c++){
-                nEsum += nE[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(nEfile, "%1.2f ", nEsum);
-            }
-            fprintf(nEfile, "\n");
-          }
-          fclose(nEfile);
-        }
-        //end nE printing
-
-
-        //nADP printing
-        char *outfilenameADP = new char[1000];
-        sprintf(outfilenameADP, "data/shape-%s/%s%snADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
-        FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
-        delete[] outfilenameADP;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(nADPfile, "%1.2f ", nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(nADPfile, "\n");
-          }
-          fclose(nADPfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double nADPsum = 0;
-              for (int c=0;c<Nx;c++){
-                nADPsum += nADP[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(nADPfile, "%1.2f ", nADPsum);
-            }
-            fprintf(nADPfile, "\n");
-          }
-          fclose(nADPfile);
-        }
-        //end nADP printing
-
-        //begin ND printing
-        char *outfilenameD = new char[1000];
-        sprintf(outfilenameD, "data/shape-%s/%s%sND-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
-        FILE *NDfile = fopen((const char *)outfilenameD,"w");
-        delete[] outfilenameD;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(NDfile, "%1.2f ", ND[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(NDfile, "\n");
-          }
-          fclose(NDfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double NDsum = 0;
-              for (int c=0;c<Nx;c++){
-                NDsum += ND[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(NDfile, "%1.2f ", NDsum);
-            }
-            fprintf(NDfile, "\n");
-          }
-          fclose(NDfile);
-        }
-        //end ND printing
-
-        //begin NDE printing
-        char *outfilenameDE = new char[1000];
-        sprintf(outfilenameDE, "data/shape-%s/%s%sNDE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
-        FILE *NDEfile = fopen((const char *)outfilenameDE,"w");
-        delete[] outfilenameDE;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(NDEfile, "%1.2f ", NDE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(NDEfile, "\n");
-          }
-          fclose(NDEfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double NDEsum = 0;
-              for (int c=0;c<Nx;c++){
-                NDEsum += NDE[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(NDEfile, "%1.2f ", NDEsum);
-            }
-            fprintf(NDEfile, "\n");
-          }
-          fclose(NDEfile);
-        }
-        //end NDE printing
-
-        //begin NflE printing
-        char *outfilenameflE = new char[1000];
-        sprintf(outfilenameflE, "data/shape-%s/%s%sNflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
-        FILE *NflEfile = fopen((const char *)outfilenameflE,"w");
-        delete[] outfilenameflE;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(NflEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + NDE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(NflEfile, "\n");
-          }
-          fclose(NflEfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double NflEsum = 0;
-              for (int c=0;c<Nx;c++){
-                NflEsum += nE[c*Ny*Nz+a*Nz+b]*dV + NDE[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(NflEfile, "%1.2f ", NflEsum);
-            }
-            fprintf(NflEfile, "\n");
-          }
-          fclose(NflEfile);
-        }
-        //end NflE printing
-
-        //begin NflD printing
-        char *outfilenameflD = new char[1000];
-        sprintf(outfilenameflD, "data/shape-%s/%s%sNflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
-        FILE *NflDfile = fopen((const char *)outfilenameflD,"w");
-        delete[] outfilenameflD;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(NflDfile, "%1.2f ", NDE[(int(Nx/2))*Ny*Nz+a*Nz+b] + nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + ND[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(NflDfile, "\n");
-          }
-          fclose(NflDfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double NflDsum = 0;
-              for (int c=0;c<Nx;c++){
-                NflDsum += NDE[c*Ny*Nz+a*Nz+b] + nADP[c*Ny*Nz+a*Nz+b]*dV + nATP[c*Ny*Nz+a*Nz+b]*dV + ND[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(NflDfile, "%1.2f ", NflDsum);
-            }
-            fprintf(NflDfile, "\n");
-          }
-          fclose(NflDfile);
-        }
-        //end NflD printing
-        k++;
-        fflush(out_file);
-      }
-      //end file printing
-    }
-    //end simulation
-
-    fclose(out_file);
-
-    //printing plot information
-    for (int pNum=0; pNum<numProteins; pNum++) {
-
-      //time map
-      char *fname = new char[1024];
-      sprintf(fname,"%s",print_filename("time-map",proteinList[pNum]->name));
-      FILE* time_map = fopen(fname,"w");
-
-      for (int a=0; a<Ny; a++) {
-        for (int b=0; b<Nz; b++) {
-          fprintf(time_map,"%1.2f",(proteinList[pNum]->sum[a*Nz+b])/((double)iter));
-        }
-        fprintf(time_map,"\n");
-      }
-  
-      fclose(time_map);
 
       //box plot
-
-    }
-
-
-    //printing to the project directory so we have a shortlist of what we've done.
-    char *fname = new char[1024];
-    sprintf(fname,"catalog.txt");
-    FILE * catalog;
-    int catalog_exists;
-    catalog = fopen(fname,"r");
-    if (catalog==NULL) {
-      catalog_exists=0;
-    }
-    else {
-      catalog_exists=1;
-      fclose(catalog);
-    }
-    if (catalog_exists==1) {
-      catalog=fopen(fname,"a+b");
-    }
-    else {
-      catalog=fopen(fname,"w+b");
-    }
-    if (catalog!=NULL) {
-      fprintf(catalog,"%s %1.2f %1.2f %1.2f %1.2f %1.2f", mem_f_shape.c_str(),A,B,C,D,density_factor);
-      if (dx==.05) {
-        fprintf(catalog," -hires\n");
-      }
-      else {
-        fprintf(catalog,"\n");
-      }
-      fclose(catalog);
-    }
-    delete[] fname;
-    //end catalog
-
-    return 0;
-  }
-
-  void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
-                    double mem_A[]) {
-    clock_t old_time = clock();
-    for(int xi=0;xi<Nx;xi++){
-      clock_t time = clock();
-      fprintf(out_file, "x row %d in set_membrane took %4.02f seconds",xi, (time-old_time)/double(CLOCKS_PER_SEC));
-      fflush(stdout);
-      old_time = time;
-      for(int yi=0;yi<Ny;yi++){
-        for(int zi=0;zi<Nz;zi++){
-          double fXYZ = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
-          double fXYz = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi-0.5)*dx);
-          double fXyZ = mem_f((xi+0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
-          double fXyz = mem_f((xi+0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
-          double fxYZ = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
-          double fxYz = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi-0.5)*dx);
-          double fxyZ = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
-          double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
-          double f = mem_f(xi*dx, yi*dx, zi*dx);
-          mem_A[xi*Ny*Nz+yi*Nz+zi] = find_intersection(fXYZ, fXYz, fXyZ, fXyz, fxYZ, fxYz, fxyZ, fxyz, f);
-        }
-      }
-    }
-  }
-
-  void set_curvature(double mem_A[], double curvature[]){
-    printf("doing set curvature!!!\n");
-    fflush(stdout);
-    double X = Nx*dx;
-    double x1 = (X-A)/2.0;
-    double x2 = (X+A)/2.0;
-    for(int xi=0;xi<Nx;xi++){
-      for(int yi=0;yi<Ny;yi++){
-        for(int zi=0;zi<Nz;zi++){
-          if (mem_A[xi*Ny*Nz+yi*Nz+zi]==0 || (xi*dx+0.05)>x2 || (xi*dx-0.05)<x1 ){
-            curvature[xi*Ny*Nz+yi*Nz+zi]=0;
-          } else {
-            double fX = mem_f((xi+0.5)*dx, yi*dx, zi*dx);
-            double fx = mem_f((xi-0.5)*dx, yi*dx, zi*dx);
-            double fY = mem_f(xi*dx, (yi+0.5)*dx, zi*dx);
-            double fy = mem_f(xi*dx, (yi-0.5)*dx, zi*dx);
-            double fZ = mem_f(xi*dx, yi*dx, (zi+0.5)*dx);
-            double fz = mem_f(xi*dx, yi*dx, (zi-0.5)*dx);
-            double f = mem_f(xi*dx, yi*dx, zi*dx);
-
-            double df_dx = (fX-fx)/dx;
-            double df_dy = (fY-fy)/dx;
-            double df_dz = (fZ-fz)/dx;
-            double constant = sqrt((df_dx)*(df_dx) + (df_dy)*(df_dy) + (df_dz)*(df_dz));
-
-            curvature[xi*Ny*Nz+yi*Nz+zi] = 4*(fX + fx + fY + fy + fZ + fz - 6*f)/dx/dx/constant;
+      for (int a=0; a<Ny; a++) { 
+        for (int b=0; b<Nz; b++) {
+          for (int c=0; c<Nx; c++) {
+            if (b < box_divider_left) { 
+              proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            }
+            if (b > box_divider_right) { 
+              proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            }
+            else {
+              proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            }
           }
         }
       }
     }
-    fflush(stdout);
+
+    //begin file printing
+    if ((dump_flag == 1) && (i%printout_iterations == 0)) {
+      fprintf(out_file,"Printing at iteration number = %d\n",i);
+
+      int k = i/printout_iterations;
+
+      //begin nATP printing.
+      char *outfilenameATP = new char[1024];
+      sprintf(outfilenameATP, "data/shape-%s/%s%snATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
+      delete[] outfilenameATP;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(nATPfile, "%1.2f ", nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fprintf(nATPfile, "\n");
+        }
+        fclose(nATPfile);
+      }
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double nATPsum = 0;
+            for (int c=0;c<Nx;c++){
+              nATPsum += nATP[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(nATPfile, "%1.2f ", nATPsum);
+          }
+          fprintf(nATPfile, "\n");
+        }
+        fclose(nATPfile);
+      }
+      //end nATP printing
+
+      //nE printing
+      char *outfilenameE = new char[1000];
+      sprintf(outfilenameE, "data/shape-%s/%s%snE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *nEfile = fopen((const char *)outfilenameE,"w");
+      delete[] outfilenameE;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(nEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fprintf(nEfile, "\n");
+        }
+        fclose(nEfile);
+      }
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double nEsum = 0;
+            for (int c=0;c<Nx;c++){
+              nEsum += nE[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(nEfile, "%1.2f ", nEsum);
+          }
+          fprintf(nEfile, "\n");
+        }
+        fclose(nEfile);
+      }
+      //end nE printing
+
+
+      //nADP printing
+      char *outfilenameADP = new char[1000];
+      sprintf(outfilenameADP, "data/shape-%s/%s%snADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
+      delete[] outfilenameADP;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(nADPfile, "%1.2f ", nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fprintf(nADPfile, "\n");
+        }
+        fclose(nADPfile);
+      }
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double nADPsum = 0;
+            for (int c=0;c<Nx;c++){
+              nADPsum += nADP[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(nADPfile, "%1.2f ", nADPsum);
+          }
+          fprintf(nADPfile, "\n");
+        }
+        fclose(nADPfile);
+      }
+      //end nADP printing
+
+      //begin ND printing
+      char *outfilenameD = new char[1000];
+      sprintf(outfilenameD, "data/shape-%s/%s%sND-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *NDfile = fopen((const char *)outfilenameD,"w");
+      delete[] outfilenameD;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(NDfile, "%1.2f ", ND[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fprintf(NDfile, "\n");
+        }
+        fclose(NDfile);
+      }
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double NDsum = 0;
+            for (int c=0;c<Nx;c++){
+              NDsum += ND[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(NDfile, "%1.2f ", NDsum);
+          }
+          fprintf(NDfile, "\n");
+        }
+        fclose(NDfile);
+      }
+      //end ND printing
+
+      //begin NDE printing
+      char *outfilenameDE = new char[1000];
+      sprintf(outfilenameDE, "data/shape-%s/%s%sNDE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *NDEfile = fopen((const char *)outfilenameDE,"w");
+      delete[] outfilenameDE;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(NDEfile, "%1.2f ", NDE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fprintf(NDEfile, "\n");
+        }
+        fclose(NDEfile);
+      }
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double NDEsum = 0;
+            for (int c=0;c<Nx;c++){
+              NDEsum += NDE[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(NDEfile, "%1.2f ", NDEsum);
+          }
+          fprintf(NDEfile, "\n");
+        }
+        fclose(NDEfile);
+      }
+      //end NDE printing
+
+      //begin NflE printing
+      char *outfilenameflE = new char[1000];
+      sprintf(outfilenameflE, "data/shape-%s/%s%sNflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *NflEfile = fopen((const char *)outfilenameflE,"w");
+      delete[] outfilenameflE;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(NflEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + NDE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fprintf(NflEfile, "\n");
+        }
+        fclose(NflEfile);
+      }
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double NflEsum = 0;
+            for (int c=0;c<Nx;c++){
+              NflEsum += nE[c*Ny*Nz+a*Nz+b]*dV + NDE[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(NflEfile, "%1.2f ", NflEsum);
+          }
+          fprintf(NflEfile, "\n");
+        }
+        fclose(NflEfile);
+      }
+      //end NflE printing
+
+      //begin NflD printing
+      char *outfilenameflD = new char[1000];
+      sprintf(outfilenameflD, "data/shape-%s/%s%sNflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *NflDfile = fopen((const char *)outfilenameflD,"w");
+      delete[] outfilenameflD;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(NflDfile, "%1.2f ", NDE[(int(Nx/2))*Ny*Nz+a*Nz+b] + nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + ND[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fprintf(NflDfile, "\n");
+        }
+        fclose(NflDfile);
+      }
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double NflDsum = 0;
+            for (int c=0;c<Nx;c++){
+              NflDsum += NDE[c*Ny*Nz+a*Nz+b] + nADP[c*Ny*Nz+a*Nz+b]*dV + nATP[c*Ny*Nz+a*Nz+b]*dV + ND[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(NflDfile, "%1.2f ", NflDsum);
+          }
+          fprintf(NflDfile, "\n");
+        }
+        fclose(NflDfile);
+      }
+      //end NflD printing
+      k++;
+      fflush(out_file);
+    }
+    //end file printing
+  }
+  //end simulation
+
+  fclose(out_file);
+
+  //printing plot information
+  for (int pNum=0; pNum<numProteins; pNum++) {
+
+    //time map
+    char *timename = new char[1024];
+    sprintf(timename,"%s",print_filename("time-map",proteinList[pNum]->name));
+    FILE* time_map = fopen(timename,"w");
+
+    for (int a=0; a<Ny; a++) {
+      for (int b=0; b<Nz; b++) {
+        fprintf(time_map,"%1.2f\t",(proteinList[pNum]->sum[a*Nz+b])/((double)iter));
+      }
+      fprintf(time_map,"\n");
+    }
+  
+    fclose(time_map);
+    delete[] timename;
   }
 
-  double find_intersection(const double fXYZ, const double fXYz, const double fXyZ, const double fXyz,
-                           const double fxYZ, const double fxYz, const double fxyZ, const double fxyz,
-                           const double f) {
-    double dA = 0;
-    double *ptsx = new double[8];
-    double *ptsy = new double[8];
-    double *ptsz = new double[8];
-    for (int i=0;i<8;i++) ptsx[i] = 0;
-    for (int i=0;i<8;i++) ptsy[i] = 0;
-    for (int i=0;i<8;i++) ptsz[i] = 0;
-    int np = 0;
-    double df_dx = (fXYZ + fXYz + fXyZ + fXyz - fxYZ - fxyZ - fxYz - fxyz)/(4*dx);
-    double df_dy = (fXYZ + fXYz + fxYZ + fxYz - fXyZ - fxyZ - fXyz - fxyz)/(4*dx);
-    double df_dz = (fXYZ + fXyZ + fxYZ + fxyZ - fXYz - fXyz - fxYz - fxyz)/(4*dx);
-    for (double j=-0.5; j<1.0; j++){
-      for (double k=-0.5; k<1.0; k++){
-        if ((-f - j*dx*df_dy - k*dx*df_dz)/(df_dx*dx) < 0.5 && (-f - j*dx*df_dy - k*dx*df_dz)/(df_dx*dx) > -0.5){
-          ptsx[np] = (-f - j*dx*df_dy - k*dx*df_dz)/df_dx;
-          ptsy[np] = j*dx;
-          ptsz[np] = k*dx;
-          np++;
+  char *boxname = new char[1024];
+  sprintf(boxname,"%s",print_filename("box-plot",""));
+  FILE* box_plot = fopen(boxname,"w");
+
+  for (int pNum=0; pNum<numProteins; pNum++) {
+    for (int i=0; i<iter; i++) {
+      fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
+    }
+    fprintf(box_plot,"\n");
+    for (int i=0; i<iter; i++) {
+      fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i]));
+    }
+    fprintf(box_plot,"\n");
+    for (int i=0; i<iter; i++) {
+      fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i]));
+    }
+    fprintf(box_plot,"\n");
+    fprintf(box_plot,"\n");
+  }
+
+  fclose(box_plot);
+  delete[] boxname;
+
+  //printing to the project directory so we have a shortlist of what we've done.
+  char *fname = new char[1024];
+  sprintf(fname,"catalog.txt");
+  FILE * catalog;
+  int catalog_exists;
+  catalog = fopen(fname,"r");
+  if (catalog==NULL) {
+    catalog_exists=0;
+  }
+  else {
+    catalog_exists=1;
+    fclose(catalog);
+  }
+  if (catalog_exists==1) {
+    catalog=fopen(fname,"a+b");
+  }
+  else {
+    catalog=fopen(fname,"w+b");
+  }
+  if (catalog!=NULL) {
+    fprintf(catalog,"%s %1.2f %1.2f %1.2f %1.2f %1.2f", mem_f_shape.c_str(),A,B,C,D,density_factor);
+    if (dx==.05) {
+      fprintf(catalog," -hires\n");
+    }
+    else {
+      fprintf(catalog,"\n");
+    }
+    fclose(catalog);
+  }
+  delete[] fname;
+  //end catalog
+
+  return 0;
+}
+
+void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
+                  double mem_A[]) {
+  clock_t old_time = clock();
+  for(int xi=0;xi<Nx;xi++){
+    clock_t time = clock();
+    fprintf(out_file, "x row %d in set_membrane took %4.02f seconds",xi, (time-old_time)/double(CLOCKS_PER_SEC));
+    fflush(stdout);
+    old_time = time;
+    for(int yi=0;yi<Ny;yi++){
+      for(int zi=0;zi<Nz;zi++){
+        double fXYZ = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
+        double fXYz = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi-0.5)*dx);
+        double fXyZ = mem_f((xi+0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
+        double fXyz = mem_f((xi+0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
+        double fxYZ = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
+        double fxYz = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi-0.5)*dx);
+        double fxyZ = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
+        double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
+        double f = mem_f(xi*dx, yi*dx, zi*dx);
+        mem_A[xi*Ny*Nz+yi*Nz+zi] = find_intersection(fXYZ, fXYz, fXyZ, fXyz, fxYZ, fxYz, fxyZ, fxyz, f);
+      }
+    }
+  }
+}
+
+void set_curvature(double mem_A[], double curvature[]){
+  printf("doing set curvature!!!\n");
+  fflush(stdout);
+  double X = Nx*dx;
+  double x1 = (X-A)/2.0;
+  double x2 = (X+A)/2.0;
+  for(int xi=0;xi<Nx;xi++){
+    for(int yi=0;yi<Ny;yi++){
+      for(int zi=0;zi<Nz;zi++){
+        if (mem_A[xi*Ny*Nz+yi*Nz+zi]==0 || (xi*dx+0.05)>x2 || (xi*dx-0.05)<x1 ){
+          curvature[xi*Ny*Nz+yi*Nz+zi]=0;
+        } else {
+          double fX = mem_f((xi+0.5)*dx, yi*dx, zi*dx);
+          double fx = mem_f((xi-0.5)*dx, yi*dx, zi*dx);
+          double fY = mem_f(xi*dx, (yi+0.5)*dx, zi*dx);
+          double fy = mem_f(xi*dx, (yi-0.5)*dx, zi*dx);
+          double fZ = mem_f(xi*dx, yi*dx, (zi+0.5)*dx);
+          double fz = mem_f(xi*dx, yi*dx, (zi-0.5)*dx);
+          double f = mem_f(xi*dx, yi*dx, zi*dx);
+
+          double df_dx = (fX-fx)/dx;
+          double df_dy = (fY-fy)/dx;
+          double df_dz = (fZ-fz)/dx;
+          double constant = sqrt((df_dx)*(df_dx) + (df_dy)*(df_dy) + (df_dz)*(df_dz));
+
+          curvature[xi*Ny*Nz+yi*Nz+zi] = 4*(fX + fx + fY + fy + fZ + fz - 6*f)/dx/dx/constant;
         }
       }
     }
+  }
+  fflush(stdout);
+}
+
+double find_intersection(const double fXYZ, const double fXYz, const double fXyZ, const double fXyz,
+                         const double fxYZ, const double fxYz, const double fxyZ, const double fxyz,
+                         const double f) {
+  double dA = 0;
+  double *ptsx = new double[8];
+  double *ptsy = new double[8];
+  double *ptsz = new double[8];
+  for (int i=0;i<8;i++) ptsx[i] = 0;
+  for (int i=0;i<8;i++) ptsy[i] = 0;
+  for (int i=0;i<8;i++) ptsz[i] = 0;
+  int np = 0;
+  double df_dx = (fXYZ + fXYz + fXyZ + fXyz - fxYZ - fxyZ - fxYz - fxyz)/(4*dx);
+  double df_dy = (fXYZ + fXYz + fxYZ + fxYz - fXyZ - fxyZ - fXyz - fxyz)/(4*dx);
+  double df_dz = (fXYZ + fXyZ + fxYZ + fxyZ - fXYz - fXyz - fxYz - fxyz)/(4*dx);
+  for (double j=-0.5; j<1.0; j++){
+    for (double k=-0.5; k<1.0; k++){
+      if ((-f - j*dx*df_dy - k*dx*df_dz)/(df_dx*dx) < 0.5 && (-f - j*dx*df_dy - k*dx*df_dz)/(df_dx*dx) > -0.5){
+        ptsx[np] = (-f - j*dx*df_dy - k*dx*df_dz)/df_dx;
+        ptsy[np] = j*dx;
+        ptsz[np] = k*dx;
+        np++;
+      }
+    }
+  }
+  for (double i=-0.5; i<1.0; i++){
+    for (double k=-0.5; k<1.0; k++){
+      if ((-f - i*dx*df_dx - k*dx*df_dz)/(df_dy*dx) < 0.5 && (-f - i*dx*df_dx - k*dx*df_dz)/(df_dy*dx) > -0.5){
+        ptsy[np] = (-f - i*dx*df_dx - k*dx*df_dz)/df_dy;
+        ptsx[np] = i*dx;
+        ptsz[np] = k*dx;
+        np++;
+      }
+    }
+  }
+  for (double j=-0.5; j<1.0; j++){
     for (double i=-0.5; i<1.0; i++){
-      for (double k=-0.5; k<1.0; k++){
-        if ((-f - i*dx*df_dx - k*dx*df_dz)/(df_dy*dx) < 0.5 && (-f - i*dx*df_dx - k*dx*df_dz)/(df_dy*dx) > -0.5){
-          ptsy[np] = (-f - i*dx*df_dx - k*dx*df_dz)/df_dy;
-          ptsx[np] = i*dx;
-          ptsz[np] = k*dx;
-          np++;
-        }
+      if ((-f - j*dx*df_dy - i*dx*df_dx)/(df_dz*dx) < 0.5 && (-f - j*dx*df_dy - i*dx*df_dx)/(df_dz*dx) > -0.5){
+        ptsz[np] = (-f - j*dx*df_dy - i*dx*df_dx)/df_dz;
+        ptsy[np] = j*dx;
+        ptsx[np] = i*dx;
+        np++;
       }
     }
-    for (double j=-0.5; j<1.0; j++){
-      for (double i=-0.5; i<1.0; i++){
-        if ((-f - j*dx*df_dy - i*dx*df_dx)/(df_dz*dx) < 0.5 && (-f - j*dx*df_dy - i*dx*df_dx)/(df_dz*dx) > -0.5){
-          ptsz[np] = (-f - j*dx*df_dy - i*dx*df_dx)/df_dz;
-          ptsy[np] = j*dx;
-          ptsx[np] = i*dx;
-          np++;
-        }
-      }
-    }
-    int nz0 = 0;
-    int ny0 = 0;
-    int nx0 = 0;
-    double *ptx = new double[8];
-    double *pty = new double[8];
-    double *ptz = new double[8];
-    for (int i=0;i<8;i++) ptx[i] = 0;
-    for (int i=0;i<8;i++) pty[i] = 0;
-    for (int i=0;i<8;i++) ptz[i] = 0;
-    double *line = new double[8];
-    for (int i=0;i<8;i++) line[i] = 0;
-    double *cos = new double[8];
-    double cos_max = -2;
-    int as=0;
-    int bs=0;
-    int cs=0;
-    int ds=0;
-    int s = 1;
-    double eline = 0;
-    double p = 0;
+  }
+  int nz0 = 0;
+  int ny0 = 0;
+  int nx0 = 0;
+  double *ptx = new double[8];
+  double *pty = new double[8];
+  double *ptz = new double[8];
+  for (int i=0;i<8;i++) ptx[i] = 0;
+  for (int i=0;i<8;i++) pty[i] = 0;
+  for (int i=0;i<8;i++) ptz[i] = 0;
+  double *line = new double[8];
+  for (int i=0;i<8;i++) line[i] = 0;
+  double *cos = new double[8];
+  double cos_max = -2;
+  int as=0;
+  int bs=0;
+  int cs=0;
+  int ds=0;
+  int s = 1;
+  double eline = 0;
+  double p = 0;
+  for (int i=0;i<np;i++){
+    if (ptsz[i] == -0.5*dx) {ptz[nz0]=ptsz[i]; ptx[nz0]=ptsx[i]; pty[nz0]=ptsy[i]; nz0++;}
+  }
+  if (nz0 == 2){
+    line[0] = sqrt((ptx[1]-ptx[0])*(ptx[1]-ptx[0]) + (pty[1]-pty[0])*(pty[1]-pty[0])
+                   + (ptz[1]-ptz[0])*(ptz[1]-ptz[0]));
     for (int i=0;i<np;i++){
-      if (ptsz[i] == -0.5*dx) {ptz[nz0]=ptsz[i]; ptx[nz0]=ptsx[i]; pty[nz0]=ptsy[i]; nz0++;}
+      if (ptsz[i] != -0.5*dx){
+        line[s] = sqrt((ptsx[i]-ptx[0])*(ptsx[i]-ptx[0]) + (ptsy[i]-pty[0])*(ptsy[i]-pty[0])
+                       + (ptsz[i]-ptz[0])*(ptsz[i]-ptz[0]));
+        cos[s] = ((ptsx[i]-ptx[0])*(ptx[1]-ptx[0]) + (ptsy[i]-pty[0])*(pty[1]-pty[0])
+                  + (ptsz[i]-ptz[0])*(ptz[1]-ptz[0])) / (line[s]*line[0]);
+        ptz[s+1] = ptsz[i]; ptx[s+1] = ptsx[i]; pty[s+1] = ptsy[i];
+        s++;
+      }
     }
-    if (nz0 == 2){
+  } else {
+    for (int i=0;i<np;i++){
+      if (ptsx[i] == -0.5*dx) {ptz[nx0]=ptsz[i]; ptx[nx0]=ptsx[i]; pty[nx0]=ptsy[i]; nx0++;}
+    }
+    if (nx0 == 2){
       line[0] = sqrt((ptx[1]-ptx[0])*(ptx[1]-ptx[0]) + (pty[1]-pty[0])*(pty[1]-pty[0])
                      + (ptz[1]-ptz[0])*(ptz[1]-ptz[0]));
       for (int i=0;i<np;i++){
-        if (ptsz[i] != -0.5*dx){
+        if (ptsx[i] != -0.5*dx){
           line[s] = sqrt((ptsx[i]-ptx[0])*(ptsx[i]-ptx[0]) + (ptsy[i]-pty[0])*(ptsy[i]-pty[0])
                          + (ptsz[i]-ptz[0])*(ptsz[i]-ptz[0]));
           cos[s] = ((ptsx[i]-ptx[0])*(ptx[1]-ptx[0]) + (ptsy[i]-pty[0])*(pty[1]-pty[0])
@@ -1133,13 +1190,13 @@ int main (int argc, char *argv[]) {
       }
     } else {
       for (int i=0;i<np;i++){
-        if (ptsx[i] == -0.5*dx) {ptz[nx0]=ptsz[i]; ptx[nx0]=ptsx[i]; pty[nx0]=ptsy[i]; nx0++;}
+        if (ptsy[i] == -0.5*dx) {ptz[ny0]=ptsz[i]; ptx[ny0]=ptsx[i]; pty[ny0]=ptsy[i]; ny0++;}
       }
-      if (nx0 == 2){
+      if (ny0 == 2){
         line[0] = sqrt((ptx[1]-ptx[0])*(ptx[1]-ptx[0]) + (pty[1]-pty[0])*(pty[1]-pty[0])
                        + (ptz[1]-ptz[0])*(ptz[1]-ptz[0]));
         for (int i=0;i<np;i++){
-          if (ptsx[i] != -0.5*dx){
+          if (ptsy[i] != -0.5*dx){
             line[s] = sqrt((ptsx[i]-ptx[0])*(ptsx[i]-ptx[0]) + (ptsy[i]-pty[0])*(ptsy[i]-pty[0])
                            + (ptsz[i]-ptz[0])*(ptsz[i]-ptz[0]));
             cos[s] = ((ptsx[i]-ptx[0])*(ptx[1]-ptx[0]) + (ptsy[i]-pty[0])*(pty[1]-pty[0])
@@ -1148,279 +1205,262 @@ int main (int argc, char *argv[]) {
             s++;
           }
         }
-      } else {
-        for (int i=0;i<np;i++){
-          if (ptsy[i] == -0.5*dx) {ptz[ny0]=ptsz[i]; ptx[ny0]=ptsx[i]; pty[ny0]=ptsy[i]; ny0++;}
-        }
-        if (ny0 == 2){
-          line[0] = sqrt((ptx[1]-ptx[0])*(ptx[1]-ptx[0]) + (pty[1]-pty[0])*(pty[1]-pty[0])
-                         + (ptz[1]-ptz[0])*(ptz[1]-ptz[0]));
-          for (int i=0;i<np;i++){
-            if (ptsy[i] != -0.5*dx){
-              line[s] = sqrt((ptsx[i]-ptx[0])*(ptsx[i]-ptx[0]) + (ptsy[i]-pty[0])*(ptsy[i]-pty[0])
-                             + (ptsz[i]-ptz[0])*(ptsz[i]-ptz[0]));
-              cos[s] = ((ptsx[i]-ptx[0])*(ptx[1]-ptx[0]) + (ptsy[i]-pty[0])*(pty[1]-pty[0])
-                        + (ptsz[i]-ptz[0])*(ptz[1]-ptz[0])) / (line[s]*line[0]);
-              ptz[s+1] = ptsz[i]; ptx[s+1] = ptsx[i]; pty[s+1] = ptsy[i];
-              s++;
-            }
-          }
-        }
       }
     }
+  }
+  for (int i=1;i<s;i++){
+    if (cos[i] > cos_max){cos_max = cos[i]; as=i;}
+  }
+  eline = sqrt((ptx[as+1]-ptx[1])*(ptx[as+1]-ptx[1]) + (pty[as+1]-pty[1])*(pty[as+1]-pty[1])
+               + (ptz[as+1]-ptz[1])*(ptz[as+1]-ptz[1]));
+  p = (line[as]+line[0]+eline)/2;
+  dA = sqrt(p*(p-line[as])*(p-line[0])*(p-eline));
+  cos[as] = -2; cos_max = -2;
+
+  if (np==4 || np==5 || np==6){
     for (int i=1;i<s;i++){
-      if (cos[i] > cos_max){cos_max = cos[i]; as=i;}
+      if (cos[i] > cos_max){cos_max = cos[i]; bs=i;}
     }
-    eline = sqrt((ptx[as+1]-ptx[1])*(ptx[as+1]-ptx[1]) + (pty[as+1]-pty[1])*(pty[as+1]-pty[1])
-                 + (ptz[as+1]-ptz[1])*(ptz[as+1]-ptz[1]));
-    p = (line[as]+line[0]+eline)/2;
-    dA = sqrt(p*(p-line[as])*(p-line[0])*(p-eline));
-    cos[as] = -2; cos_max = -2;
-
-    if (np==4 || np==5 || np==6){
-      for (int i=1;i<s;i++){
-        if (cos[i] > cos_max){cos_max = cos[i]; bs=i;}
-      }
-      eline = sqrt((ptx[bs+1]-ptx[as+1])*(ptx[bs+1]-ptx[as+1]) + (pty[bs+1]-pty[as+1])*(pty[bs+1]-pty[as+1])
-                   + (ptz[bs+1]-ptz[as+1])*(ptz[bs+1]-ptz[as+1]));
-      p = (line[bs]+line[as]+eline)/2;
-      dA += sqrt(p*(p-line[bs])*(p-line[as])*(p-eline));
-      cos[bs] = -2; cos_max = -2;
-    }
-
-    if (np==5 || np==6){
-      for (int i=1;i<s;i++){
-        if (cos[i] > cos_max){cos_max = cos[i]; cs=i;}
-      }
-      eline = sqrt((ptx[cs+1]-ptx[bs+1])*(ptx[cs+1]-ptx[bs+1]) + (pty[cs+1]-pty[bs+1])*(pty[cs+1]-pty[bs+1])
-                   + (ptz[cs+1]-ptz[bs+1])*(ptz[cs+1]-ptz[bs+1]));
-      p = (line[cs]+line[bs]+eline)/2;
-      dA += sqrt(p*(p-line[cs])*(p-line[bs])*(p-eline));
-      cos[cs] = -2; cos_max = -2;
-    }
-
-    if (np == 6) {
-      for (int i=1;i<s;i++){
-        if (cos[i] > cos_max){cos_max = cos[i]; ds=i;}
-      }
-      eline = sqrt((ptx[ds+1]-ptx[cs+1])*(ptx[ds+1]-ptx[cs+1]) + (pty[ds+1]-pty[cs+1])*(pty[ds+1]-pty[cs+1])
-                   + (ptz[ds+1]-ptz[cs+1])*(ptz[ds+1]-ptz[cs+1]));
-      p = (line[ds]+line[cs]+eline)/2;
-      dA += sqrt(p*(p-line[ds])*(p-line[cs])*(p-eline));
-    }
-    delete[] ptsx;
-    delete[] ptsy;
-    delete[] ptsz;
-    delete[] ptx;
-    delete[] pty;
-    delete[] ptz;
-    delete[] line;
-    delete[] cos;
-    return dA;
+    eline = sqrt((ptx[bs+1]-ptx[as+1])*(ptx[bs+1]-ptx[as+1]) + (pty[bs+1]-pty[as+1])*(pty[bs+1]-pty[as+1])
+                 + (ptz[bs+1]-ptz[as+1])*(ptz[bs+1]-ptz[as+1]));
+    p = (line[bs]+line[as]+eline)/2;
+    dA += sqrt(p*(p-line[bs])*(p-line[as])*(p-eline));
+    cos[bs] = -2; cos_max = -2;
   }
 
-  void set_insideArr(bool *insideArr){
-    for(int xi=0;xi<Nx;xi++){
-      for(int yi=0;yi<Ny;yi++){
-        for(int zi=0;zi<Nz;zi++){
-          insideArr[xi*Ny*Nz+yi*Nz+zi] = inside(xi,yi,zi);
-        }
+  if (np==5 || np==6){
+    for (int i=1;i<s;i++){
+      if (cos[i] > cos_max){cos_max = cos[i]; cs=i;}
+    }
+    eline = sqrt((ptx[cs+1]-ptx[bs+1])*(ptx[cs+1]-ptx[bs+1]) + (pty[cs+1]-pty[bs+1])*(pty[cs+1]-pty[bs+1])
+                 + (ptz[cs+1]-ptz[bs+1])*(ptz[cs+1]-ptz[bs+1]));
+    p = (line[cs]+line[bs]+eline)/2;
+    dA += sqrt(p*(p-line[cs])*(p-line[bs])*(p-eline));
+    cos[cs] = -2; cos_max = -2;
+  }
+
+  if (np == 6) {
+    for (int i=1;i<s;i++){
+      if (cos[i] > cos_max){cos_max = cos[i]; ds=i;}
+    }
+    eline = sqrt((ptx[ds+1]-ptx[cs+1])*(ptx[ds+1]-ptx[cs+1]) + (pty[ds+1]-pty[cs+1])*(pty[ds+1]-pty[cs+1])
+                 + (ptz[ds+1]-ptz[cs+1])*(ptz[ds+1]-ptz[cs+1]));
+    p = (line[ds]+line[cs]+eline)/2;
+    dA += sqrt(p*(p-line[ds])*(p-line[cs])*(p-eline));
+  }
+  delete[] ptsx;
+  delete[] ptsy;
+  delete[] ptsz;
+  delete[] ptx;
+  delete[] pty;
+  delete[] ptz;
+  delete[] line;
+  delete[] cos;
+  return dA;
+}
+
+void set_insideArr(bool *insideArr){
+  for(int xi=0;xi<Nx;xi++){
+    for(int yi=0;yi<Ny;yi++){
+      for(int zi=0;zi<Nz;zi++){
+        insideArr[xi*Ny*Nz+yi*Nz+zi] = inside(xi,yi,zi);
       }
     }
   }
+}
 
-  bool inside (int xi, int yi, int zi){
-    if (mem_f((xi-0.5)*dx,(yi-0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
-    if (mem_f((xi+0.5)*dx,(yi-0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
-    if (mem_f((xi-0.5)*dx,(yi+0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
-    if (mem_f((xi-0.5)*dx,(yi-0.5)*dx,(zi+0.5)*dx) <= 0) {return true;}
-    if (mem_f((xi-0.5)*dx,(yi+0.5)*dx,(zi+0.5)*dx) <= 0) {return true;}
-    if (mem_f((xi+0.5)*dx,(yi-0.5)*dx,(zi+0.5)*dx) <= 0) {return true;}
-    if (mem_f((xi+0.5)*dx,(yi+0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
-    if (mem_f((xi+0.5)*dx,(yi+0.5)*dx,(zi+0.5)*dx) <= 0) {return true;}
-    return false;
+bool inside (int xi, int yi, int zi){
+  if (mem_f((xi-0.5)*dx,(yi-0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
+  if (mem_f((xi+0.5)*dx,(yi-0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
+  if (mem_f((xi-0.5)*dx,(yi+0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
+  if (mem_f((xi-0.5)*dx,(yi-0.5)*dx,(zi+0.5)*dx) <= 0) {return true;}
+  if (mem_f((xi-0.5)*dx,(yi+0.5)*dx,(zi+0.5)*dx) <= 0) {return true;}
+  if (mem_f((xi+0.5)*dx,(yi-0.5)*dx,(zi+0.5)*dx) <= 0) {return true;}
+  if (mem_f((xi+0.5)*dx,(yi+0.5)*dx,(zi-0.5)*dx) <= 0) {return true;}
+  if (mem_f((xi+0.5)*dx,(yi+0.5)*dx,(zi+0.5)*dx) <= 0) {return true;}
+  return false;
+}
+
+int get_J(double difD, double *nATP, double *nADP, double *nE,
+          double *JxATP, double *JyATP, double *JzATP,
+          double *JxADP, double *JyADP, double *JzADP,
+          double *JxE, double *JyE, double *JzE){
+  for(int xi=0;xi<Nx-1;xi++){
+    for(int yi=0;yi<Ny-1;yi++){
+      for(int zi=0;zi<Nz-1;zi++){
+        JzATP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nATP[xi*Ny*Nz+yi*Nz+zi+1]-nATP[xi*Ny*Nz+yi*Nz+zi])/dx;
+        JyATP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nATP[xi*Ny*Nz+(yi+1)*Nz+zi]-nATP[xi*Ny*Nz+yi*Nz+zi])/dx;
+        JxATP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nATP[(xi+1)*Ny*Nz+yi*Nz+zi]-nATP[xi*Ny*Nz+yi*Nz+zi])/dx;
+        JzADP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nADP[xi*Ny*Nz+yi*Nz+zi+1]-nADP[xi*Ny*Nz+yi*Nz+zi])/dx;
+        JyADP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nADP[xi*Ny*Nz+(yi+1)*Nz+zi]-nADP[xi*Ny*Nz+yi*Nz+zi])/dx;
+        JxADP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nADP[(xi+1)*Ny*Nz+yi*Nz+zi]-nADP[xi*Ny*Nz+yi*Nz+zi])/dx;
+        JzE[xi*Ny*Nz+yi*Nz+zi] = -difD*(nE[xi*Ny*Nz+yi*Nz+zi+1]-nE[xi*Ny*Nz+yi*Nz+zi])/dx;
+        JyE[xi*Ny*Nz+yi*Nz+zi] = -difD*(nE[xi*Ny*Nz+(yi+1)*Nz+zi]-nE[xi*Ny*Nz+yi*Nz+zi])/dx;
+        JxE[xi*Ny*Nz+yi*Nz+zi] = -difD*(nE[(xi+1)*Ny*Nz+yi*Nz+zi]-nE[xi*Ny*Nz+yi*Nz+zi])/dx;
+      }
+    }
+  }
+  return 0;
+}
+
+int get_next_density(double *mem_A, bool *insideArr, double *nATP, double *nADP,
+                     double *nE, double *Nd, double *Nde,
+                     double *JxATP, double *JyATP, double *JzATP,
+                     double *JxADP, double *JyADP, double *JzADP,
+                     double *JxE, double *JyE, double *JzE){
+  for(int xi=0;xi<Nx-1;xi++){
+    for(int yi=0;yi<Ny-1;yi++){
+      for(int zi=0;zi<Nz-1;zi++){
+        //for the diffusion terms, we use dn/dt = dA*J/dV thinking in terms of tot #, but dA/dV=1/dx
+        if (insideArr[(xi+1)*Ny*Nz+yi*Nz+zi] && insideArr[xi*Ny*Nz+yi*Nz+zi]){
+          nADP[(xi+1)*Ny*Nz+yi*Nz+zi] += JxADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nADP[xi*Ny*Nz+yi*Nz+zi] -= JxADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nATP[(xi+1)*Ny*Nz+yi*Nz+zi] += JxATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nATP[xi*Ny*Nz+yi*Nz+zi] -= JxATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nE[(xi+1)*Ny*Nz+yi*Nz+zi] += JxE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nE[xi*Ny*Nz+yi*Nz+zi] -= JxE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+        }
+        if (insideArr[xi*Ny*Nz+(yi+1)*Nz+zi] && insideArr[xi*Ny*Nz+yi*Nz+zi]){
+          nADP[xi*Ny*Nz+(yi+1)*Nz+zi] += JyADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nADP[xi*Ny*Nz+yi*Nz+zi] -= JyADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nATP[xi*Ny*Nz+(yi+1)*Nz+zi] += JyATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nATP[xi*Ny*Nz+yi*Nz+zi] -= JyATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nE[xi*Ny*Nz+(yi+1)*Nz+zi] += JyE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nE[xi*Ny*Nz+yi*Nz+zi] -= JyE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+        }
+        if (insideArr[xi*Ny*Nz+yi*Nz+(zi+1)] && insideArr[xi*Ny*Nz+yi*Nz+zi]){
+          nADP[xi*Ny*Nz+yi*Nz+(zi+1)] += JzADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nADP[xi*Ny*Nz+yi*Nz+zi] -= JzADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nATP[xi*Ny*Nz+yi*Nz+(zi+1)] += JzATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nATP[xi*Ny*Nz+yi*Nz+zi] -= JzATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nE[xi*Ny*Nz+yi*Nz+(zi+1)] += JzE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+          nE[xi*Ny*Nz+yi*Nz+zi] -= JzE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
+        }
+      }
+    }
+  }
+  double ADP_to_ATP;
+  double de_to_ADP_E;
+  double ATP_to_d;
+  double E_d_to_de;
+  for(int xi=0;xi<Nx;xi++){
+    for(int yi=0;yi<Ny;yi++){
+      for(int zi=0;zi<Nz;zi++){
+        ADP_to_ATP = rate_ADP_ATP*nADP[xi*Ny*Nz+yi*Nz+zi]*time_step;
+        de_to_ADP_E = rate_de*NDE[xi*Ny*Nz+yi*Nz+zi]/mem_A[xi*Ny*Nz+yi*Nz+zi]*time_step;
+        ATP_to_d = (rate_D + rate_dD*(ND[xi*Ny*Nz+yi*Nz+zi] + NDE[xi*Ny*Nz+yi*Nz+zi])/mem_A[xi*Ny*Nz+yi*Nz+zi])
+          *nATP[xi*Ny*Nz+yi*Nz+zi]*time_step;
+        E_d_to_de = rate_E*ND[xi*Ny*Nz+yi*Nz+zi]/mem_A[xi*Ny*Nz+yi*Nz+zi]*nE[xi*Ny*Nz+yi*Nz+zi]*time_step;
+        //Jeff!  remember that when you gain cyto density and lose the same amount of wall density,
+        //the numbers of proteins gained/lost will be different, and it's the numbers that you want to be the same!!
+        //also, keep thinking about the issue below where all additions are divided and then mult by the same mem_A fun
+        nADP[xi*Ny*Nz+yi*Nz+zi] -= ADP_to_ATP;
+        nATP[xi*Ny*Nz+yi*Nz+zi] += ADP_to_ATP;
+        if (mem_A[xi*Ny*Nz+yi*Nz+zi] != 0){
+          NDE[xi*Ny*Nz+yi*Nz+zi] += -de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi];
+          nADP[xi*Ny*Nz+yi*Nz+zi] += de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
+          nE[xi*Ny*Nz+yi*Nz+zi] += de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
+
+          nATP[xi*Ny*Nz+yi*Nz+zi] -= ATP_to_d*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
+          ND[xi*Ny*Nz+yi*Nz+zi] += ATP_to_d*mem_A[xi*Ny*Nz+yi*Nz+zi];
+
+          nE[xi*Ny*Nz+yi*Nz+zi] -= E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
+          ND[xi*Ny*Nz+yi*Nz+zi] -= E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
+          NDE[xi*Ny*Nz+yi*Nz+zi] += E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
+        }
+      }
+    }
+  }
+  return 0;
+}
+
+int set_density(double *nATP, double *nE, double *mem_A){
+  int right_most_point_z=0; //left and right most points for z
+  int left_most_point_z=Nz;
+  int right_most_point_y=0; //"left" and "right" most points for y, in terms of magnitude (right = larger y value)
+  int left_most_point_y=Ny;
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          if (k>right_most_point_z){
+            right_most_point_z = k;
+          }
+          if(k<left_most_point_z){
+            left_most_point_z = k;
+          }
+          if (j>right_most_point_y){
+            right_most_point_y = j;
+          }
+          if (j<left_most_point_y){
+            left_most_point_y = j;
+          }
+        }
+      }
+    }
   }
 
-  int get_J(double difD, double *nATP, double *nADP, double *nE,
-            double *JxATP, double *JyATP, double *JzATP,
-            double *JxADP, double *JyADP, double *JzADP,
-            double *JxE, double *JyE, double *JzE){
-    for(int xi=0;xi<Nx-1;xi++){
-      for(int yi=0;yi<Ny-1;yi++){
-        for(int zi=0;zi<Nz-1;zi++){
-          JzATP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nATP[xi*Ny*Nz+yi*Nz+zi+1]-nATP[xi*Ny*Nz+yi*Nz+zi])/dx;
-          JyATP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nATP[xi*Ny*Nz+(yi+1)*Nz+zi]-nATP[xi*Ny*Nz+yi*Nz+zi])/dx;
-          JxATP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nATP[(xi+1)*Ny*Nz+yi*Nz+zi]-nATP[xi*Ny*Nz+yi*Nz+zi])/dx;
-          JzADP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nADP[xi*Ny*Nz+yi*Nz+zi+1]-nADP[xi*Ny*Nz+yi*Nz+zi])/dx;
-          JyADP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nADP[xi*Ny*Nz+(yi+1)*Nz+zi]-nADP[xi*Ny*Nz+yi*Nz+zi])/dx;
-          JxADP[xi*Ny*Nz+yi*Nz+zi] = -difD*(nADP[(xi+1)*Ny*Nz+yi*Nz+zi]-nADP[xi*Ny*Nz+yi*Nz+zi])/dx;
-          JzE[xi*Ny*Nz+yi*Nz+zi] = -difD*(nE[xi*Ny*Nz+yi*Nz+zi+1]-nE[xi*Ny*Nz+yi*Nz+zi])/dx;
-          JyE[xi*Ny*Nz+yi*Nz+zi] = -difD*(nE[xi*Ny*Nz+(yi+1)*Nz+zi]-nE[xi*Ny*Nz+yi*Nz+zi])/dx;
-          JxE[xi*Ny*Nz+yi*Nz+zi] = -difD*(nE[(xi+1)*Ny*Nz+yi*Nz+zi]-nE[xi*Ny*Nz+yi*Nz+zi])/dx;
-        }
-      }
-    }
-    return 0;
-  }
+  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
 
-  int get_next_density(double *mem_A, bool *insideArr, double *nATP, double *nADP,
-                       double *nE, double *Nd, double *Nde,
-                       double *JxATP, double *JyATP, double *JzATP,
-                       double *JxADP, double *JyADP, double *JzADP,
-                       double *JxE, double *JyE, double *JzE){
-    for(int xi=0;xi<Nx-1;xi++){
-      for(int yi=0;yi<Ny-1;yi++){
-        for(int zi=0;zi<Nz-1;zi++){
-          //for the diffusion terms, we use dn/dt = dA*J/dV thinking in terms of tot #, but dA/dV=1/dx
-          if (insideArr[(xi+1)*Ny*Nz+yi*Nz+zi] && insideArr[xi*Ny*Nz+yi*Nz+zi]){
-            nADP[(xi+1)*Ny*Nz+yi*Nz+zi] += JxADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nADP[xi*Ny*Nz+yi*Nz+zi] -= JxADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nATP[(xi+1)*Ny*Nz+yi*Nz+zi] += JxATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nATP[xi*Ny*Nz+yi*Nz+zi] -= JxATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nE[(xi+1)*Ny*Nz+yi*Nz+zi] += JxE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nE[xi*Ny*Nz+yi*Nz+zi] -= JxE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-          }
-          if (insideArr[xi*Ny*Nz+(yi+1)*Nz+zi] && insideArr[xi*Ny*Nz+yi*Nz+zi]){
-            nADP[xi*Ny*Nz+(yi+1)*Nz+zi] += JyADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nADP[xi*Ny*Nz+yi*Nz+zi] -= JyADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nATP[xi*Ny*Nz+(yi+1)*Nz+zi] += JyATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nATP[xi*Ny*Nz+yi*Nz+zi] -= JyATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nE[xi*Ny*Nz+(yi+1)*Nz+zi] += JyE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nE[xi*Ny*Nz+yi*Nz+zi] -= JyE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-          }
-          if (insideArr[xi*Ny*Nz+yi*Nz+(zi+1)] && insideArr[xi*Ny*Nz+yi*Nz+zi]){
-            nADP[xi*Ny*Nz+yi*Nz+(zi+1)] += JzADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nADP[xi*Ny*Nz+yi*Nz+zi] -= JzADP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nATP[xi*Ny*Nz+yi*Nz+(zi+1)] += JzATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nATP[xi*Ny*Nz+yi*Nz+zi] -= JzATP[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nE[xi*Ny*Nz+yi*Nz+(zi+1)] += JzE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-            nE[xi*Ny*Nz+yi*Nz+zi] -= JzE[xi*Ny*Nz+yi*Nz+zi]/dx*time_step;
-          }
-        }
-      }
-    }
-    double ADP_to_ATP;
-    double de_to_ADP_E;
-    double ATP_to_d;
-    double E_d_to_de;
-    for(int xi=0;xi<Nx;xi++){
-      for(int yi=0;yi<Ny;yi++){
-        for(int zi=0;zi<Nz;zi++){
-          ADP_to_ATP = rate_ADP_ATP*nADP[xi*Ny*Nz+yi*Nz+zi]*time_step;
-          de_to_ADP_E = rate_de*NDE[xi*Ny*Nz+yi*Nz+zi]/mem_A[xi*Ny*Nz+yi*Nz+zi]*time_step;
-          ATP_to_d = (rate_D + rate_dD*(ND[xi*Ny*Nz+yi*Nz+zi] + NDE[xi*Ny*Nz+yi*Nz+zi])/mem_A[xi*Ny*Nz+yi*Nz+zi])
-            *nATP[xi*Ny*Nz+yi*Nz+zi]*time_step;
-          E_d_to_de = rate_E*ND[xi*Ny*Nz+yi*Nz+zi]/mem_A[xi*Ny*Nz+yi*Nz+zi]*nE[xi*Ny*Nz+yi*Nz+zi]*time_step;
-          //Jeff!  remember that when you gain cyto density and lose the same amount of wall density,
-          //the numbers of proteins gained/lost will be different, and it's the numbers that you want to be the same!!
-          //also, keep thinking about the issue below where all additions are divided and then mult by the same mem_A fun
-          nADP[xi*Ny*Nz+yi*Nz+zi] -= ADP_to_ATP;
-          nATP[xi*Ny*Nz+yi*Nz+zi] += ADP_to_ATP;
-          if (mem_A[xi*Ny*Nz+yi*Nz+zi] != 0){
-            NDE[xi*Ny*Nz+yi*Nz+zi] += -de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi];
-            nADP[xi*Ny*Nz+yi*Nz+zi] += de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
-            nE[xi*Ny*Nz+yi*Nz+zi] += de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
-
-            nATP[xi*Ny*Nz+yi*Nz+zi] -= ATP_to_d*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
-            ND[xi*Ny*Nz+yi*Nz+zi] += ATP_to_d*mem_A[xi*Ny*Nz+yi*Nz+zi];
-
-            nE[xi*Ny*Nz+yi*Nz+zi] -= E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
-            ND[xi*Ny*Nz+yi*Nz+zi] -= E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
-            NDE[xi*Ny*Nz+yi*Nz+zi] += E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
-          }
-        }
-      }
-    }
-    return 0;
-  }
-
-  int set_density(double *nATP, double *nE, double *mem_A){
-    int right_most_point_z=0; //left and right most points for z
-    int left_most_point_z=Nz;
-    int right_most_point_y=0; //"left" and "right" most points for y, in terms of magnitude (right = larger y value)
-    int left_most_point_y=Ny;
-    for (int i=0;i<Nx;i++){
-      for (int j=0;j<Ny;j++){
-        for (int k=0;k<Nz;k++){
-          if (inside(i,j,k)){
-            if (k>right_most_point_z){
-              right_most_point_z = k;
-            }
-            if(k<left_most_point_z){
-              left_most_point_z = k;
-            }
-            if (j>right_most_point_y){
-              right_most_point_y = j;
-            }
-            if (j<left_most_point_y){
-              left_most_point_y = j;
-            }
-          }
-        }
-      }
-    }
-
-    int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
-
-    //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
-    int gridpoints_left = 0;
-    int gridpoints_right = 0;
-    int gridpoints_total = 0;
-    for (int i=0;i<Nx;i++){
-      for (int j=0;j<Ny;j++){
-        for (int k=0;k<Nz;k++){
-          if (inside(i,j,k)){
-            gridpoints_total++;
-            if (k<=density_divider_z) {
-              gridpoints_left++;
-            }
-            else {
-              gridpoints_right++;
-            }
-          }
-        }
-      }
-    }
-
-    //compute density scale factors left and right of divide (to ensure correct protein #)
-    double density_factor_left = gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
-    double density_factor_right = density_factor*gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
-
-    printf("Density factors: left: %f, right: %f, ratio: %f\n", density_factor_left, density_factor_right, density_factor_right/density_factor_left);
-
-    printf("Gridpoints left of the divider: %d\n",gridpoints_left);
-    printf("Gridpoints right of the divider:%d\n",gridpoints_right);
-    printf("Gridpoints total: %d\n",gridpoints_total);
-
-    //begin setting density at each gridpoint:
-    for (int i=0;i<Nx;i++){
-      for (int j=0;j<Ny;j++){
-        for (int k=0;k<Nz;k++){
-          if (inside(i,j,k)){
-            if(k>density_divider_z){
-              nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
-              nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
-              nADP[i*Ny*Nz+j*Nz+k] =0;
-              ND[i*Ny*Nz+j*Nz+k] =0;
-              NDE[i*Ny*Nz+j*Nz+k] = 0;
-            }
-            else {
-              nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left;
-              nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left;
-              nADP[i*Ny*Nz+j*Nz+k] =0;
-              ND[i*Ny*Nz+j*Nz+k] =0;
-              NDE[i*Ny*Nz+j*Nz+k] = 0;
-            }
+  //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
+  int gridpoints_left = 0;
+  int gridpoints_right = 0;
+  int gridpoints_total = 0;
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          gridpoints_total++;
+          if (k<=density_divider_z) {
+            gridpoints_left++;
           }
           else {
-            nATP[i*Ny*Nz+j*Nz+k] = 0;
-            nE[i*Ny*Nz+j*Nz+k] = 0;
+            gridpoints_right++;
+          }
+        }
+      }
+    }
+  }
+
+  //compute density scale factors left and right of divide (to ensure correct protein #)
+  double density_factor_left = gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
+  double density_factor_right = density_factor*gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
+
+  printf("Density factors: left: %f, right: %f, ratio: %f\n", density_factor_left, density_factor_right, density_factor_right/density_factor_left);
+
+  printf("Gridpoints left of the divider: %d\n",gridpoints_left);
+  printf("Gridpoints right of the divider:%d\n",gridpoints_right);
+  printf("Gridpoints total: %d\n",gridpoints_total);
+
+  //begin setting density at each gridpoint:
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          if(k>density_divider_z){
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
+            nADP[i*Ny*Nz+j*Nz+k] =0;
+            ND[i*Ny*Nz+j*Nz+k] =0;
+            NDE[i*Ny*Nz+j*Nz+k] = 0;
+          }
+          else {
+            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left;
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left;
             nADP[i*Ny*Nz+j*Nz+k] =0;
             ND[i*Ny*Nz+j*Nz+k] =0;
             NDE[i*Ny*Nz+j*Nz+k] = 0;
           }
         }
+        else {
+          nATP[i*Ny*Nz+j*Nz+k] = 0;
+          nE[i*Ny*Nz+j*Nz+k] = 0;
+          nADP[i*Ny*Nz+j*Nz+k] =0;
+          ND[i*Ny*Nz+j*Nz+k] =0;
+          NDE[i*Ny*Nz+j*Nz+k] = 0;
+        }
       }
     }
-    return 0;
   }
+  return 0;
+}
