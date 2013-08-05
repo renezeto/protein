@@ -21,30 +21,35 @@ const double nATP_starting_density = 1000.0/(M_PI*0.5*0.5); //proteins per micro
 const double nE_starting_density = 350.0/(M_PI*0.5*0.5); // proteins per micrometer
 double density_factor;
 
-const int n = 706; //what is this?
-
 int area_rating_flag = 0;
 int slice_flag = 0;
-int time_res_flag = 0;
 
-double dx;
-double tot_time;
-double time_step;
-int iter;
-int printout_iterations;
+int dump_flag = 0;
+
+char* hires_flag_str = new char[1024];
+char* slice_flag_str = new char[1024];
+
+double dx; //grid spacing
+double tot_time; //total simulation time
+double time_step; //simulation time step
+int iter; //total # of iterations
+int printout_iterations; //iterations between file printout
+
+int box_divider_left;
+int box_divider_right;
 
 double x, y, z;
-int Nx, Ny, Nz;
+int Nx, Ny, Nz; //number of gridpoints in each direction
 
-string mem_f_shape;
-double A, B, C, D;
+string mem_f_shape; //cell shape argument
+double A, B, C, D; //specific shape parameters, set by command line args
 
 //N denotes protein number, n denotes protein number density
 double *nATP; //min D bound to an ATP
 double *nADP; //min D bound to an ADP
 double *nE; //loose min E in cytoplasm
-double *Nd; //min D bound to ATP on the wall
-double *Nde; //min D bound to ATP and min E on the wall
+double *ND; //min D bound to ATP on the wall
+double *NDE; //min D bound to ATP and min E on the wall
 double *f_mem;
 
 const int starting_num_guassians=20;
@@ -53,6 +58,7 @@ const int random_num_guassians=5;
 int rand_seed=0; //=14; at this point I have this passed in from the command line as the D argument
 double Norm = 15.0; //This is the height of the guassians that make the cell wall
 
+//begin randst shape functions
 double rand_dis(double d0,double d_fac,int i) {
   int fac = 1;
   srand(i+rand_seed);
@@ -133,7 +139,9 @@ double f_2D_randst(double y, double z){
   }
   return f;
 }
+//end randst shape functions
 
+//mem_f produces a scalar field on the grid. points where mem_f = 0 are cell wall. 
 double mem_f(double x, double y, double z) {
   if(mem_f_shape=="randst" || mem_f_shape=="TIE_fighter" || mem_f_shape=="triangle"){
     double f = 0;
@@ -291,7 +299,31 @@ double mem_f(double x, double y, double z) {
   }
 }
 
+
+//struct for storing plot information
+struct protein {
+  char* name;
+
+  //time_map
+  double* sum;
+
+  //box_plot
+  double* numLeft;
+  double* numMid;
+  double* numRight;
+
+  //arrow_plot
+  double* maxloc;
+};
+
+char* print_filename(const char* plotname, const char* proteinname) {
+  char* filename = new char[1024];
+  sprintf(filename,"data/shape-%s/%s%s%s-%s-%1.2f-%1.2f-%1.2f-%1.2f-%1.2f.dat",mem_f_shape.c_str(),hires_flag_str,slice_flag_str,plotname,proteinname,A,B,C,D,density_factor);
+  return filename;
+}
+
 int main (int argc, char *argv[]) {
+  //command line parameters
   mem_f_shape = argv[1];
   A = atof(argv[2]);
   B = atof(argv[3]);
@@ -300,6 +332,7 @@ int main (int argc, char *argv[]) {
   density_factor = atof(argv[6]);
   dx=.15;
 
+  //flag checking
   for (int i=0; i<argc; i++) {
     if (strcmp(argv[i],"-area")==0) {
       area_rating_flag = 1;
@@ -308,10 +341,16 @@ int main (int argc, char *argv[]) {
     if (strcmp(argv[i],"-hires")==0) {
       dx=.05;
       printf("Using high resolution.\n");
+      sprintf(hires_flag_str,"hires-");
     }
     if (strcmp(argv[i],"-slice")==0) {
       slice_flag = 1;
       printf("Printing middle slice data.\n");
+      sprintf(slice_flag_str,"slice-");
+    }
+    if (strcmp(argv[i],"-dump")==0) {
+      dump_flag = 1;
+      printf("Printing all 501 data files.\n");
     }
     if (strcmp(argv[i],"-timeres")==0) {
       printf("Printing high time resolution data\n");
@@ -319,11 +358,11 @@ int main (int argc, char *argv[]) {
     }
   }
 
+  //fixed simulation parameters
   tot_time = 2500; //sec
-  time_step = .1*dx*dx/difD;//sec; if I change this at all, the program breaks??
+  time_step = .1*dx*dx/difD;//sec
   iter = int(tot_time/time_step);
   printout_iterations = int(5.0/time_step); //approximately 5 seconds between each printout
-  printf("%f, %f, %d, %d",tot_time,time_step,iter,printout_iterations);
   double dV = dx*dx*dx;
 
   //compute grid size based on cell parameters
@@ -331,6 +370,8 @@ int main (int argc, char *argv[]) {
     Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*B/dx) + 4;
     Nz = ceil((A + 2*B)/dx) + 4;
+    box_divider_left = int(Nz/3);//ceil((Nz*dx-A)/2);
+    box_divider_right = int(Nz/3); //ceil(A+(Nz*dx-A)/2);
   }
   if (mem_f_shape=="b") {
     Nx = ceil(A/dx) + 4;
@@ -382,13 +423,7 @@ int main (int argc, char *argv[]) {
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
 
-  time_t t = time(0);
-  struct tm * now = localtime( & t );
-  char * timevar = new char[1024];
-  sprintf(timevar, "%d/%d/%d at %d hours and %d minutes", now->tm_mon +1,now->tm_mday,now->tm_year +1900,now->tm_hour,now->tm_min);
-  fprintf(out_file,"This simulation was run on %s\n",timevar);
-  fflush(out_file);
-
+  //random stuff that needs to be contained
   fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
   for (int i=0;i<3*starting_num_guassians;i++){
     guass[i]=0;
@@ -426,13 +461,14 @@ int main (int argc, char *argv[]) {
       randomize_cell_wall(guass);
     }
   }
+  //end random stuff
 
-
+  //global arrays for storing simulation data
   nATP = new double[Nx*Ny*Nz];
   nADP = new double[Nx*Ny*Nz];
   nE = new double[Nx*Ny*Nz];
-  Nd = new double[Nx*Ny*Nz];
-  Nde = new double[Nx*Ny*Nz];
+  ND = new double[Nx*Ny*Nz];
+  NDE = new double[Nx*Ny*Nz];
   f_mem = new double[Nx*Ny*Nz];
   fprintf(out_file,"For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
           dx, tot_time, time_step, iter, printout_iterations);
@@ -450,10 +486,34 @@ int main (int argc, char *argv[]) {
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
 
-  //this was missing:
+  //initialize plot structs - 1kB prob too small
+  const int numProteins = 5;
+
+  protein* nATP_plot = new protein;
+  protein* nE_plot = new protein;
+  protein* nADP_plot = new protein;
+  protein* NDE_plot = new protein;
+  protein* ND_plot = new protein;
+
+  protein* proteinList[numProteins] = { nATP_plot, nADP_plot, nE_plot, ND_plot, NDE_plot };
+  double* accessGlobals[numProteins] = { nATP, nADP, nE, ND, NDE };
+
+  for (int pNum=0; pNum<numProteins; pNum++) {
+    proteinList[pNum]->sum = new double[Ny*Nz];
+    proteinList[pNum]->name = new char[1024];
+    proteinList[pNum]->numLeft = new double[iter];
+    proteinList[pNum]->numMid = new double[iter];
+    proteinList[pNum]->numRight = new double[iter];
+  }
+
+  sprintf(proteinList[0]->name,"nATP");
+  sprintf(proteinList[1]->name,"nADP");
+  sprintf(proteinList[2]->name,"nE");
+  sprintf(proteinList[3]->name,"ND");
+  sprintf(proteinList[4]->name,"NDE");
+
   set_membrane(out_file, mem_f, mem_A);
   set_curvature(mem_A,curvature);
-  //note: I changed set_membrane temporarily to not include the normals arrays.
 
   //begin area rating
   printf("Starting with the area rating stuff!!!!\n");
@@ -512,11 +572,13 @@ int main (int argc, char *argv[]) {
 
   double total_cell_volume = 0;
   double total_cell_area = 0;
+
   for (int i=0;i<Nx*Ny*Nz;i++){
     if (insideArr[i]==true) {
       total_cell_volume += dx*dx*dx;
     }
   }
+
   int i=int(Nx/2);
   printf("Hello!!!Nx=%d, x=%g, Nx/2=%d, x/2=%g\n",Nx,Nx*dx,i,Nx*dx/2.0);
   fflush(stdout);
@@ -572,7 +634,7 @@ int main (int argc, char *argv[]) {
 
   fflush(out_file);
 
-  //begin membrane printing
+  //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   char* outfilename = new char[1024];
   sprintf(outfilename,"data/shape-%s/membrane_files/membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
@@ -624,77 +686,61 @@ int main (int argc, char *argv[]) {
   set_density(nATP, nE, mem_A);
   fflush(out_file);
   printf("density set.\n");
-  // double bef_total_NATP=0;
-  // double bef_total_NADP=0;
-  // double bef_total_NE=0;
-  // double bef_total_Nde=0;
-  // double bef_total_Nd=0;
-  // double bef_total_N=0;
-  // double total_NATP=0;
-  // double total_NADP=0;
-  // double total_NE=0;
-  // double total_Nde=0;
-  // double total_Nd=0;
-  // double total_N=0;
-  // for (int i=0;i<Nx*Ny*Nz;i++){
-  //   bef_total_NATP += nATP[i]*dx*dx*dx;
-  //   bef_total_NADP += nADP[i]*dx*dx*dx;
-  //   bef_total_NE += nE[i]*dx*dx*dx;
-  //   bef_total_Nde += Nde[i];
-  //   bef_total_Nd += Nd[i];
-  // }
-  // bef_total_N = bef_total_NATP*2 + bef_total_NADP*2 + bef_total_NE + bef_total_Nde*3 + bef_total_Nd*2;
 
-  int percent = int(iter/100);
-  double time_for_percent;
-  bool check = true;
-  //  clock_t newtime; unused
-  clock_t start = clock();
-  int k=0;
 
-  // double* nATP_avg = new double[Nx*Ny*Nz];
-  // double* nE_avg = new double[Nx*Ny*Nz];
-  // double* nADP_avg = new double[Nx*Ny*Nz];
-  // double* nD_avg = new double[Nx*Ny*Nz];
+  //begin simulation
+  for (int i=0;i<iter;i++){
+    get_J(difD, nATP, nADP, nE, JxATP, JyATP,
+          JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
+    get_next_density(mem_A, insideArr, nATP, nADP, nE, ND, NDE, JxATP, JyATP, JzATP,
+                     JxADP, JyADP, JzADP, JxE, JyE, JzE);
 
-  if (time_res_flag==1) {
-    double off_center = C;
-    int left_divider = Nz/2 - int(off_center/dx);
-    int right_divider = Nz/2 + int(off_center/dx);
-    char *divider_and_cell_filename = new char[1000];
-    if (dx==.05) {
-      sprintf(divider_and_cell_filename,"data/shape-%s/hires-m-cell-dividers-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,off_center,D,density_factor);
-    } else {
-      sprintf(divider_and_cell_filename,"data/shape-%s/m-cell-dividers-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,off_center,D,density_factor);
-    }
-    FILE * divider_and_cell_file = fopen((const char*) divider_and_cell_filename, "w");
+    //capture plot information at each time step -- need to work after first 10%
+    for (int pNum=0; pNum<numProteins; pNum++) {
 
-    fprintf(divider_and_cell_file,"0.0 0.0 0.0 %03.2f\n0 0 0 %03.2f\n",left_divider*dx,right_divider*dx);
-    for(int a=0;a<Nx;a++) {
-      for(int b=0;b<Ny;b++) {
-        for(int c=0;c<Nz;c++) {
-          fprintf(divider_and_cell_file,"%03.2f\t%03.2f\t%03.2f\t%f\n",a*dx,b*dx,c*dx,mem_A[a*Ny*Nz+b*Nz+c]);
+      //time map
+      for (int a=0; a<Ny; a++) {
+        for (int b=0; b<Nz; b++) {
+          if (slice_flag==0) {
+            for (int c=0; c<Nx; c++) {
+              proteinList[pNum]->sum[a*Nz+b] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            }
+          }
+          else { 
+            proteinList[pNum]->sum[a*Nz+b] += accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
+          }
+        }
+      }
+
+      //box plot
+      for (int a=0; a<Ny; a++) { 
+        for (int b=0; b<Nz; b++) {
+          for (int c=0; c<Nx; c++) {
+            if (b < box_divider_left) { 
+              proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            }
+            if (b > box_divider_right) { 
+              proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            }
+            else {
+              proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            }
+          }
         }
       }
     }
-    fclose(divider_and_cell_file);
 
-    char *outfilenameDivisions = new char[1000];
-    if (dx==.05) {
-      sprintf(outfilenameDivisions, "data/shape-%s/hires-m-divisions-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
-    } else {
-      sprintf(outfilenameDivisions, "data/shape-%s/m-divisions-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
-    }
+    //begin file printing
+    if ((dump_flag == 1) && (i%printout_iterations == 0)) {
+      fprintf(out_file,"Printing at iteration number = %d\n",i);
 
-    FILE *Divisionsfile = fopen((const char *)outfilenameDivisions,"w");
-    delete[] outfilenameDivisions;
+      int k = i/printout_iterations;
 
-    char *compare_end_middle_filename = new char[1000];
-    if (dx==.05) {
-      sprintf(compare_end_middle_filename,"data/shape-%s/hires-m-compare-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
-    } else {
-      sprintf(compare_end_middle_filename,"data/shape-%s/m-compare-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f.dat", argv[1],argv[1],A,B,C,D,density_factor);
-    }
+      //begin nATP printing.
+      char *outfilenameATP = new char[1024];
+      sprintf(outfilenameATP, "data/shape-%s/%s%snATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
+      delete[] outfilenameATP;
 
     FILE *compare_end_middle_file = fopen((const char*)compare_end_middle_filename,"w");
     delete[] compare_end_middle_filename;
@@ -744,136 +790,11 @@ int main (int argc, char *argv[]) {
         }
       }
 
-      if (tot_wall_MinD_right < last_tot_MinD_right && last_last_tot_MinD_right < last_tot_MinD_right) {
-        period_condition+=1;
-        printf("tot = %f last tot = %f last_last tot = %f\n", tot_wall_MinD_right, last_tot_MinD_right, last_last_tot_MinD_right);
-        fflush(stdout);
-      }
-      if (period_condition == 6) {
-        break;
-      }
-      if (period_condition == 4 || period_condition == 5) {
-        double ave_MinD_per_wall_right = tot_wall_MinD_right/tot_wall_right;
-        double ave_MinD_per_wall_middle = tot_wall_MinD_middle/tot_wall_middle;
-
-
-        // printf("ave_MinD_per_wall_right = %1.2f ave_MinD_per_wall_middle = %1.2f\n",ave_MinD_per_wall_right, ave_MinD_per_wall_middle);
-        // printf("tot_wall_MinD_right = %1.2f tot_wall_MinD_middle = %1.2f\n",tot_wall_MinD_right, tot_wall_MinD_middle);
-        // printf("tot_wall_right = %1.2f tot_wall_middle = %1.2f\n",tot_wall_right, tot_wall_middle);
-
-        fprintf(compare_end_middle_file,"%1.2f\t%1.2f\n",ave_MinD_per_wall_right,ave_MinD_per_wall_middle);
-
-        double NATPtotal_right = 0;
-        double NADPtotal_right = 0;
-        double Ndtotal_right = 0;
-        double Ndetotal_right = 0;
-        double NEtotal_right = 0;
-        double NflDtotal_right = 0;
-        double NflEtotal_right = 0;
-
-        double NATPtotal_mid = 0;
-        double NADPtotal_mid = 0;
-        double Ndtotal_mid = 0;
-        double Ndetotal_mid = 0;
-        double NEtotal_mid = 0;
-        double NflDtotal_mid = 0;
-        double NflEtotal_mid = 0;
-
-        double NATPtotal_left = 0;
-        double NADPtotal_left = 0;
-        double Ndtotal_left = 0;
-        double Ndetotal_left = 0;
-        double NEtotal_left = 0;
-        double NflDtotal_left = 0;
-        double NflEtotal_left = 0;
-
-        for (int a=0;a<Nx;a++){
-          for (int b=0;b<Ny;b++){
-            for (int c=0;c<Nz;c++){
-              if (c < left_divider){
-                NATPtotal_left += dV*nATP[a*Ny*Nz+b*Nz+c];
-                NADPtotal_left += dV*nADP[a*Ny*Nz+b*Nz+c];
-                Ndtotal_left += Nd[a*Ny*Nz+b*Nz+c];
-                Ndetotal_left += Nde[a*Ny*Nz+b*Nz+c];
-                NEtotal_left += dV*nE[a*Ny*Nz+b*Nz+c];
-                NflDtotal_left += dV*nATP[a*Ny*Nz+b*Nz+c] + dV*nADP[a*Ny*Nz+b*Nz+c] + Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-                NflEtotal_left += dV*nE[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-              } else if (c > right_divider){
-                NATPtotal_right += dV*nATP[a*Ny*Nz+b*Nz+c];
-                NADPtotal_right += dV*nADP[a*Ny*Nz+b*Nz+c];
-                Ndtotal_right += Nd[a*Ny*Nz+b*Nz+c];
-                Ndetotal_right += Nde[a*Ny*Nz+b*Nz+c];
-                NEtotal_right += dV*nE[a*Ny*Nz+b*Nz+c];
-                NflDtotal_right += dV*nATP[a*Ny*Nz+b*Nz+c] + dV*nADP[a*Ny*Nz+b*Nz+c] + Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-                NflEtotal_right += dV*nE[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-              } else {
-                NATPtotal_mid += dV*nATP[a*Ny*Nz+b*Nz+c];
-                NADPtotal_mid += dV*nADP[a*Ny*Nz+b*Nz+c];
-                Ndtotal_mid += Nd[a*Ny*Nz+b*Nz+c];
-                Ndetotal_mid += Nde[a*Ny*Nz+b*Nz+c];
-                NEtotal_mid += dV*nE[a*Ny*Nz+b*Nz+c];
-                NflDtotal_mid += dV*nATP[a*Ny*Nz+b*Nz+c] + dV*nADP[a*Ny*Nz+b*Nz+c] + Nd[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-                NflEtotal_mid += dV*nE[a*Ny*Nz+b*Nz+c] + Nde[a*Ny*Nz+b*Nz+c];
-              }
-            }
-          }
-        }
-        fprintf(Divisionsfile, "%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\t%1.2f\n",
-                NATPtotal_left, NADPtotal_left, Ndtotal_left, Ndetotal_left, NEtotal_left, NflDtotal_left, NflEtotal_left,
-                NATPtotal_mid, NADPtotal_mid, Ndtotal_mid, Ndetotal_mid, NEtotal_mid, NflDtotal_mid, NflEtotal_mid,
-                NATPtotal_right, NADPtotal_right, Ndtotal_right, Ndetotal_right, NEtotal_right, NflDtotal_right, NflEtotal_right, time_step*i);
-      }
-    }
-    fclose(compare_end_middle_file);
-    fclose(Divisionsfile);
-  } else {
-    for (int i=0;i<iter;i++){
-      get_J(difD, nATP, nADP, nE, JxATP, JyATP,
-            JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
-      get_next_density(mem_A, insideArr, nATP, nADP, nE, Nd, Nde, JxATP, JyATP, JzATP,
-                       JxADP, JyADP, JzADP, JxE, JyE, JzE);
-
-      if (i%percent == 0){
-        if (i!=0){
-          clock_t newtime = clock();
-          if (check){
-            time_for_percent = double(newtime - start)/CLOCKS_PER_SEC;
-            check = false;
-          }
-          int percents_to_go = int(iter/percent - i/percent);
-          if(percents_to_go%10==0 || percents_to_go == 99){
-            fprintf(out_file,"We are %d percent complete and have %f seconds to go!\n",
-                    i/percent, percents_to_go*time_for_percent);
-          }
-        }
-      }
-      //begin file printing
-      if (i%printout_iterations == 0) {
-        fprintf(out_file,"Printing at iteration number = %d\n",i);
-        //if(i>30){exit(1);}
-        //int k = i/printout_iterations;
-
-        //begin nATP printing.
-        char *outfilenameATP = new char[1000];
-        if (dx==.05) {
-          if (slice_flag==1) {
-            sprintf(outfilenameATP, "data/shape-%s/hires-nATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenameATP, "data/shape-%s/hires-m-nATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-        else {
-          if (slice_flag==1) {
-            sprintf(outfilenameATP, "data/shape-%s/nATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenameATP, "data/shape-%s/m-nATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-
-        FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
-        delete[] outfilenameATP;
+      //nE printing
+      char *outfilenameE = new char[1000];
+      sprintf(outfilenameE, "data/shape-%s/%s%snE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *nEfile = fopen((const char *)outfilenameE,"w");
+      delete[] outfilenameE;
 
         if (slice_flag==1) {
           for (int a=0;a<Ny;a++){
@@ -900,53 +821,11 @@ int main (int argc, char *argv[]) {
         }
         //end nATP printing
 
-        //nE printing
-        char *outfilenameE = new char[1000];
-        if (dx==.05) {
-          if (slice_flag==1) {
-            sprintf(outfilenameE, "data/shape-%s/hires-nE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenameE, "data/shape-%s/hires-m-nE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-        else {
-          if (slice_flag==1) {
-            sprintf(outfilenameE, "data/shape-%s/nE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenameE, "data/shape-%s/m-nE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-
-        FILE *nEfile = fopen((const char *)outfilenameE,"w");
-        delete[] outfilenameE;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(nEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(nEfile, "\n");
-          }
-          fclose(nEfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double nEsum = 0;
-              for (int c=0;c<Nx;c++){
-                nEsum += nE[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(nEfile, "%1.2f ", nEsum);
-            }
-            fprintf(nEfile, "\n");
-          }
-          fclose(nEfile);
-        }
-        //end nE printing
-
+      //nADP printing
+      char *outfilenameADP = new char[1000];
+      sprintf(outfilenameADP, "data/shape-%s/%s%snADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
+      delete[] outfilenameADP;
 
         //nADP printing
         char *outfilenameADP = new char[1000];
@@ -967,252 +846,175 @@ int main (int argc, char *argv[]) {
           }
         }
 
-        FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
-        delete[] outfilenameADP;
+      //begin ND printing
+      char *outfilenameD = new char[1000];
+      sprintf(outfilenameD, "data/shape-%s/%s%sND-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *NDfile = fopen((const char *)outfilenameD,"w");
+      delete[] outfilenameD;
 
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(nADPfile, "%1.2f ", nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(nADPfile, "\n");
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(NDfile, "%1.2f ", ND[(int(Nx/2))*Ny*Nz+a*Nz+b]);
           }
-          fclose(nADPfile);
+          fprintf(NDfile, "\n");
         }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double nADPsum = 0;
-              for (int c=0;c<Nx;c++){
-                nADPsum += nADP[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(nADPfile, "%1.2f ", nADPsum);
-            }
-            fprintf(nADPfile, "\n");
-          }
-          fclose(nADPfile);
-        }
-        //end nADP printing
-
-        //begin Nd printing
-        char *outfilenamed = new char[1000];
-        if (dx==.05) {
-          if (slice_flag==1) {
-            sprintf(outfilenamed, "data/shape-%s/hires-Nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenamed, "data/shape-%s/hires-m-Nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-        else {
-          if (slice_flag==1) {
-            sprintf(outfilenamed, "data/shape-%s/Nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenamed, "data/shape-%s/m-Nd-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-
-        FILE *Ndfile = fopen((const char *)outfilenamed,"w");
-        delete[] outfilenamed;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(Ndfile, "%1.2f ", Nd[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(Ndfile, "\n");
-          }
-          fclose(Ndfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double Ndsum = 0;
-              for (int c=0;c<Nx;c++){
-                Ndsum += Nd[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(Ndfile, "%1.2f ", Ndsum);
-            }
-            fprintf(Ndfile, "\n");
-          }
-          fclose(Ndfile);
-        }
-        //end Nd printing
-
-        //begin Nde printing
-        char *outfilenamede = new char[1000];
-        if (dx==.05) {
-          if (slice_flag==1) {
-            sprintf(outfilenamede, "data/shape-%s/hires-Nde-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenamede, "data/shape-%s/hires-m-Nde-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-        else {
-          if (slice_flag==1) {
-            sprintf(outfilenamede, "data/shape-%s/Nde-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenamede, "data/shape-%s/m-Nde-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-
-        FILE *Ndefile = fopen((const char *)outfilenamede,"w");
-        delete[] outfilenamede;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(Ndefile, "%1.2f ", Nde[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(Ndefile, "\n");
-          }
-          fclose(Ndefile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double Ndesum = 0;
-              for (int c=0;c<Nx;c++){
-                Ndesum += Nde[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(Ndefile, "%1.2f ", Ndesum);
-            }
-            fprintf(Ndefile, "\n");
-          }
-          fclose(Ndefile);
-        }
-        //end Nde printing
-
-        //begin flE printing
-        char *outfilenameflE = new char[1000];
-        if (dx==.05) {
-          if (slice_flag==1) {
-            sprintf(outfilenameflE, "data/shape-%s/hires-NflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenameflE, "data/shape-%s/hires-m-NflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-        else {
-          if (slice_flag==1) {
-            sprintf(outfilenameflE, "data/shape-%s/NflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenameflE, "data/shape-%s/m-NflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-
-        FILE *NflEfile = fopen((const char *)outfilenameflE,"w");
-        delete[] outfilenameflE;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(NflEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + Nde[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(NflEfile, "\n");
-          }
-          fclose(NflEfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double NflEsum = 0;
-              for (int c=0;c<Nx;c++){
-                NflEsum += nE[c*Ny*Nz+a*Nz+b]*dV + Nde[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(NflEfile, "%1.2f ", NflEsum);
-            }
-            fprintf(NflEfile, "\n");
-          }
-          fclose(NflEfile);
-        }
-        //end flE printing
-
-        //begin flD printing
-        char *outfilenameflD = new char[1000];
-        if (dx==.05) {
-          if (slice_flag==1) {
-            sprintf(outfilenameflD, "data/shape-%s/hires-NflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenameflD, "data/shape-%s/hires-m-NflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-        else {
-          if (slice_flag==1) {
-            sprintf(outfilenameflD, "data/shape-%s/NflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-          else {
-            sprintf(outfilenameflD, "data/shape-%s/m-NflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],argv[1],A,B,C,D,density_factor,k);
-          }
-        }
-
-        FILE *NflDfile = fopen((const char *)outfilenameflD,"w");
-        delete[] outfilenameflD;
-
-        if (slice_flag==1) {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              fprintf(NflDfile, "%1.2f ", Nde[(int(Nx/2))*Ny*Nz+a*Nz+b] + nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + Nd[(int(Nx/2))*Ny*Nz+a*Nz+b]);
-            }
-            fprintf(NflDfile, "\n");
-          }
-          fclose(NflDfile);
-        }
-
-        else {
-          for (int a=0;a<Ny;a++){
-            for (int b=0;b<Nz;b++){
-              double NflDsum = 0;
-              for (int c=0;c<Nx;c++){
-                NflDsum += Nde[c*Ny*Nz+a*Nz+b] + nADP[c*Ny*Nz+a*Nz+b]*dV + nATP[c*Ny*Nz+a*Nz+b]*dV + Nd[c*Ny*Nz+a*Nz+b];
-              }
-              fprintf(NflDfile, "%1.2f ", NflDsum);
-            }
-            fprintf(NflDfile, "\n");
-          }
-          fclose(NflDfile);
-        }
-        //end flD printing
-
-        k++;
-        fflush(out_file);
+        fclose(NDfile);
       }
-    //end file printing
-    // for (int i=0;i<Nx*Ny*Nz;i++){
-    //   total_NATP += nATP[i]*dx*dx*dx;
-    //   total_NADP += nADP[i]*dx*dx*dx;
-    //   total_NE += nE[i]*dx*dx*dx;
-    //   total_Nde += Nde[i];
-    //   total_Nd += Nd[i];
-    // }
-    // total_N = total_NATP*2 + total_NADP*2 + total_NE + total_Nde*3 + total_Nd*2;
-    // fprintf(out_file,"total before NATP is = %f\n",bef_total_NATP);
-    // fprintf(out_file,"total before NADP is = %f\n",bef_total_NADP);
-    // fprintf(out_file,"total before NE is = %f\n",bef_total_NE);
-    // fprintf(out_file,"total before Nd is = %f\n",bef_total_Nd);
-    // fprintf(out_file,"total before Nde is = %f\n",bef_total_Nde);
-    // fprintf(out_file,"total before N is = %f\n",bef_total_N);
-    // fprintf(out_file,"total after NATP is = %f\n",total_NATP);
-    // fprintf(out_file,"total after NADP is = %f\n",total_NADP);
-    // fprintf(out_file,"total after NE is = %f\n",total_NE);
-    // fprintf(out_file,"total after Nd is = %f\n",total_Nd);
-    // fprintf(out_file,"total after Nde is = %f\n",total_Nde);
-    // fprintf(out_file,"total after N is = %f\n",total_N);
-    // fflush(out_file);
-    // fprintf(out_file,"Program has Run!!");
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double NDsum = 0;
+            for (int c=0;c<Nx;c++){
+              NDsum += ND[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(NDfile, "%1.2f ", NDsum);
+          }
+          fprintf(NDfile, "\n");
+        }
+        fclose(NDfile);
+      }
+      //end ND printing
+
+      //begin NDE printing
+      char *outfilenameDE = new char[1000];
+      sprintf(outfilenameDE, "data/shape-%s/%s%sNDE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *NDEfile = fopen((const char *)outfilenameDE,"w");
+      delete[] outfilenameDE;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(NDEfile, "%1.2f ", NDE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fprintf(NDEfile, "\n");
+        }
+        fclose(NDEfile);
+      }
+
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double NDEsum = 0;
+            for (int c=0;c<Nx;c++){
+              NDEsum += NDE[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(NDEfile, "%1.2f ", NDEsum);
+          }
+          fprintf(NDEfile, "\n");
+        }
+        fclose(NDEfile);
+      }
+      //end NDE printing
+
+      //begin NflE printing
+      char *outfilenameflE = new char[1000];
+      sprintf(outfilenameflE, "data/shape-%s/%s%sNflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *NflEfile = fopen((const char *)outfilenameflE,"w");
+      delete[] outfilenameflE;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(NflEfile, "%1.2f ", nE[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + NDE[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fclose(NflEfile);
+        }
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double NflEsum = 0;
+            for (int c=0;c<Nx;c++){
+              NflEsum += nE[c*Ny*Nz+a*Nz+b]*dV + NDE[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(NflEfile, "\n");
+          }
+          fclose(NflEfile);
+        }
+        fclose(NflEfile);
+      }
+      //end NflE printing
+
+      //begin NflD printing
+      char *outfilenameflD = new char[1000];
+      sprintf(outfilenameflD, "data/shape-%s/%s%sNflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      FILE *NflDfile = fopen((const char *)outfilenameflD,"w");
+      delete[] outfilenameflD;
+
+      if (slice_flag==1) {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            fprintf(NflDfile, "%1.2f ", NDE[(int(Nx/2))*Ny*Nz+a*Nz+b] + nADP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + nATP[(int(Nx/2))*Ny*Nz+a*Nz+b]*dV + ND[(int(Nx/2))*Ny*Nz+a*Nz+b]);
+          }
+          fclose(NflDfile);
+        }
+      else {
+        for (int a=0;a<Ny;a++){
+          for (int b=0;b<Nz;b++){
+            double NflDsum = 0;
+            for (int c=0;c<Nx;c++){
+              NflDsum += NDE[c*Ny*Nz+a*Nz+b] + nADP[c*Ny*Nz+a*Nz+b]*dV + nATP[c*Ny*Nz+a*Nz+b]*dV + ND[c*Ny*Nz+a*Nz+b];
+            }
+            fprintf(NflDfile, "\n");
+          }
+          fclose(NflDfile);
+        }
+        fclose(NflDfile);
+      }
+      //end NflD printing
+      k++;
+      fflush(out_file);
     }
+    //end file printing
   }
+  //end simulation
+
   fclose(out_file);
-  //printing to the root directory so we have a shortlist of what we've done.
+
+  //printing plot information
+  for (int pNum=0; pNum<numProteins; pNum++) {
+
+    //time map
+    char *timename = new char[1024];
+    sprintf(timename,"%s",print_filename("time-map",proteinList[pNum]->name));
+    FILE* time_map = fopen(timename,"w");
+
+    for (int a=0; a<Ny; a++) {
+      for (int b=0; b<Nz; b++) {
+        fprintf(time_map,"%1.2f\t",(proteinList[pNum]->sum[a*Nz+b])/((double)iter));
+      }
+      fprintf(time_map,"\n");
+    }
+
+    fclose(time_map);
+    delete[] timename;
+  }
+
+  char *boxname = new char[1024];
+  sprintf(boxname,"%s",print_filename("box-plot",""));
+  FILE* box_plot = fopen(boxname,"w");
+
+  for (int pNum=0; pNum<numProteins; pNum++) {
+    for (int i=0; i<iter; i++) {
+      fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
+    }
+    fprintf(box_plot,"\n");
+    for (int i=0; i<iter; i++) {
+      fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i]));
+    }
+    fprintf(box_plot,"\n");
+    for (int i=0; i<iter; i++) {
+      fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i]));
+    }
+    fprintf(box_plot,"\n");
+    fprintf(box_plot,"\n");
+  }
+
+  fclose(box_plot);
+  delete[] boxname;
+
+  //printing to the project directory so we have a shortlist of what we've done.
   char *fname = new char[1024];
   sprintf(fname,"catalog.txt");
   FILE * catalog;
@@ -1241,46 +1043,12 @@ int main (int argc, char *argv[]) {
     }
     fclose(catalog);
   }
+  delete[] fname;
   //end catalog
-
-  // char* nATPavg_name = new char[1024];
-  // char* nEavg_name = new char[1024];
-  // char* nADPavg_name = new char[1024];
-  // char* nDavg_name = new char[1024];
-  // sprintf(nATPavg_name,"data/shape-%s/natp-avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // sprintf(nEavg_name,"data/shape-%s/ne-avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // sprintf(nADPavg_name,"data/shape-%s/nadp-avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // sprintf(nDavg_name,"data/shape-%s/nd-avg_density-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
-  // FILE* nATPavg_file = fopen((const char *)nATPavg_name,"w");
-  // FILE* nEavg_file = fopen((const char *)nEavg_name,"w");
-  // FILE* nADPavg_file = fopen((const char *)nADPavg_name,"w");
-  // FILE* nDavg_file = fopen((const char *)nDavg_name,"w");
-
-  // for (int i2=0; i2<Nx; i2++) {
-  //   for (int j2=0; j2<Ny; j2++) {
-  //     for (int k2=0; k2<Nz; k2++) {
-  //       nATP_avg[i2*Ny*Nz+j2*Nz+k2] *= 1/((double) iter);
-  //       nE_avg[i2*Ny*Nz+j2*Nz+k2] *= 1/((double) iter);
-  //       nADP_avg[i2*Ny*Nz+j2*Nz+k2] *= 1/((double) iter);
-  //       nD_avg[i2*Ny*Nz+j2*Nz+k2] *= 1/((double) iter);
-  //       fprintf(nATPavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nATP_avg[i2*Ny*Nz+j2*Nz+k2]);
-  //       fprintf(nEavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nE_avg[i2*Ny*Nz+j2*Nz+k2]);
-  //       fprintf(nADPavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nADP_avg[i2*Ny*Nz+j2*Nz+k2]);
-  //       fprintf(nDavg_file,"%g\t%g\t%g\t%g\n",i2*dx,j2*dx,k2*dx,nD_avg[i2*Ny*Nz+j2*Nz+k2]);
-  //       //x y z avg_density print to each file
-  //     }
-  //   }
-  // }
-  // fclose(nATPavg_file);
-  // fclose(nEavg_file);
-  // fclose(nADPavg_file);
-  // fclose(nDavg_file);
 
   return 0;
 }
 
-
-//problem with randst is in this function. it is taking far too long to do this calculation.
 void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
                   double mem_A[]) {
   clock_t old_time = clock();
@@ -1301,9 +1069,6 @@ void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z)
         double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
         double f = mem_f(xi*dx, yi*dx, zi*dx);
         mem_A[xi*Ny*Nz+yi*Nz+zi] = find_intersection(fXYZ, fXYz, fXyZ, fXyz, fxYZ, fxYz, fxyZ, fxyz, f);
-        // if (zi>Nz/3){
-        //   printf("First x=%g, y=%g, z=%g, mem_A=%g!!!\n",xi*dx,yi*dx,zi*dx,mem_A[xi*Ny*Nz+yi*Nz+zi]);
-        // }
       }
     }
   }
@@ -1319,25 +1084,8 @@ void set_curvature(double mem_A[], double curvature[]){
     for(int yi=0;yi<Ny;yi++){
       for(int zi=0;zi<Nz;zi++){
         if (mem_A[xi*Ny*Nz+yi*Nz+zi]==0 || (xi*dx+0.05)>x2 || (xi*dx-0.05)<x1 ){
-          //printf("x=%g, y=%g, z=%g, mem_A=%g!!!\n",xi*dx,yi*dx,zi*dx,mem_A[xi*Ny*Nz+yi*Nz+zi]);
           curvature[xi*Ny*Nz+yi*Nz+zi]=0;
         } else {
-          // double fXYZ = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
-          // double fXYz = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi-0.5)*dx);
-          // double fXyZ = mem_f((xi+0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
-          // double fXyz = mem_f((xi+0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
-          // double fxYZ = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
-          // double fxYz = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi-0.5)*dx);
-          // double fxyZ = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi+0.5)*dx);
-          // double fxyz = mem_f((xi-0.5)*dx, (yi-0.5)*dx, (zi-0.5)*dx);
-          // double f = mem_f(xi*dx, yi*dx, zi*dx);
-
-          // double fX = (fXYZ + fXYz + fXyZ + fXyz)/4;
-          // double fx = (fxYZ + fxYz + fxyZ + fxyz)/4;
-          // double fY = (fXYZ + fXYz + fxYZ + fxYz)/4;
-          // double fy = (fXyZ + fXyz + fxyZ + fxyz)/4;
-          // double fZ = (fXYZ + fXyZ + fxYZ + fxyZ)/4;
-          // double fz = (fXYz + fXyz + fxYz + fxyz)/4;
           double fX = mem_f((xi+0.5)*dx, yi*dx, zi*dx);
           double fx = mem_f((xi-0.5)*dx, yi*dx, zi*dx);
           double fY = mem_f(xi*dx, (yi+0.5)*dx, zi*dx);
@@ -1352,12 +1100,10 @@ void set_curvature(double mem_A[], double curvature[]){
           double constant = sqrt((df_dx)*(df_dx) + (df_dy)*(df_dy) + (df_dz)*(df_dz));
 
           curvature[xi*Ny*Nz+yi*Nz+zi] = 4*(fX + fx + fY + fy + fZ + fz - 6*f)/dx/dx/constant;
-          //printf("x=%g, y=%g, z=%g, curvature=%g\n",xi*dx,yi*dx,zi*dx,curvature[xi*Ny*Nz+yi*Nz+zi]);
         }
       }
     }
   }
-  printf("Done with set curvature! dx = %g\n",dx);
   fflush(stdout);
 }
 
@@ -1518,7 +1264,6 @@ double find_intersection(const double fXYZ, const double fXYz, const double fXyZ
     p = (line[ds]+line[cs]+eline)/2;
     dA += sqrt(p*(p-line[ds])*(p-line[cs])*(p-eline));
   }
-  //if (np > 6){cout << "There are more than six points in the cube!!!\n";}
   delete[] ptsx;
   delete[] ptsy;
   delete[] ptsz;
@@ -1556,7 +1301,6 @@ int get_J(double difD, double *nATP, double *nADP, double *nE,
           double *JxATP, double *JyATP, double *JzATP,
           double *JxADP, double *JyADP, double *JzADP,
           double *JxE, double *JyE, double *JzE){
-  //  double F; unused
   for(int xi=0;xi<Nx-1;xi++){
     for(int yi=0;yi<Ny-1;yi++){
       for(int zi=0;zi<Nz-1;zi++){
@@ -1619,26 +1363,26 @@ int get_next_density(double *mem_A, bool *insideArr, double *nATP, double *nADP,
     for(int yi=0;yi<Ny;yi++){
       for(int zi=0;zi<Nz;zi++){
         ADP_to_ATP = rate_ADP_ATP*nADP[xi*Ny*Nz+yi*Nz+zi]*time_step;
-        de_to_ADP_E = rate_de*Nde[xi*Ny*Nz+yi*Nz+zi]/mem_A[xi*Ny*Nz+yi*Nz+zi]*time_step;
-        ATP_to_d = (rate_D + rate_dD*(Nd[xi*Ny*Nz+yi*Nz+zi] + Nde[xi*Ny*Nz+yi*Nz+zi])/mem_A[xi*Ny*Nz+yi*Nz+zi])
+        de_to_ADP_E = rate_de*NDE[xi*Ny*Nz+yi*Nz+zi]/mem_A[xi*Ny*Nz+yi*Nz+zi]*time_step;
+        ATP_to_d = (rate_D + rate_dD*(ND[xi*Ny*Nz+yi*Nz+zi] + NDE[xi*Ny*Nz+yi*Nz+zi])/mem_A[xi*Ny*Nz+yi*Nz+zi])
           *nATP[xi*Ny*Nz+yi*Nz+zi]*time_step;
-        E_d_to_de = rate_E*Nd[xi*Ny*Nz+yi*Nz+zi]/mem_A[xi*Ny*Nz+yi*Nz+zi]*nE[xi*Ny*Nz+yi*Nz+zi]*time_step;
+        E_d_to_de = rate_E*ND[xi*Ny*Nz+yi*Nz+zi]/mem_A[xi*Ny*Nz+yi*Nz+zi]*nE[xi*Ny*Nz+yi*Nz+zi]*time_step;
         //Jeff!  remember that when you gain cyto density and lose the same amount of wall density,
         //the numbers of proteins gained/lost will be different, and it's the numbers that you want to be the same!!
         //also, keep thinking about the issue below where all additions are divided and then mult by the same mem_A fun
         nADP[xi*Ny*Nz+yi*Nz+zi] -= ADP_to_ATP;
         nATP[xi*Ny*Nz+yi*Nz+zi] += ADP_to_ATP;
         if (mem_A[xi*Ny*Nz+yi*Nz+zi] != 0){
-          Nde[xi*Ny*Nz+yi*Nz+zi] += -de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi];
+          NDE[xi*Ny*Nz+yi*Nz+zi] += -de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi];
           nADP[xi*Ny*Nz+yi*Nz+zi] += de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
           nE[xi*Ny*Nz+yi*Nz+zi] += de_to_ADP_E*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
 
           nATP[xi*Ny*Nz+yi*Nz+zi] -= ATP_to_d*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
-          Nd[xi*Ny*Nz+yi*Nz+zi] += ATP_to_d*mem_A[xi*Ny*Nz+yi*Nz+zi];
+          ND[xi*Ny*Nz+yi*Nz+zi] += ATP_to_d*mem_A[xi*Ny*Nz+yi*Nz+zi];
 
           nE[xi*Ny*Nz+yi*Nz+zi] -= E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi]/(dx*dx*dx);
-          Nd[xi*Ny*Nz+yi*Nz+zi] -= E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
-          Nde[xi*Ny*Nz+yi*Nz+zi] += E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
+          ND[xi*Ny*Nz+yi*Nz+zi] -= E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
+          NDE[xi*Ny*Nz+yi*Nz+zi] += E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
         }
       }
     }
@@ -1647,17 +1391,6 @@ int get_next_density(double *mem_A, bool *insideArr, double *nATP, double *nADP,
 }
 
 int set_density(double *nATP, double *nE, double *mem_A){
-  //  double NE_per_cell = 1000*dx*dx*dx; //possible change to 350
-  //  double NATP_per_cell = 350*dx*dx*dx; //possible change to 1000
-
-  //  double NE_stdev = sqrt(NE_per_cell); unused
-  //  double NATP_stdev = sqrt(NATP_per_cell); unused
-
-  //  printf("Total inside = %d\nTotal nE should be = %f\n NE per cell = %f\n", count_inside,count_inside*NE_per_cell, NE_per_cell);
-  //  printf("Total inside = %d\nTotal nATP should be = %f\n NE per cell = %f\n", count_inside,count_inside*NE_per_cell, NE_per_cell);
-  //.
-  //double r2,U,V; unused
-
   int right_most_point_z=0; //left and right most points for z
   int left_most_point_z=Nz;
   int right_most_point_y=0; //"left" and "right" most points for y, in terms of magnitude (right = larger y value)
@@ -1684,7 +1417,6 @@ int set_density(double *nATP, double *nE, double *mem_A){
   }
 
   int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
-  //int density_divider_y = int(right_most_point_y - (right_most_point_y - left_most_point_y)/3);
 
   //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
   int gridpoints_left = 0;
@@ -1725,28 +1457,26 @@ int set_density(double *nATP, double *nE, double *mem_A){
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
             nADP[i*Ny*Nz+j*Nz+k] =0;
-            Nd[i*Ny*Nz+j*Nz+k] =0;
-            Nde[i*Ny*Nz+j*Nz+k] = 0;
+            ND[i*Ny*Nz+j*Nz+k] =0;
+            NDE[i*Ny*Nz+j*Nz+k] = 0;
           }
           else {
             nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left;
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left;
             nADP[i*Ny*Nz+j*Nz+k] =0;
-            Nd[i*Ny*Nz+j*Nz+k] =0;
-            Nde[i*Ny*Nz+j*Nz+k] = 0;
+            ND[i*Ny*Nz+j*Nz+k] =0;
+            NDE[i*Ny*Nz+j*Nz+k] = 0;
           }
         }
         else {
           nATP[i*Ny*Nz+j*Nz+k] = 0;
           nE[i*Ny*Nz+j*Nz+k] = 0;
           nADP[i*Ny*Nz+j*Nz+k] =0;
-          Nd[i*Ny*Nz+j*Nz+k] =0;
-          Nde[i*Ny*Nz+j*Nz+k] = 0;
+          ND[i*Ny*Nz+j*Nz+k] =0;
+          NDE[i*Ny*Nz+j*Nz+k] = 0;
         }
-        //printf("inside set density, coords: %d %d %d.\n", i, j, k);
       }
     }
   }
-  printf("out of loop\n");
   return 0;
 }
