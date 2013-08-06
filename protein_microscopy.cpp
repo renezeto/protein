@@ -484,7 +484,7 @@ int main (int argc, char *argv[]) {
   //initialize plot structs - 1kB prob too small
   const int numProteins = 5;
 
-  protein* nATP_plot = new protein;
+  protein* nATP_plot = new protein; //why new?
   protein* nE_plot = new protein;
   protein* nADP_plot = new protein;
   protein* NDE_plot = new protein;
@@ -700,20 +700,20 @@ int main (int argc, char *argv[]) {
               proteinList[pNum]->sum[a*Nz+b] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
             }
           }
-          else { 
+          else {
             proteinList[pNum]->sum[a*Nz+b] += accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
           }
         }
       }
 
       //box plot
-      for (int a=0; a<Ny; a++) { 
+      for (int a=0; a<Ny; a++) {
         for (int b=0; b<Nz; b++) {
           for (int c=0; c<Nx; c++) {
-            if (b < box_divider_left) { 
+            if (b < box_divider_left) {
               proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
             }
-            if (b > box_divider_right) { 
+            if (b > box_divider_right) {
               proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
             }
             else {
@@ -970,10 +970,20 @@ int main (int argc, char *argv[]) {
       }
       fprintf(time_map,"\n");
     }
-  
+
     fclose(time_map);
     delete[] timename;
   }
+
+//   Reference for creating the randst dividers:
+//   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
+//   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
+//   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
+//                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
+//   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
+//                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+
+
 
   char *boxname = new char[1024];
   sprintf(boxname,"%s",print_filename("box-plot",""));
@@ -997,6 +1007,47 @@ int main (int argc, char *argv[]) {
 
   fclose(box_plot);
   delete[] boxname;
+
+  char *avename = new char[1024];
+  sprintf(avename,"%s",print_filename("ave_plot",""));
+  FILE* ave_plot = fopen(avename,"w");
+
+  double left_area_total = 0;
+  double middle_area_total = 0;
+  double right_area_total = 0;
+  for (int a=0;a<Ny; a++) {
+    for (int b=0; b<Nz; b++) {
+      for (int c=0; c<Nx; c++) {
+        if (b < box_divider_left) {
+          left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+        }
+        if (b > box_divider_right) {
+          right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+        }
+        else {
+          middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+        }
+      }
+    }
+  }
+
+  for (int pNum=0; pNum<numProteins; pNum++) {
+
+    for (int i=0; i<iter; i++) {
+      fprintf(ave_plot,"%1.2f\t",proteinList[pNum]->numLeft[i]/left_area_total);
+    }
+    fprintf(ave_plot,"\n");
+    for (int i=0; i<iter; i++) {
+      fprintf(ave_plot,"%1.2f\t",proteinList[pNum]->numMid[i]/middle_area_total);
+    }
+    fprintf(ave_plot,"\n");
+    for (int i=0; i<iter; i++) {
+      fprintf(ave_plot,"%1.2f\t",proteinList[pNum]->numRight[i]/right_area_total);
+    }
+    fprintf(ave_plot,"\n");
+  }
+  fclose(ave_plot);
+  delete[] avename;
 
   //printing to the project directory so we have a shortlist of what we've done.
   char *fname = new char[1024];
