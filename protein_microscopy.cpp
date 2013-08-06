@@ -311,6 +311,11 @@ struct protein {
   double* numMid;
   double* numRight;
 
+  double* numRightUp;
+  double* numRightDown;
+  double* numLeftUp;
+  double* numLeftDown;
+
   //arrow_plot
   double* maxloc;
 };
@@ -682,6 +687,40 @@ int main (int argc, char *argv[]) {
   fflush(out_file);
   printf("density set.\n");
 
+//   Reference for creating the randst dividers:
+//   the arrays are structured in the order of y,z,width, etc.  of the guassians that define the shape
+//   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
+//   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
+//   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
+//                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
+//   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
+//                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  double vert_div;
+  double vert_div_two;
+  double hor_div;
+  double hor_div_two;
+
+  if (mem_f_shape=="randst") {
+    if (rand_seed == 99) {
+      vert_div = 2.6/dx;
+      vert_div_two = 4.6/dx;
+    }
+    if (rand_seed == 98) {
+      vert_div = 3.0/dx;
+      vert_div_two = 4.8/dx;
+    }
+    if (rand_seed == 97) {
+      vert_div = 2.6/dx;
+      hor_div = 1.8/dx;
+      hor_div_two = 3.0/dx;
+    }
+    if (rand_seed == 96) {
+      vert_div = 1.7/dx;
+      hor_div = 1.7/dx;
+    }
+  }
+
+
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
@@ -710,14 +749,57 @@ int main (int argc, char *argv[]) {
       for (int a=0; a<Ny; a++) {
         for (int b=0; b<Nz; b++) {
           for (int c=0; c<Nx; c++) {
-            if (b < box_divider_left) {
-              proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            if (mem_f_shape == "p") {
+              if (b < box_divider_left) {
+                proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+              }
+              if (b > box_divider_right) {
+                proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+              }
+              else {
+                proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+              }
             }
-            if (b > box_divider_right) {
-              proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
-            }
-            else {
-              proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            if (mem_f_shape == "randst") {
+              if (rand_seed == 99 || rand_seed == 98) {
+                if (b < vert_div) {
+                  proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+                if (b > vert_div_two) {
+                  proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+                else {
+                  proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+              }
+              if (rand_seed == 97) {
+                if (b < vert_div) {
+                  proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+                else if (b > vert_div && a > hor_div_two) {
+                  proteinList[pNum]->numRightUp[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+                else if (b > vert_div && a < hor_div) {
+                  proteinList[pNum]->numRightDown[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+                else {
+                  proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+              }
+              if (rand_seed == 96) {
+                if (b < vert_div && a < hor_div) {
+                  proteinList[pNum]->numLeftDown[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+                else if (b < vert_div_two && a > hor_div) {
+                  proteinList[pNum]->numLeftUp[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+                else if (b > vert_div_two && a < hor_div) {
+                  proteinList[pNum]->numRightDown[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+                else {
+                  proteinList[pNum]->numRightUp[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
+              }
             }
           }
         }
@@ -974,35 +1056,65 @@ int main (int argc, char *argv[]) {
     fclose(time_map);
     delete[] timename;
   }
-
-//   Reference for creating the randst dividers:
-//   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
-//   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
-//   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
-//                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
-//   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
-//                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
-
-
-
   char *boxname = new char[1024];
   sprintf(boxname,"%s",print_filename("box-plot",""));
   FILE* box_plot = fopen(boxname,"w");
 
   for (int pNum=0; pNum<numProteins; pNum++) {
-    for (int i=0; i<iter; i++) {
-      fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
+
+    if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98) {
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
+      }
+      fprintf(box_plot,"\n");
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i]));
+      }
+      fprintf(box_plot,"\n");
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i]));
+      }
+      fprintf(box_plot,"\n");
+      fprintf(box_plot,"\n");
     }
-    fprintf(box_plot,"\n");
-    for (int i=0; i<iter; i++) {
-      fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i]));
+    if (rand_seed == 97) {
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
+      }
+      fprintf(box_plot,"\n");
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i]));
+      }
+      fprintf(box_plot,"\n");
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i]));
+      }
+      fprintf(box_plot,"\n");
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i]));
+      }
+      fprintf(box_plot,"\n");
+      fprintf(box_plot,"\n");
     }
-    fprintf(box_plot,"\n");
-    for (int i=0; i<iter; i++) {
-      fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i]));
+    if (rand_seed == 96) {
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i]));
+      }
+      fprintf(box_plot,"\n");
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftUp[i]));
+      }
+      fprintf(box_plot,"\n");
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftDown[i]));
+      }
+      fprintf(box_plot,"\n");
+      for (int i=0; i<iter; i++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i]));
+      }
+      fprintf(box_plot,"\n");
+      fprintf(box_plot,"\n");
     }
-    fprintf(box_plot,"\n");
-    fprintf(box_plot,"\n");
   }
 
   fclose(box_plot);
