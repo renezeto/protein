@@ -106,7 +106,7 @@ double f_2D_TIE_fighter(double y, double z){
 
 double f_2D_triangle(double y, double z){
   double f = 0; double Y = Ny*dx; double Z = Nz*dx;
-  double y1 = A + 2*dx; double z1 = A + 2*dx;
+  double y1 = A+2*dx; double z1 = A+2*dx;
   double y2 = Y-A-2*dx; double z2 = z1;
   double y3 = Y/2.0; double z3 = Z-A-2*dx;
   double b1 = (z3-z1)/(y3-y1); double a1 = z1 - b1*y1;
@@ -326,6 +326,36 @@ char* print_filename(const char* plotname, const char* proteinname) {
   return filename;
 }
 
+string triangle_section (double y, double z) {
+  double Y = Ny*dx;
+  double Z = Nz*dx;
+
+  double y1 = Y/2.0; double z1 = sqrt(3)/6.0*(Y-4*dx-2*A)+2*dx;
+  double y2 = 3.0/4.0*Y-dx-A/2.0; double z2 = Z/2.0;
+  double y3 = Y/4.0+dx+A/2.0; double z3 = z2;
+
+  double slope_r = (z2-z1)/(y2-y1);
+  double slope_l = (z1-z3)/(y1-y3);
+  if (y > y1) {
+    if (z < slope_r*(y-Y/2.0) + z1) {
+      return "Right";
+    }
+    else {
+      return "Mid";
+    }
+  }
+  if (y < y2) {
+    if (z < slope_l*(y-Y/2.0) + z1) {
+      return "Left";
+    }
+    else {
+      return "Mid";
+    }
+  }
+  else printf("There was no section chosen for the triangle section function!!\n");
+  exit(1);
+}
+
 int main (int argc, char *argv[]) {
   //command line parameters
   mem_f_shape = argv[1];
@@ -400,7 +430,7 @@ int main (int argc, char *argv[]) {
   if (mem_f_shape=="triangle") {
     Nx = ceil(A/dx) + 4;
     Ny = ceil(B/dx) + 4;
-    Nz = ceil(C/dx) + 4;
+    Nz = ceil(B/dx) + 4;
   }
   if (mem_f_shape=="st") {
     Nx = ceil(2*B/dx) + 4;
@@ -695,10 +725,13 @@ int main (int argc, char *argv[]) {
 //                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
 //   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
 //                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+
+
   double vert_div;
   double vert_div_two;
   double hor_div;
   double hor_div_two;
+
 
   if (mem_f_shape=="randst") {
     if (rand_seed == 99) {
@@ -720,7 +753,7 @@ int main (int argc, char *argv[]) {
     }
   }
 
-
+  
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
@@ -800,6 +833,17 @@ int main (int argc, char *argv[]) {
                   else {
                     proteinList[pNum]->numRightUp[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
+                }
+              }
+              if (mem_f_shape == "triangle") {
+                if (triangle_section(a*dx,b*dx) == "Left") {
+                    proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  }
+                if (triangle_section(a*dx,b*dx) == "Right") {
+                    proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  }
+                if (triangle_section(a*dx,b*dx) == "Mid") {
+                  proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                 }
               }
             }
@@ -1064,7 +1108,7 @@ int main (int argc, char *argv[]) {
 
   for (int pNum=0; pNum<numProteins; pNum++) {
 
-    if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98) {
+    if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98 || mem_f_shape == "triangle") {
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
       }
@@ -1197,6 +1241,7 @@ int main (int argc, char *argv[]) {
 
   return 0;
 }
+
 
 void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
                   double mem_A[]) {
