@@ -29,7 +29,7 @@ f_param3 = sys.argv[4]
 f_param4 = sys.argv[5]
 f_param5 = sys.argv[6]
 
-box_file =  "./data/shape-"+f_shape+"/"+hires_str+"box-plot"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".dat"
+box_file =  "./data/shape-"+f_shape+"/"+hires_str+"box-plot--"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".dat"
 
 compare_file = "./data/shape-"+f_shape+"/"+hires_str+"m-compare-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".dat"
 
