@@ -761,7 +761,7 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  
+
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
