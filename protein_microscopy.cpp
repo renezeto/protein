@@ -105,10 +105,15 @@ double f_2D_TIE_fighter(double y, double z){
 }
 
 double f_2D_triangle(double y, double z){
-  double f = 0; double Y = Ny*dx; double Z = Nz*dx;
-  double y1 = A+2*dx; double z1 = A+2*dx;
-  double y2 = Y-A-2*dx; double z2 = z1;
-  double y3 = Y/2.0; double z3 = Z-A-2*dx;
+  double Y = Ny*dx; double Z = Nz*dx; // total width and height of grid
+  double y1 = A+2*dx; double z1 = A+2*dx; // lower left corner of triangle
+  if (z < z1) {
+    return 0.1; // it's too low to be in the triangle
+  }
+  double y2 = Y-A-2*dx; double z2 = z1; // lower right corner of triangle
+  double y3 = Y/2.0; double z3 = Z-A-2*dx; // top corner of triangle
+  //double y_from_lower_left_corner = y - y1;
+  //double z_from_lower_left_corner = z - z1;
   double b1 = (z3-z1)/(y3-y1); double a1 = z1 - b1*y1;
   double b3 = (z2-z3)/(y2-y3); double a3 = z3 - b3*y3;
   double zl1 = b1*y +a1;
@@ -116,11 +121,10 @@ double f_2D_triangle(double y, double z){
   double rad = 1.75*(y2-y1)*sqrt(3.0)/6.0;
   double y_circle = Y/2.0; double z_circle = z1 + sqrt(3)*(y2-y1)/6.0;
   if ((z < zl1) && (z < zl3) && (z > z1) && ((z-z_circle)*(z-z_circle) + (y-y_circle)*(y-y_circle)) < rad*rad){
-    f = -0.1;
+    return -0.1;
   } else {
-    f = 0.1;
+    return 0.1;
   }
-  return f;
 }
 
 double f_2D_randst(double y, double z){
@@ -392,7 +396,8 @@ int main (int argc, char *argv[]) {
   tot_time = 2500; //sec
   time_step = .1*dx*dx/difD;//sec
   iter = int(tot_time/time_step);
-  printout_iterations = int(5.0/time_step); //approximately 5 seconds between each printout
+  printout_iterations = int(5.0/time_step);
+  printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
 
   //compute grid size based on cell parameters
@@ -600,21 +605,24 @@ int main (int argc, char *argv[]) {
   // set_insideArr(insideArr);
   // fprintf(out_file,"Finished with insideArr function.\n");
 
-  // double total_cell_volume = 0;
-  // double total_cell_area = 0;
+  double total_cell_volume = 0;
+  double total_cell_area = 0;
 
-  // for (int i=0;i<Nx*Ny*Nz;i++){
-  //   if (insideArr[i]==true) {
-  //     total_cell_volume += dx*dx*dx;
-  //   }
-  // }
+  for (int i=0;i<Nx*Ny*Nz;i++){
+    total_cell_area += mem_A[i];
+    if (insideArr[i]==true) {
+      total_cell_volume += dx*dx*dx;
+    }
+  }
+
+  //add cell params file
 
   // int i=int(Nx/2);
   // printf("Hello!!!Nx=%d, x=%g, Nx/2=%d, x/2=%g\n",Nx,Nx*dx,i,Nx*dx/2.0);
   // fflush(stdout);
   // for (int j=0;j<Ny;j++){
   //   for (int k=0;k<Nz;k++){
-  //     total_cell_area += mem_A[i*Ny*Nz+j*Nz+k];
+
   //     double area_rating = 0;
   //     double area_rating_two = 0;
   //     double area_rating_three = 0;
@@ -761,7 +769,7 @@ int main (int argc, char *argv[]) {
     get_next_density(mem_A, insideArr, nATP, nADP, nE, ND, NDE, JxATP, JyATP, JzATP,
                      JxADP, JyADP, JzADP, JxE, JyE, JzE);
 
-    if (false) {
+    if (i%100==0) {
       //capture plot information at each time step -- need to work after first 10%
       for (int pNum=0; pNum<numProteins; pNum++) {
 
@@ -874,7 +882,7 @@ int main (int argc, char *argv[]) {
         }
 
         else {
-          for (int a=0;a<Ny;a++){
+          for (int a=0;a<ny;a++){
             for (int b=0;b<Nz;b++){
               double nATPsum = 0;
               for (int c=0;c<Nx;c++){
