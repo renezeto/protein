@@ -1118,14 +1118,17 @@ int main (int argc, char *argv[]) {
   for (int pNum=0; pNum<numProteins; pNum++) {
 
     if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98 || mem_f_shape == "triangle") {
+      fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
       }
       fprintf(box_plot,"\n");
+      fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i]));
       }
       fprintf(box_plot,"\n");
+      fprintf(box_plot,"%s\tright\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i]));
       }
@@ -1133,18 +1136,22 @@ int main (int argc, char *argv[]) {
       fprintf(box_plot,"\n");
     }
     if (rand_seed == 97) {
+      fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
       }
       fprintf(box_plot,"\n");
+      fprintf(box_plot,"%s\trightup\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i]));
       }
+      fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
       fprintf(box_plot,"\n");
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i]));
       }
       fprintf(box_plot,"\n");
+      fprintf(box_plot,"%s\trightdown\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i]));
       }
@@ -1152,18 +1159,22 @@ int main (int argc, char *argv[]) {
       fprintf(box_plot,"\n");
     }
     if (rand_seed == 96) {
+      fprintf(box_plot,"%s\trightup\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i]));
       }
       fprintf(box_plot,"\n");
+      fprintf(box_plot,"%s\tleftup\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftUp[i]));
       }
       fprintf(box_plot,"\n");
+      fprintf(box_plot,"%s\tleftdown\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftDown[i]));
       }
       fprintf(box_plot,"\n");
+      fprintf(box_plot,"%s\trightdown\t",proteinList[pNum]->name);
       for (int i=0; i<iter; i++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i]));
       }
