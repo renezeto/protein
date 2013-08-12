@@ -883,7 +883,7 @@ int main (int argc, char *argv[]) {
         }
 
         else {
-          for (int a=0;a<ny;a++){
+          for (int a=0;a<Ny;a++){
             for (int b=0;b<Nz;b++){
               double nATPsum = 0;
               for (int c=0;c<Nx;c++){
