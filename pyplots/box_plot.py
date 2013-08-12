@@ -9,6 +9,8 @@ import file_loader_dump as load
 
 ## WIP!! 
 
+#[[j+k for (j,k) in zip(plot_lines[i-1], p.lines[i])]]
+
 #this is the ordering of proteins in the box plot list
 # sprintf(proteinList[0]->name,"nATP");
 # sprintf(proteinList[1]->name,"nADP");
@@ -25,18 +27,19 @@ def returnData(protein,boxName):
         proteinsOverTime = [line for line in f if (protein in line) and (boxName in line)]
     return proteinsOvertime
 
-#*args is a tuple of the function input separated by commas
 def stackData(plotList):
-    stackedPlotList = []
+    tempList = []
     for proteinData in plotList:
         splitString = proteinData.split('-')
         (protein, boxName) = (splitString[0], splitString[1])
-        stackedPlotList.append(returnData(protein, boxName))
-    stackedPlotList = ["list comprehension from old box plot wip"]
-        
+        tempList += [[returnData(protein, boxName)]]
+    stackedPlotList = [tempList[0]]
+    for i in range(1,len(stackedPlotList)):
+        stackedPlotList += [[j+k for (j,k) in zip(tempList[i-1],tempList[i])]]
+    return stackedPlotList
 
 def main():
-    returnData("nATP","left")
+    #enter command line arguments and it will automatically generate the right plot
     return 0
 
 if __name__ == '__main__':
