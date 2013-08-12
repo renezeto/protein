@@ -788,7 +788,7 @@ int main (int argc, char *argv[]) {
       }
 
       //box plot ...
-      if (i%100==0) {
+      if (i%1000==0) {
         for (int a=0; a<Ny; a++) {
           for (int b=0; b<Nz; b++) {
             for (int c=0; c<Nx; c++) {
