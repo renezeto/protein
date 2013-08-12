@@ -725,14 +725,14 @@ int main (int argc, char *argv[]) {
   fflush(out_file);
   printf("density set.\n");
 
-//   Reference for creating the randst dividers:
-//   the arrays are structured in the order of y,z,width, etc.  of the guassians that define the shape
-//   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
-//   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
-//   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
-//                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
-//   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
-//                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  //   Reference for creating the randst dividers:
+  //   the arrays are structured in the order of y,z,width, etc.  of the guassians that define the shape
+  //   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
+  //   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
+  //   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
+  //                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
+  //   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
+  //                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
 
 
   double vert_div;
@@ -769,25 +769,26 @@ int main (int argc, char *argv[]) {
     get_next_density(mem_A, insideArr, nATP, nADP, nE, ND, NDE, JxATP, JyATP, JzATP,
                      JxADP, JyADP, JzADP, JxE, JyE, JzE);
 
-    if (i%100==0) {
-      //capture plot information at each time step -- need to work after first 10%
-      for (int pNum=0; pNum<numProteins; pNum++) {
 
-        //time map
-        for (int a=0; a<Ny; a++) {
-          for (int b=0; b<Nz; b++) {
-            if (slice_flag==0) {
-              for (int c=0; c<Nx; c++) {
-                proteinList[pNum]->sum[a*Nz+b] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
-              }
-            }
-            else {
-              proteinList[pNum]->sum[a*Nz+b] += accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
+    //capture plot information at each time step -- need to work after first 10%
+    for (int pNum=0; pNum<numProteins; pNum++) {
+
+      //time map
+      for (int a=0; a<Ny; a++) {
+        for (int b=0; b<Nz; b++) {
+          if (slice_flag==0) {
+            for (int c=0; c<Nx; c++) {
+              proteinList[pNum]->sum[a*Nz+b] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
             }
           }
+          else {
+            proteinList[pNum]->sum[a*Nz+b] += accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
+          }
         }
+      }
 
-        //box plot
+      //box plot ...
+      if (i%100==0) {
         for (int a=0; a<Ny; a++) {
           for (int b=0; b<Nz; b++) {
             for (int c=0; c<Nx; c++) {
@@ -845,11 +846,11 @@ int main (int argc, char *argv[]) {
               }
               if (mem_f_shape == "triangle") {
                 if (triangle_section(a*dx,b*dx) == "Left") {
-                    proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
-                  }
+                  proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
                 if (triangle_section(a*dx,b*dx) == "Right") {
-                    proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
-                  }
+                  proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                }
                 if (triangle_section(a*dx,b*dx) == "Mid") {
                   proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                 }
