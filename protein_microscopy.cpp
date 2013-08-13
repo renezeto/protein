@@ -406,8 +406,8 @@ int main (int argc, char *argv[]) {
     Nx = ceil(2*B/dx) + 4;
     Ny = ceil(2*B/dx) + 4;
     Nz = ceil((A + 2*B)/dx) + 4;
-    box_divider_left = int(Nz/3);//ceil((Nz*dx-A)/2);
-    box_divider_right = int(Nz/3); //ceil(A+(Nz*dx-A)/2);
+    box_divider_left = int(Nz/3);
+    box_divider_right = int(2*Nz/3);
   }
   if (mem_f_shape=="b") {
     Nx = ceil(A/dx) + 4;
@@ -800,71 +800,77 @@ int main (int argc, char *argv[]) {
 
       //box plot ...
       if (i%print_denominator==0) {
+	if ((strcmp(proteinList[pNum]->name,"D_nATP")==0) || (strcmp(proteinList[pNum]->name,"E_nE")==0) || (strcmp(proteinList[pNum]->name,"D_nADP")==0)) {
+	  dV = dx*dx*dx;
+	}
+	else {
+	  dV = 1;
+	}
         int i_dat = i/print_denominator;
         for (int a=0; a<Ny; a++) {
           for (int b=0; b<Nz; b++) {
             for (int c=0; c<Nx; c++) {
               if (mem_f_shape == "p") {
-                if (b < box_divider_left) {
-                  proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+		if (b < box_divider_left) {
+                  proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
                 if (b > box_divider_right) {
-                  proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
                 else {
-                  proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
               }
               if (mem_f_shape == "randst") {
                 if (rand_seed == 99 || rand_seed == 98) {
                   if (b < vert_div) {
-                    proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   if (b > vert_div_two) {
-                    proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else {
-                    proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                 }
                 if (rand_seed == 97) {
                   if (b < vert_div) {
-                    proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else if (b > vert_div && a > hor_div_two) {
-                    proteinList[pNum]->numRightUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRightUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else if (b > vert_div && a < hor_div) {
-                    proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else {
-                    proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                 }
                 if (rand_seed == 96) {
                   if (b < vert_div && a < hor_div) {
-                    proteinList[pNum]->numLeftDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numLeftDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else if (b < vert_div_two && a > hor_div) {
-                    proteinList[pNum]->numLeftUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numLeftUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else if (b > vert_div_two && a < hor_div) {
-                    proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else {
-                    proteinList[pNum]->numRightUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRightUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                 }
               }
               if (mem_f_shape == "triangle") {
                 if (triangle_section(a*dx,b*dx) == "Left") {
-                  proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
                 if (triangle_section(a*dx,b*dx) == "Right") {
-                  proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
                 if (triangle_section(a*dx,b*dx) == "Mid") {
-                  proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
               }
             }
@@ -874,6 +880,7 @@ int main (int argc, char *argv[]) {
 
       //begin file printing
       if ((dump_flag == 1) && (i%printout_iterations == 0)) {
+	dV = dx*dx*dx;
         fprintf(out_file,"Printing at iteration number = %d\n",i);
 
         int k = i/printout_iterations;
