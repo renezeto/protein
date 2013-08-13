@@ -23,7 +23,7 @@ import file_loader_dump as load
 #where n(t) is the number of proteins of one type at time t
 
 #opens the file and grabs a particular line matching proteinType and boxName. returns list of protein counts at each time.
-def returnData(proteinType,boxName):
+def returnData(boxName,proteinType):
 
     #open the data file, grab the line with the correct protein type and box partition, load it as a [string] (so we can use list comprehensions)
     with open("./data/shape-%s/box-plot--%s-%s-%s-%s-%s.dat"%(load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
@@ -46,7 +46,7 @@ def stackData(plotList):
     for proteinData in plotList:
         splitString = proteinData.split('-')
         (protein, boxName) = (splitString[0], splitString[1])
-        tempList += [returnData(protein, boxName)]
+        tempList += [returnData(boxName,protein)]
 
     #"stack" the lists
     stackedPlotList = [tempList[0]]
@@ -70,21 +70,39 @@ def main():
     numBoxes = (len(fileLines) - numNewLines)/numProteinTypes
 
     #grab the names of the proteins used, and the names of the boxes
-    nameList = []
+    proteinTypeList = []
     boxList = []
     for line in fileLines:
         if (line != "\n"):
-            nameList += [line.split("\t")[0]]
+            proteinTypeList += [line.split("\t")[0]]
             boxList += [line.split("\t")[1]]
 
     #prune duplicates
-    nameList = list(set(nameList))
+    proteinTypeList = list(set(proteinTypeList))
     boxList = list(set(boxList))
 
 
     #plot scales. colors limited for now.
     colorScale = ["b","g","r","c","m","y"]
     alphaScale = [1/n for n in range(1,numProteinTypes)]
+
+    #generate list of proteinType and box combinations to feed into stackData
+    plotNameList = []
+    for box in boxList:
+        for proteinType in proteinTypeList:
+            plotNameList += ["%s-%s"%(box,proteinType)]
+
+    #pass plotNameList through stackData to generate the list of line data to be plotted
+    plotCurveList = stackData(plotNameList)
+
+    #get a time axis for the plot from the length of one of the data sets we have
+    timeAxis = range(len(plotCurveList[0]))
+
+    #generate the plot - wip
+    # plt.figure()
+    # for curve in plotCurveList:
+    #     plt.plot(timeAxis,curve)
+    # plt.savefig("test.pdf")
     return 0
 
 if __name__ == '__main__':
