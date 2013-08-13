@@ -522,10 +522,9 @@ int main (int argc, char *argv[]) {
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
 
-  //initialize plot structs - 1kB prob too small
   const int numProteins = 5;
 
-  protein* nATP_plot = new protein; //why new?
+  protein* nATP_plot = new protein;
   protein* nE_plot = new protein;
   protein* nADP_plot = new protein;
   protein* NDE_plot = new protein;
@@ -534,12 +533,21 @@ int main (int argc, char *argv[]) {
   protein* proteinList[numProteins] = { nATP_plot, nADP_plot, nE_plot, ND_plot, NDE_plot };
   double* accessGlobals[numProteins] = { nATP, nADP, nE, ND, NDE };
 
+  int print_denominator = 1000;
+
+  //initialize things
   for (int pNum=0; pNum<numProteins; pNum++) {
     proteinList[pNum]->sum = new double[Ny*Nz];
     proteinList[pNum]->name = new char[1024];
-    proteinList[pNum]->numLeft = new double[iter];
-    proteinList[pNum]->numMid = new double[iter];
-    proteinList[pNum]->numRight = new double[iter];
+
+    proteinList[pNum]->numLeft = new double[int(iter/print_denominator)+1];
+    proteinList[pNum]->numMid = new double[int(iter/print_denominator)+1];
+    proteinList[pNum]->numRight = new double[int(iter/print_denominator)+1];
+
+    proteinList[pNum]->numRightUp = new double[int(iter/print_denominator)+1];
+    proteinList[pNum]->numRightDown = new double[int(iter/print_denominator)+1];
+    proteinList[pNum]->numLeftUp = new double[int(iter/print_denominator)+1];
+    proteinList[pNum]->numLeftDown = new double[int(iter/print_denominator)+1];
   }
 
   sprintf(proteinList[0]->name,"nATP");
@@ -762,7 +770,7 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  int print_denominator = 1000;
+
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
