@@ -107,7 +107,7 @@ double f_2D_TIE_fighter(double y, double z){
 double f_2D_triangle(double y, double z){
   double Y = Ny*dx; double Z = Nz*dx; // total height and width of grid
   double z1 = A+2*dx; double y1 = A+2*dx; // lower left corner of triangle
-  if (z < z1) {
+  if (y < y1) {
     return 0.1; // it's too low to be in the triangle
   }
 
@@ -115,19 +115,20 @@ double f_2D_triangle(double y, double z){
   //Using law of cosines from lengths of sides we get top corner:
   double cos_theta = (B*B+D*D-C*C)/(2*B*D);
   double z3 = D*cos_theta; double y3 = Y-A-2*dx; // top corner of triangle
+  //printf("z1 = %g y1 = %g\nz2 = %g y2 = %g\nz3 = %g y3 = %g\n",z1,y1,z2,y2,z3,y3);
 
-  if (z < z3) {
-    double fac = (z-z1)/(z3-z1); //how far along the line the z coordinate is
-    double y_line = fac*(y3-y1)+y1; //the y coordinate of the line at the z point
-    if (y > y_line) {
-      return 0.1; // its outside the triangle on the left side
-    }
-  }
   if (z >= z3) {
     double fac = (z-z3)/(z2-z3); //how far along the line the z coordinate is
     double y_line = fac*(y2-y3)+y3; //the y coordinate of the line at the z point
     if (y > y_line) {
       return 0.1; // it's outside the triangle on the right side
+    }
+  }
+  if (z < z3) {
+    double fac = (z-z1)/(z3-z1); //how far along the line the z coordinate is
+    double y_line = fac*(y3-y1)+y1; //the y coordinate of the line at the z point
+    if (y > y_line) {
+      return 0.1; // its outside the triangle on the left side
     }
   }
   //double rad = 1.75*(z2-z1)*sqrt(3.0)/6.0;
@@ -342,6 +343,7 @@ char* print_filename(const char* plotname, const char* proteinname) {
 }
 
 string triangle_section (double y, double z) {
+  //needs editing!!!!!
   double Y = Ny*dx; double Z = Nz*dx; // total height and width of grid
   double z1 = A+2*dx; double y1 = A+2*dx; // lower left corner of triangle
   double z2 = Z-A-2*dx; double y2 = z1; // lower right corner of triangle
@@ -411,8 +413,8 @@ int main (int argc, char *argv[]) {
   //fixed simulation parameters
   tot_time = 2500; //sec
   time_step = .1*dx*dx/difD;//sec
+  iter = int(20*1000);
   //iter = int(tot_time/time_step);
-  iter = int(tot_time/time_step);
   printout_iterations = int(5.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
@@ -451,10 +453,10 @@ int main (int argc, char *argv[]) {
   }
   if (mem_f_shape=="triangle") {
     Nx = ceil(A/dx) + 4;
-    Nz = ceil(B/dx) + 4;
+    Nz = ceil((A+B)/dx) + 4;
     //Using law of cosines we get height of triangle:
     double theta = acos((B*B+D*D-C*C)/(2*B*D));
-    Ny = ceil(D*sin(theta)/dx) + 4;
+    Ny = ceil((A+D*sin(theta))/dx) + 4;
   }
   if (mem_f_shape=="st") {
     Nx = ceil(2*B/dx) + 4;
@@ -819,18 +821,18 @@ int main (int argc, char *argv[]) {
 
       //box plot ...
       if (i%print_denominator==0) {
-	if ((strcmp(proteinList[pNum]->name,"D_nATP")==0) || (strcmp(proteinList[pNum]->name,"E_nE")==0) || (strcmp(proteinList[pNum]->name,"D_nADP")==0)) {
-	  dV = dx*dx*dx;
-	}
-	else {
-	  dV = 1;
-	}
+        if ((strcmp(proteinList[pNum]->name,"D_nATP")==0) || (strcmp(proteinList[pNum]->name,"E_nE")==0) || (strcmp(proteinList[pNum]->name,"D_nADP")==0)) {
+          dV = dx*dx*dx;
+        }
+        else {
+          dV = 1;
+        }
         int i_dat = i/print_denominator;
         for (int a=0; a<Ny; a++) {
           for (int b=0; b<Nz; b++) {
             for (int c=0; c<Nx; c++) {
               if (mem_f_shape == "p") {
-		if (b < box_divider_left) {
+                if (b < box_divider_left) {
                   proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
                 if (b > box_divider_right) {
@@ -899,7 +901,7 @@ int main (int argc, char *argv[]) {
 
       //begin file printing
       if ((dump_flag == 1) && (i%printout_iterations == 0)) {
-	dV = dx*dx*dx;
+        dV = dx*dx*dx;
         fprintf(out_file,"Printing at iteration number = %d\n",i);
 
         int k = i/printout_iterations;
@@ -1154,7 +1156,7 @@ int main (int argc, char *argv[]) {
   FILE* box_plot = fopen(boxname,"w");
 
   for (int pNum=0; pNum<numProteins; pNum++) {
-    
+
     if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98 || mem_f_shape == "triangle") {
       fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
       for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
