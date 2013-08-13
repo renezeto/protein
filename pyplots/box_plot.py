@@ -29,6 +29,7 @@ def returnData(proteinType,boxName):
     with open("./data/shape-%s/box-plot--%s-%s-%s-%s-%s.dat"%(load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
         proteinsOverTime = [line for line in boxData if (proteinType in line) and (boxName in line)]
 
+
     #format the string so that it is a list of numbers (split on tab, pop off keywords and newlines, convert str -> float)
     proteinsOverTime = proteinsOverTime[0].split('\t')
     proteinsOverTime = proteinsOverTime[2:-1]
@@ -55,6 +56,35 @@ def stackData(plotList):
     return stackedPlotList
 
 def main():
+
+    with open("./data/shape-%s/box-plot--%s-%s-%s-%s-%s.dat"%(load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
+        fileLines = boxData.readlines()
+
+    #get number of boxes and protein types. little hokey but it works. in boxData.readlines(), there is exactly one '\n' newline string
+    #for each protein type block. therefor, the number of protein types is equal to the number of times "\n" appears by itself in the list.
+    numProteinTypes = len([line for line in fileLines if line=="\n"])
+    numNewLines = numProteinTypes
+
+    #it follows that the total number of lines in the data file, minus the number of blank lines in the data file, is equal to
+    #the number of protein types * the number of box types. divide by number of protein types to get number of box types.
+    numBoxes = (len(fileLines) - numNewLines)/numProteinTypes
+
+    #grab the names of the proteins used, and the names of the boxes
+    nameList = []
+    boxList = []
+    for line in fileLines:
+        if (line != "\n"):
+            nameList += [line.split("\t")[0]]
+            boxList += [line.split("\t")[1]]
+
+    #prune duplicates
+    nameList = list(set(nameList))
+    boxList = list(set(boxList))
+
+
+    #plot scales. colors limited for now.
+    colorScale = ["b","g","r","c","m","y"]
+    alphaScale = [1/n for n in range(1,numProteinTypes)]
     return 0
 
 if __name__ == '__main__':
