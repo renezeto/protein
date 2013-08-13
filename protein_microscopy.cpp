@@ -396,7 +396,7 @@ int main (int argc, char *argv[]) {
   tot_time = 2500; //sec
   time_step = .1*dx*dx/difD;//sec
   //iter = int(tot_time/time_step);
-  iter = int(20*1000);
+  iter = int(tot_time/time_step);
   printout_iterations = int(5.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
@@ -540,14 +540,14 @@ int main (int argc, char *argv[]) {
     proteinList[pNum]->sum = new double[Ny*Nz];
     proteinList[pNum]->name = new char[1024];
 
-    proteinList[pNum]->numLeft = new double[int(iter/print_denominator)+1];
-    proteinList[pNum]->numMid = new double[int(iter/print_denominator)+1];
-    proteinList[pNum]->numRight = new double[int(iter/print_denominator)+1];
+    proteinList[pNum]->numLeft = new double[iter];
+    proteinList[pNum]->numMid = new double[iter];
+    proteinList[pNum]->numRight = new double[iter];
 
-    proteinList[pNum]->numRightUp = new double[int(iter/print_denominator)+1];
-    proteinList[pNum]->numRightDown = new double[int(iter/print_denominator)+1];
-    proteinList[pNum]->numLeftUp = new double[int(iter/print_denominator)+1];
-    proteinList[pNum]->numLeftDown = new double[int(iter/print_denominator)+1];
+    proteinList[pNum]->numRightUp = new double[iter];
+    proteinList[pNum]->numRightDown = new double[iter];
+    proteinList[pNum]->numLeftUp = new double[iter];
+    proteinList[pNum]->numLeftDown = new double[iter];
   }
 
   sprintf(proteinList[0]->name,"nATP");
@@ -777,7 +777,7 @@ int main (int argc, char *argv[]) {
           JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
     get_next_density(mem_A, insideArr, nATP, nADP, nE, ND, NDE, JxATP, JyATP, JzATP,
                      JxADP, JyADP, JzADP, JxE, JyE, JzE);
-    if (i%1000==0) {
+    if (i%print_denominator==0) {
       printf("Finished sim loop # i=%d, We're %1.2f percent done\n",i,double(100*i/iter));
     }
 
