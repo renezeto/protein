@@ -550,11 +550,11 @@ int main (int argc, char *argv[]) {
     proteinList[pNum]->numLeftDown = new double[iter];
   }
 
-  sprintf(proteinList[0]->name,"nATP");
-  sprintf(proteinList[1]->name,"nADP");
-  sprintf(proteinList[2]->name,"nE");
-  sprintf(proteinList[3]->name,"ND");
-  sprintf(proteinList[4]->name,"NDE");
+  sprintf(proteinList[0]->name,"D_nATP");
+  sprintf(proteinList[1]->name,"D_nADP");
+  sprintf(proteinList[2]->name,"E_nE");
+  sprintf(proteinList[3]->name,"D_ND");
+  sprintf(proteinList[4]->name,"D_E_NDE");
 
   set_membrane(out_file, mem_f, mem_A);
   set_curvature(mem_A,curvature);
