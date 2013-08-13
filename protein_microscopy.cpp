@@ -395,7 +395,8 @@ int main (int argc, char *argv[]) {
   //fixed simulation parameters
   tot_time = 2500; //sec
   time_step = .1*dx*dx/difD;//sec
-  iter = int(tot_time/time_step);
+  //iter = int(tot_time/time_step);
+  iter = int(20*1000);
   printout_iterations = int(5.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
@@ -761,14 +762,16 @@ int main (int argc, char *argv[]) {
     }
   }
 
-
+  int print_denominator = 1000;
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
           JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
     get_next_density(mem_A, insideArr, nATP, nADP, nE, ND, NDE, JxATP, JyATP, JzATP,
                      JxADP, JyADP, JzADP, JxE, JyE, JzE);
-
+    if (i%1000==0) {
+      printf("Finished sim loop # i=%d, We're %1.2f percent done\n",i,double(100*i/iter));
+    }
 
     //capture plot information at each time step -- need to work after first 10%
     for (int pNum=0; pNum<numProteins; pNum++) {
@@ -788,71 +791,72 @@ int main (int argc, char *argv[]) {
       }
 
       //box plot ...
-      if (i%1000==0) {
+      if (i%print_denominator==0) {
+        int i_dat = i/print_denominator;
         for (int a=0; a<Ny; a++) {
           for (int b=0; b<Nz; b++) {
             for (int c=0; c<Nx; c++) {
               if (mem_f_shape == "p") {
                 if (b < box_divider_left) {
-                  proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                 }
                 if (b > box_divider_right) {
-                  proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                 }
                 else {
-                  proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                 }
               }
               if (mem_f_shape == "randst") {
                 if (rand_seed == 99 || rand_seed == 98) {
                   if (b < vert_div) {
-                    proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                   if (b > vert_div_two) {
-                    proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                   else {
-                    proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                 }
                 if (rand_seed == 97) {
                   if (b < vert_div) {
-                    proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                   else if (b > vert_div && a > hor_div_two) {
-                    proteinList[pNum]->numRightUp[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRightUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                   else if (b > vert_div && a < hor_div) {
-                    proteinList[pNum]->numRightDown[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                   else {
-                    proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                 }
                 if (rand_seed == 96) {
                   if (b < vert_div && a < hor_div) {
-                    proteinList[pNum]->numLeftDown[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numLeftDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                   else if (b < vert_div_two && a > hor_div) {
-                    proteinList[pNum]->numLeftUp[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numLeftUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                   else if (b > vert_div_two && a < hor_div) {
-                    proteinList[pNum]->numRightDown[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                   else {
-                    proteinList[pNum]->numRightUp[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                    proteinList[pNum]->numRightUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                   }
                 }
               }
               if (mem_f_shape == "triangle") {
                 if (triangle_section(a*dx,b*dx) == "Left") {
-                  proteinList[pNum]->numLeft[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                 }
                 if (triangle_section(a*dx,b*dx) == "Right") {
-                  proteinList[pNum]->numRight[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                 }
                 if (triangle_section(a*dx,b*dx) == "Mid") {
-                  proteinList[pNum]->numMid[i] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+                  proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
                 }
               }
             }
@@ -1116,67 +1120,67 @@ int main (int argc, char *argv[]) {
   FILE* box_plot = fopen(boxname,"w");
 
   for (int pNum=0; pNum<numProteins; pNum++) {
-
+    
     if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98 || mem_f_shape == "triangle") {
       fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"%s\tright\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"\n");
     }
     if (rand_seed == 97) {
       fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"%s\trightup\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_dat]));
       }
       fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
       fprintf(box_plot,"\n");
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"%s\trightdown\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"\n");
     }
     if (rand_seed == 96) {
       fprintf(box_plot,"%s\trightup\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"%s\tleftup\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftUp[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftUp[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"%s\tleftdown\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftDown[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftDown[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"%s\trightdown\t",proteinList[pNum]->name);
-      for (int i=0; i<iter; i++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i]));
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_dat]));
       }
       fprintf(box_plot,"\n");
       fprintf(box_plot,"\n");
