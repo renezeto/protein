@@ -103,25 +103,10 @@ def main():
     timeAxis = range(len(plotCurveList_D[0]))
 
     #generate the plot - wip
-    # plt.figure()
-    # for i in range(1,len(plotCurveList_D)):
-    #     if i==1:
-    #         plt.plot(timeAxis,plotCurveList_D[i],color=colorScale[i-1])
-    #         plt.fill_between(timeAxis,[0 for j in range(len(timeAxis))],plotCurveList_D[i],alpha=alphaScale[i-1],facecolor=colorScale[i-1])
-    #     else:
-    #         plt.plot(timeAxis,plotCurveList_D[i],color=colorScale[i-1])
-    #         plt.fill_between(timeAxis,plotCurveList_D[i-1],plotCurveList_D[i],alpha=alphaScale[i-1],facecolor=colorScale[i-1])
-    # plt.savefig("test_D.pdf")
-
-    # for i in range(1,len(plotCurveList_E)):
-    #     if i==1:
-    #         plt.plot(timeAxis,plotCurveList_E[i],color=colorScale[i-1])
-    #         plt.fill_between(timeAxis,[0 for j in range(len(timeAxis))],plotCurveList_E[i],alpha=alphaScale[i-1],facecolor=colorScale[i-1])
-    #     else:
-    #         plt.plot(timeAxis,plotCurveList_E[i],color=colorScale[i-1])
-    #         plt.fill_between(timeAxis,plotCurveList_E[i-1],plotCurveList_E[i],alpha=alphaScale[i-1],facecolor=colorScale[i-1])
-    # plt.savefig("test_E.pdf")
-
+    plt.figure()
+    for i in range(1,len(plotCurveList_D)):
+        print int(np.floor(i/numBoxes)), i
+        
     return 0
 
 if __name__ == '__main__':
