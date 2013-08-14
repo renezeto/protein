@@ -611,7 +611,7 @@ int main (int argc, char *argv[]) {
   // }
 
   // fprintf(out_file,"Finished opening area_rating file.\n");
-  // set_insideArr(insideArr);
+  set_insideArr(insideArr);
   // fprintf(out_file,"Finished with insideArr function.\n");
 
   double total_cell_volume = 0;
