@@ -104,18 +104,23 @@ double f_2D_TIE_fighter(double y, double z){
   return f;
 }
 
+bool only_print_once = true;
 double f_2D_triangle(double y, double z){
   double Y = Ny*dx; double Z = Nz*dx; // total height and width of grid
-  double z1 = A+2*dx; double y1 = A+2*dx; // lower left corner of triangle
+  double z1 = A/2.0+2*dx; double y1 = A/2.0+2*dx; // lower left corner of triangle
   if (y < y1) {
     return 0.1; // it's too low to be in the triangle
   }
 
-  double z2 = Z-A-2*dx; double y2 = z1; // lower right corner of triangle
+  double z2 = Z-A/2.0-2*dx; double y2 = y1; // lower right corner of triangle
   //Using law of cosines from lengths of sides we get top corner:
   double cos_theta = (B*B+D*D-C*C)/(2*B*D);
-  double z3 = D*cos_theta; double y3 = Y-A-2*dx; // top corner of triangle
-  //printf("z1 = %g y1 = %g\nz2 = %g y2 = %g\nz3 = %g y3 = %g\n",z1,y1,z2,y2,z3,y3);
+  double z3 = A/2.0+2*dx+D*cos_theta; double y3 = Y-A/2.0-2*dx; // top corner of triangle
+  if (only_print_once==true){
+    printf("z1 = %g y1 = %g\nz2 = %g y2 = %g\nz3 = %g y3 = %g\n",z1,y1,z2,y2,z3,y3);
+    printf("cos_theta = %g\nZ = %g Y = %g A = %g",cos_theta,Z,Y,A/2.0);
+    only_print_once = false;
+  }
 
   if (z >= z3) {
     double fac = (z-z3)/(z2-z3); //how far along the line the z coordinate is
@@ -342,14 +347,18 @@ char* print_filename(const char* plotname, const char* proteinname) {
   return filename;
 }
 
+bool only_once = true;
 string triangle_section (double y, double z) {
   //needs editing!!!!!
   double Y = Ny*dx; double Z = Nz*dx; // total height and width of grid
-  double z1 = A+2*dx; double y1 = A+2*dx; // lower left corner of triangle
-  double z2 = Z-A-2*dx; double y2 = z1; // lower right corner of triangle
+  double z1 = A/2.0+2*dx; double y1 = A/2.0+2*dx; // lower left corner of triangle
+  double z2 = Z-A/2.0-2*dx; double y2 = y1; // lower right corner of triangle
   //Using law of cosines from lengths of sides we get top corner:
   double cos_theta = (B*B+D*D-C*C)/(2*B*D);
-  double z3 = D*cos_theta; double y3 = Y-A-2*dx; // top corner of triangle
+  double z3 = A/2.0+2*dx+D*cos_theta; double y3 = Y-A/2.0-2*dx; // top corner of triangle
+  if (only_once == true) {
+    printf("z1 = %g y1 = %g\nz2 = %g y2 = %g\nz3 %g y3 = %g\n",z1,y1,z2,y2,z3,y3);
+  }
 
   //get bisecting points and lines:
   double y_21 = y1; double z_21 = (z2 + z1)/2.0;
@@ -362,17 +371,20 @@ string triangle_section (double y, double z) {
   //find centroid, which is where all three lines above intersect:
   double z_cen = (y3 - y1 + slope1*z1 - slope3*z3)/(slope1 -slope3);
   double y_cen = slope1*(z_cen-z1) + y1;
-
+  if (only_once ==true){
+    printf("z_cen = %g y_cen = %g\n",z_cen,y_cen);
+    only_once = false;
+  }
   if (z > z_cen) {
-    if (z > slope1*(z-z_cen)+y_cen) {
+    if (y > slope1*(z-z_cen)+y_cen) {
       return "Mid";
     }
   } else {
-    if (z > slope2*(z-z_13)+y_13) {
+    if (y > slope2*(z-z_13)+y_13) {
       return "Mid";
     }
   }
-  if (z > slope3*(z-z_cen)+y_cen) {
+  if (y > slope3*(z-z_cen)+y_cen) {
     return "Right";
   }
   return "Left";
@@ -725,7 +737,30 @@ int main (int argc, char *argv[]) {
   fflush(stdout);
   fclose(out);
   printf("\nMembrane file printed.\n");
-  //end membrane printing
+
+  char* outfilename_sections = new char[1024];
+  sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
+  for (int j=0;j<Ny;j++){
+    for (int i=0;i<Nz;i++) {
+      if (triangle_section(j*dx,i*dx)=="Right"){
+        marker = 1;
+      }
+      if (triangle_section(j*dx,i*dx)=="Mid"){
+        marker = 2;
+      }
+      if (triangle_section(j*dx,i*dx)=="Left"){
+        marker = 3;
+      }
+      fprintf(outfile_sections,"%g ",marker);
+    }
+    fprintf(outfile_sections,"\n");
+  }
+  fflush(stdout);
+  fclose(outfile_sections);
+  printf("\nMembrane sections file printed.\n");
+
+//end membrane printing
 
   //eventually uncommend and replace membrane.dat prints with mem_f prints for extrema.py
   //begin mem_f printing for randst, tie fighter, triangle - possibly do this for other shapes if needed -- NEEDS UPDATE.
