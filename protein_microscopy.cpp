@@ -873,17 +873,16 @@ int main (int argc, char *argv[]) {
                 if (b > box_divider_right) {
                   proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
-		if ((b <= box_divider_right) && (b >= box_divider_left)) {
+                if ((b <= box_divider_right) && (b >= box_divider_left)) {
                   proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
               }
-	      //these else statements might not work
               if (mem_f_shape == "randst") {
                 if (rand_seed == 99 || rand_seed == 98) {
                   if (b < vert_div) {
                     proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  if (b > vert_div_two) {
+                  else if (b > vert_div_two) {
                     proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else {
@@ -923,11 +922,11 @@ int main (int argc, char *argv[]) {
                 if (triangle_section(a*dx,b*dx) == "Left") {
                   proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
-                if (triangle_section(a*dx,b*dx) == "Right") {
+                else if (triangle_section(a*dx,b*dx) == "Right") {
                   proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
-                if (triangle_section(a*dx,b*dx) == "Mid") {
-                  proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
+                else {
+                    proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
               }
             }
