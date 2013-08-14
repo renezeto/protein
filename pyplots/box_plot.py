@@ -40,7 +40,6 @@ def returnData(boxName,proteinType):
 #takes input format: ["proteinType1-boxNum1","proteinType1-boxnum2",proteinType2-boxnum1"...]. will return a list of lists
 #in the stacking order specified by the input (first entry is at the bottom).
 def stackData(plotList):
-
     #parse the input
     tempList = []
     for proteinData in plotList:
@@ -51,7 +50,7 @@ def stackData(plotList):
     #"stack" the lists
     stackedPlotList = [tempList[0]]
     for i in range(1,len(tempList)):
-        stackedPlotList += [[j+k for (j,k) in zip(tempList[i-1],tempList[i])]]
+        stackedPlotList += [[j+k for (j,k) in zip(stackedPlotList[i-1],tempList[i])]]
 
     return stackedPlotList
 
@@ -87,22 +86,42 @@ def main():
     alphaScale = [1/n for n in range(1,numProteinTypes)]
 
     #generate list of proteinType and box combinations to feed into stackData
-    plotNameList = []
+    plotNameList_D = []
+    plotNameList_E = []
     for box in boxList:
         for proteinType in proteinTypeList:
-            plotNameList += ["%s-%s"%(box,proteinType)]
+            if "D_" in proteinType:
+                plotNameList_D += ["%s-%s"%(box,proteinType)]
+            if "E_" in proteinType:
+                plotNameList_E += ["%s-%s"%(box,proteinType)]
 
     #pass plotNameList through stackData to generate the list of line data to be plotted
-    plotCurveList = stackData(plotNameList)
+    plotCurveList_D = stackData(plotNameList_D)
+    plotCurveList_E = stackData(plotNameList_E)
 
     #get a time axis for the plot from the length of one of the data sets we have
-    timeAxis = range(len(plotCurveList[0]))
+    timeAxis = range(len(plotCurveList_D[0]))
 
     #generate the plot - wip
     # plt.figure()
-    # for curve in plotCurveList:
-    #     plt.plot(timeAxis,curve)
-    # plt.savefig("test.pdf")
+    # for i in range(1,len(plotCurveList_D)):
+    #     if i==1:
+    #         plt.plot(timeAxis,plotCurveList_D[i],color=colorScale[i-1])
+    #         plt.fill_between(timeAxis,[0 for j in range(len(timeAxis))],plotCurveList_D[i],alpha=alphaScale[i-1],facecolor=colorScale[i-1])
+    #     else:
+    #         plt.plot(timeAxis,plotCurveList_D[i],color=colorScale[i-1])
+    #         plt.fill_between(timeAxis,plotCurveList_D[i-1],plotCurveList_D[i],alpha=alphaScale[i-1],facecolor=colorScale[i-1])
+    # plt.savefig("test_D.pdf")
+
+    # for i in range(1,len(plotCurveList_E)):
+    #     if i==1:
+    #         plt.plot(timeAxis,plotCurveList_E[i],color=colorScale[i-1])
+    #         plt.fill_between(timeAxis,[0 for j in range(len(timeAxis))],plotCurveList_E[i],alpha=alphaScale[i-1],facecolor=colorScale[i-1])
+    #     else:
+    #         plt.plot(timeAxis,plotCurveList_E[i],color=colorScale[i-1])
+    #         plt.fill_between(timeAxis,plotCurveList_E[i-1],plotCurveList_E[i],alpha=alphaScale[i-1],facecolor=colorScale[i-1])
+    # plt.savefig("test_E.pdf")
+
     return 0
 
 if __name__ == '__main__':

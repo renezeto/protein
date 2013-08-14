@@ -817,10 +817,11 @@ int main (int argc, char *argv[]) {
                 if (b > box_divider_right) {
                   proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
-                else {
+		if ((b <= box_divider_right) && (b >= box_divider_left)) {
                   proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
               }
+	      //these else statements might not work
               if (mem_f_shape == "randst") {
                 if (rand_seed == 99 || rand_seed == 98) {
                   if (b < vert_div) {
