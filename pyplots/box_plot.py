@@ -83,7 +83,7 @@ def main():
 
     #plot scales. colors limited for now.
     colorScale = ["b","g","r","c","m","y"]
-    alphaScale = [1/n for n in range(1,numProteinTypes)]
+    alphaScale = [n/numProteinTypes for n in range(1,numProteinTypes)]
 
     #generate list of proteinType and box combinations to feed into stackData
     plotNameList_D = []
@@ -102,10 +102,27 @@ def main():
     #get a time axis for the plot from the length of one of the data sets we have
     timeAxis = range(len(plotCurveList_D[0]))
 
-    #generate the plot - wip
+    #begin messy code (to deal with matplotlib) - don't judge me
+    (start, end) = (6*int(len(timeAxis)/10),7*int(len(timeAxis)/10))
+
+    #generate the plot
     plt.figure()
-    for i in range(1,len(plotCurveList_D)):
-        print int(np.floor(i/numBoxes)), i
+    j=0
+    k=0
+    for i in range(len(plotCurveList_D)):
+        if i%(numProteinTypes-1)==0:
+            j+=1
+        if i%(numBoxes+1)==0:
+            k=0
+        if i==0:
+            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j])
+            plt.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_D[i][start:end],alpha=alphaScale[k],facecolor=colorScale[j])
+        elif i!=0:
+            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j])
+            plt.fill_between(timeAxis[start:end],plotCurveList_D[i-1][start:end],plotCurveList_D[i][start:end],alpha=alphaScale[k],facecolor=colorScale[j])
+        print "i is ",i," || k is", k," || j is",j
+        k+=1
+    plt.savefig("test_D.pdf")
         
     return 0
 
