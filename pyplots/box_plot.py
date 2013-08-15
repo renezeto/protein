@@ -88,6 +88,8 @@ def main():
     #generate list of proteinType and box combinations to feed into stackData
     plotNameList_D = []
     plotNameList_E = []
+    numProteinTypes_D = 0
+    numProteinTypes_E = 0
     for box in boxList:
         for proteinType in proteinTypeList:
             if "D_" in proteinType:
@@ -105,12 +107,20 @@ def main():
     #begin messy code (to deal with matplotlib) - don't judge me
     (start, end) = (6*int(len(timeAxis)/10),7*int(len(timeAxis)/10))
 
+    #get num on each plot
+    for proteinType in proteinTypeList:
+        if "D_" in proteinType:
+            numProteinTypes_D += 1
+        if "E_" in proteinType:
+            numProteinTypes_E +=1
+
+
     #generate the plot
     plt.figure()
     j=0
     k=0
     for i in range(len(plotCurveList_D)):
-        if i%(numProteinTypes-1)==0:
+        if i%(numProteinTypes_D)==0:#numProteinTypes-1)==0:
             j+=1
         if i%(numBoxes+1)==0:
             k=0
@@ -120,10 +130,38 @@ def main():
         elif i!=0:
             plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j])
             plt.fill_between(timeAxis[start:end],plotCurveList_D[i-1][start:end],plotCurveList_D[i][start:end],alpha=alphaScale[k],facecolor=colorScale[j])
-        print "i is ",i," || k is", k," || j is",j
+        #print "i is ",i," || k is", k," || j is",j
         k+=1
+    plt.xlim(start,end+.40*(end-start))
+    plt.title("Min D protein counts over time")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Number of proteins")
+    plt.legend(plotNameList_D,loc="best",prop={'size':10})
     plt.savefig("test_D.pdf")
-        
+
+    plt.figure()
+    j=0
+    k=0
+    for i in range(len(plotCurveList_E)):
+        if i%(numProteinTypes_E)==0:
+            j+=1
+        if i%(numBoxes+1)==0:
+            k=0
+        if i==0:
+            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j])
+            plt.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_E[i][start:end],alpha=alphaScale[k],facecolor=colorScale[j])
+        elif i!=0:
+            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j])
+            plt.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale[k],facecolor=colorScale[j])
+        #print "i is ",i," || k is", k," || j is",j
+        k+=1
+    plt.xlim(start,end+.40*(end-start))
+    plt.title("Min E protein counts over time")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Number of proteins")
+    plt.legend(plotNameList_E,loc="best",prop={'size':10})
+    plt.savefig("test_E.pdf")
+
     return 0
 
 if __name__ == '__main__':
