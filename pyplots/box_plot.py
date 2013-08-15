@@ -137,7 +137,7 @@ def main():
     plt.xlabel("Time (s)")
     plt.ylabel("Number of proteins")
     plt.legend(plotNameList_D,loc="best",prop={'size':10})
-    plt.savefig("test_D.pdf")
+    plt.savefig("./data/shape-%s/plots/box-plot_D--%s-%s-%s-%s-%s.pdf"%(load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
 
     plt.figure()
     j=0
@@ -160,7 +160,7 @@ def main():
     plt.xlabel("Time (s)")
     plt.ylabel("Number of proteins")
     plt.legend(plotNameList_E,loc="best",prop={'size':10})
-    plt.savefig("test_E.pdf")
+    plt.savefig("./data/shape-%s/plots/box-plot_E--%s-%s-%s-%s-%s.pdf"%(load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
 
     return 0
 
