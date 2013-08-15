@@ -9,12 +9,8 @@ import time
 batch_randst_simulations = []
 i=1
 
-# batch_pill_simulations = [
-#     [10.00, 0.50], \
-#         [4.00, 0.50], \
-#         [4.00, 2.00], \
-#         [4.00, 3.00] ]
-
+batch_triangle_simulations = [
+    [1.00,4.00,4.00,4.00,15.00] ]
 batch_pill_simulations = [
     [4.00,3.75,0.00,0.00,15.00], \
     [4.00,3.50,0.00,0.00,15.00], \
@@ -32,6 +28,12 @@ if '-sim' in sys.argv:
     if 'p' in sys.argv:
         for job in batch_pill_simulations:
             processes.add(subprocess.Popen(['srun','./protein_microscopy','p','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4],'-slice']))
+            if len(processes) >= max_processes:
+                os.wait()
+                processes.difference_update(p for p in processes if p.poll() is not None)
+    if 'triangle' in sys.argv:
+        for job in batch_triangle_simulations:
+            processes.add(subprocess.Popen(['srun','./protein_microscopy','triangle','%.2f'%job[0],'%.2f'%job[1],'%.2f'%job[2],'%.2f'%job[3],'%.2f'%job[4],'-slice']))
             if len(processes) >= max_processes:
                 os.wait()
                 processes.difference_update(p for p in processes if p.poll() is not None)
