@@ -104,27 +104,44 @@ double f_2D_TIE_fighter(double y, double z){
   return f;
 }
 
+bool only_print_once = true;
 double f_2D_triangle(double y, double z){
-  double Y = Ny*dx; double Z = Nz*dx; // total width and height of grid
-  double y1 = A+2*dx; double z1 = A+2*dx; // lower left corner of triangle
-  if (z < z1) {
+  double Y = Ny*dx; double Z = Nz*dx; // total height and width of grid
+  double z1 = A/2.0+2*dx; double y1 = A/2.0+2*dx; // lower left corner of triangle
+  if (y < y1) {
     return 0.1; // it's too low to be in the triangle
   }
-  double y2 = Y-A-2*dx; double z2 = z1; // lower right corner of triangle
-  double y3 = Y/2.0; double z3 = Z-A-2*dx; // top corner of triangle
-  //double y_from_lower_left_corner = y - y1;
-  //double z_from_lower_left_corner = z - z1;
-  double b1 = (z3-z1)/(y3-y1); double a1 = z1 - b1*y1;
-  double b3 = (z2-z3)/(y2-y3); double a3 = z3 - b3*y3;
-  double zl1 = b1*y +a1;
-  double zl3 = b3*y +a3;
-  double rad = 1.75*(y2-y1)*sqrt(3.0)/6.0;
-  double y_circle = Y/2.0; double z_circle = z1 + sqrt(3)*(y2-y1)/6.0;
-  if ((z < zl1) && (z < zl3) && (z > z1) && ((z-z_circle)*(z-z_circle) + (y-y_circle)*(y-y_circle)) < rad*rad){
-    return -0.1;
-  } else {
-    return 0.1;
+
+  double z2 = Z-A/2.0-2*dx; double y2 = y1; // lower right corner of triangle
+  //Using law of cosines from lengths of sides we get top corner:
+  double cos_theta = (B*B+D*D-C*C)/(2*B*D);
+  double z3 = A/2.0+2*dx+D*cos_theta; double y3 = Y-A/2.0-2*dx; // top corner of triangle
+  if (only_print_once==true){
+    printf("z1 = %g y1 = %g\nz2 = %g y2 = %g\nz3 = %g y3 = %g\n",z1,y1,z2,y2,z3,y3);
+    printf("cos_theta = %g\nZ = %g Y = %g A = %g",cos_theta,Z,Y,A/2.0);
+    only_print_once = false;
   }
+
+  if (z >= z3) {
+    double fac = (z-z3)/(z2-z3); //how far along the line the z coordinate is
+    double y_line = fac*(y2-y3)+y3; //the y coordinate of the line at the z point
+    if (y > y_line) {
+      return 0.1; // it's outside the triangle on the right side
+    }
+  }
+  if (z < z3) {
+    double fac = (z-z1)/(z3-z1); //how far along the line the z coordinate is
+    double y_line = fac*(y3-y1)+y1; //the y coordinate of the line at the z point
+    if (y > y_line) {
+      return 0.1; // its outside the triangle on the left side
+    }
+  }
+  //double rad = 1.75*(z2-z1)*sqrt(3.0)/6.0;
+  //double y_circle = Y/2.0; double z_circle = z1 + sqrt(3)*(y2-y1)/6.0;
+  //if ((z < zl1) && (z < zl3) && (z > z1) && ((z-z_circle)*(z-z_circle) + (y-y_circle)*(y-y_circle)) < rad*rad){
+  //  return -0.1;
+  //} else {
+  return -0.1;
 }
 
 double f_2D_randst(double y, double z){
@@ -330,34 +347,47 @@ char* print_filename(const char* plotname, const char* proteinname) {
   return filename;
 }
 
+bool only_once = true;
 string triangle_section (double y, double z) {
-  double Y = Ny*dx;
-  double Z = Nz*dx;
+  //needs editing!!!!!
+  double Y = Ny*dx; double Z = Nz*dx; // total height and width of grid
+  double z1 = A/2.0+2*dx; double y1 = A/2.0+2*dx; // lower left corner of triangle
+  double z2 = Z-A/2.0-2*dx; double y2 = y1; // lower right corner of triangle
+  //Using law of cosines from lengths of sides we get top corner:
+  double cos_theta = (B*B+D*D-C*C)/(2*B*D);
+  double z3 = A/2.0+2*dx+D*cos_theta; double y3 = Y-A/2.0-2*dx; // top corner of triangle
+  if (only_once == true) {
+    printf("z1 = %g y1 = %g\nz2 = %g y2 = %g\nz3 %g y3 = %g\n",z1,y1,z2,y2,z3,y3);
+  }
 
-  double y1 = Y/2.0; double z1 = sqrt(3)/6.0*(Y-4*dx-2*A)+2*dx;
-  double y2 = 3.0/4.0*Y-dx-A/2.0; double z2 = Z/2.0;
-  double y3 = Y/4.0+dx+A/2.0; double z3 = z2;
+  //get bisecting points and lines:
+  double y_21 = y1; double z_21 = (z2 + z1)/2.0;
+  double y_32 = (y3 + y2)/2.0; double z_32 = (z3 + z2)/2.0;
+  double y_13 = (y1 + y3)/2.0; double z_13 = (z1 + z3)/2.0;
+  double slope1 = (y_32-y1)/(z_32-z1); // from left corner to right line
+  double slope2 = (y2-y_13)/(z2-z_13); //from right corner to left line
+  double slope3 = (y_21-y3)/(z_21-z3); //from top corner to bottom
 
-  double slope_r = (z2-z1)/(y2-y1);
-  double slope_l = (z1-z3)/(y1-y3);
-  if (y > y1) {
-    if (z < slope_r*(y-Y/2.0) + z1) {
-      return "Right";
+  //find centroid, which is where all three lines above intersect:
+  double z_cen = (y3 - y1 + slope1*z1 - slope3*z3)/(slope1 -slope3);
+  double y_cen = slope1*(z_cen-z1) + y1;
+  if (only_once ==true){
+    printf("z_cen = %g y_cen = %g\n",z_cen,y_cen);
+    only_once = false;
+  }
+  if (z > z_cen) {
+    if (y > slope1*(z-z_cen)+y_cen) {
+      return "Mid";
     }
-    else {
+  } else {
+    if (y > slope2*(z-z_13)+y_13) {
       return "Mid";
     }
   }
-  if (y < y2) {
-    if (z < slope_l*(y-Y/2.0) + z1) {
-      return "Left";
-    }
-    else {
-      return "Mid";
-    }
+  if (y > slope3*(z-z_cen)+y_cen) {
+    return "Right";
   }
-  else printf("There was no section chosen for the triangle section function!!\n");
-  exit(1);
+  return "Left";
 }
 
 int main (int argc, char *argv[]) {
@@ -395,7 +425,7 @@ int main (int argc, char *argv[]) {
   //fixed simulation parameters
   tot_time = 2500; //sec
   time_step = .1*dx*dx/difD;//sec
-  //iter = int(tot_time/time_step);
+  //iter = int(20*1000);
   iter = int(tot_time/time_step);
   printout_iterations = int(5.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
@@ -435,8 +465,10 @@ int main (int argc, char *argv[]) {
   }
   if (mem_f_shape=="triangle") {
     Nx = ceil(A/dx) + 4;
-    Ny = ceil(B/dx) + 4;
-    Nz = ceil(B/dx) + 4;
+    Nz = ceil((A+B)/dx) + 4;
+    //Using law of cosines we get height of triangle:
+    double theta = acos((B*B+D*D-C*C)/(2*B*D));
+    Ny = ceil((A+D*sin(theta))/dx) + 4;
   }
   if (mem_f_shape=="st") {
     Nx = ceil(2*B/dx) + 4;
@@ -556,7 +588,7 @@ int main (int argc, char *argv[]) {
   sprintf(proteinList[3]->name,"D_ND");
   sprintf(proteinList[4]->name,"D_E_NDE");
 
-  set_membrane(out_file, mem_f, mem_A);
+    set_membrane(out_file, mem_f, mem_A);
   set_curvature(mem_A,curvature);
 
   //begin area rating
@@ -623,6 +655,8 @@ int main (int argc, char *argv[]) {
       total_cell_volume += dx*dx*dx;
     }
   }
+  printf("total_cell_volume = %g\n",total_cell_volume);
+  fprintf(out_file, "total_cell_volume = %g\n",total_cell_volume);
 
   //add cell params file
 
@@ -682,6 +716,7 @@ int main (int argc, char *argv[]) {
   fflush(out_file);
 
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
+  printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
   char* outfilename = new char[1024];
   sprintf(outfilename,"data/shape-%s/membrane_files/membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
@@ -704,7 +739,30 @@ int main (int argc, char *argv[]) {
   fflush(stdout);
   fclose(out);
   printf("\nMembrane file printed.\n");
-  //end membrane printing
+
+  char* outfilename_sections = new char[1024];
+  sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
+  for (int j=0;j<Ny;j++){
+    for (int i=0;i<Nz;i++) {
+      if (triangle_section(j*dx,i*dx)=="Right"){
+        marker = 1;
+      }
+      if (triangle_section(j*dx,i*dx)=="Mid"){
+        marker = 2;
+      }
+      if (triangle_section(j*dx,i*dx)=="Left"){
+        marker = 3;
+      }
+      fprintf(outfile_sections,"%g ",marker);
+    }
+    fprintf(outfile_sections,"\n");
+  }
+  fflush(stdout);
+  fclose(outfile_sections);
+  printf("\nMembrane sections file printed.\n");
+
+//end membrane printing
 
   //eventually uncommend and replace membrane.dat prints with mem_f prints for extrema.py
   //begin mem_f printing for randst, tie fighter, triangle - possibly do this for other shapes if needed -- NEEDS UPDATE.
@@ -821,13 +879,13 @@ int main (int argc, char *argv[]) {
                   proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
               }
-              //these else statements might not work
+
               if (mem_f_shape == "randst") {
                 if (rand_seed == 99 || rand_seed == 98) {
                   if (b < vert_div) {
                     proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  if (b > vert_div_two) {
+                  else if (b > vert_div_two) {
                     proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else {
@@ -867,11 +925,11 @@ int main (int argc, char *argv[]) {
                 if (triangle_section(a*dx,b*dx) == "Left") {
                   proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
-                if (triangle_section(a*dx,b*dx) == "Right") {
+                else if (triangle_section(a*dx,b*dx) == "Right") {
                   proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
-                if (triangle_section(a*dx,b*dx) == "Mid") {
-                  proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
+                else {
+                    proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
               }
             }
@@ -879,7 +937,6 @@ int main (int argc, char *argv[]) {
         }
       }
     }
-
 
     //begin file printing
     if ((dump_flag == 1) && (i%printout_iterations == 0)) {
@@ -1219,7 +1276,7 @@ int main (int argc, char *argv[]) {
         if (b < box_divider_left) {
           left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
         }
-        if (b > box_divider_right) {
+        else if (b > box_divider_right) {
           right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
         }
         else {
@@ -1229,20 +1286,26 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  for (int pNum=0; pNum<numProteins; pNum++) {
+  if (mem_f_shape == "p"){
+    for (int pNum=3; pNum<numProteins; pNum++) {
 
-    for (int i=0; i<iter; i++) {
-      fprintf(ave_plot,"%1.2f\t",proteinList[pNum]->numLeft[i]/left_area_total);
+      fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_dat]/left_area_total));
+      }
+      fprintf(ave_plot,"\n");
+      fprintf(ave_plot,"%s\tmid\t",proteinList[pNum]->name);
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_dat]/middle_area_total));
+      }
+      fprintf(ave_plot,"\n");
+      fprintf(ave_plot,"%s\tright\t",proteinList[pNum]->name);
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_dat]/right_area_total));
+      }
+      fprintf(ave_plot,"\n");
+      fprintf(ave_plot,"\n");
     }
-    fprintf(ave_plot,"\n");
-    for (int i=0; i<iter; i++) {
-      fprintf(ave_plot,"%1.2f\t",proteinList[pNum]->numMid[i]/middle_area_total);
-    }
-    fprintf(ave_plot,"\n");
-    for (int i=0; i<iter; i++) {
-      fprintf(ave_plot,"%1.2f\t",proteinList[pNum]->numRight[i]/right_area_total);
-    }
-    fprintf(ave_plot,"\n");
   }
   fclose(ave_plot);
   delete[] avename;
