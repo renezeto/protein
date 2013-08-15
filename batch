@@ -1,0 +1,56 @@
+#!/usr/bin/python
+from __future__ import division
+import numpy as np
+import sys
+import os
+import subprocess
+import time
+
+#./batch sim plot proteins="p randst triangle" plots="time" specific="[4.00, 2.00, 0.00, 0.00, 15.00]" simflags="-hires"
+
+#notes:
+#specific needed? can make handle running sim if data not present for python?
+#reset command for doing everything in the jobs list from scatch?
+#include command for only doing things marked in include?
+#confirmation dialog
+
+#commands
+def parseArgs(args):
+    stringList = []
+    for arg in args:
+        if "=" not in arg:
+            stringList += [arg]
+    return stringList
+
+#options
+def parseKwargs(kwargs):
+    stringDict = {}
+    for kwarg in kwargs:
+        if "=" in kwarg:
+            (key,value) = kwarg.split("=")
+            stringDict[key]=value
+    return stringDict
+
+def getJobs(options):
+    with open("jobs") as jobFile:
+        jobList = jobFile.readlines()
+        
+
+def runSim(commands,options):
+    if "srun" in commands:
+        sruncmd = ["srun"]
+    #specific
+    #simflags
+    return 0
+
+def runPlots(commands,options):
+    #proteins
+    #specific
+    #plots
+    return 0
+
+def main():
+    return 0
+
+if __name__ == "__main__":
+    main()
