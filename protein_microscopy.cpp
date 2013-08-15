@@ -655,6 +655,8 @@ int main (int argc, char *argv[]) {
       total_cell_volume += dx*dx*dx;
     }
   }
+  printf("total_cell_volume = %g\n",total_cell_volume);
+  fprintf(out_file, "total_cell_volume = %g\n",total_cell_volume);
 
   //add cell params file
 
