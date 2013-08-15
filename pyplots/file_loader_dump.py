@@ -12,6 +12,9 @@ f_param5 = sys.argv[6]
 
 dx=.15
 
+#for the specific file reading, these are the protein strings
+proteinList = ["D_nATP","D_nADP","D_E_NDE","E_nE","D_nD"]
+
 #initialize as empty lists incase arguments not present in sys.argv
 hires_str=""
 m_str=""
