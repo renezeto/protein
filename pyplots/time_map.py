@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import file_loader as load
 import sys
+##
 
-time_map = np
 
 for protein in load.proteinList:
     plt.figure()
