@@ -4,9 +4,9 @@
 rene's short list:
        - do batchloader
        - get randst ready
-       - run sims
+       - run sims - working
        - bring extrema plot over to protein_microscopy
-       - add shape names to file prints
+       - add shape names to file prints - done
 
 
 Pill Normal -
