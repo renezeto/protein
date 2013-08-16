@@ -1,5 +1,14 @@
 ;This file is written in lisp.
 ;Pill normal is for the establishing that we have what works, reference other paper, then modify, is the idea.
+
+rene's short list:
+       - do batchloader
+       - get randst ready
+       - run sims - working
+       - bring extrema plot over to protein_microscopy
+       - add shape names to file prints - done
+
+
 Pill Normal -
 Pill Short -
      Run for longer to see periods of oscillations and if they die out.
