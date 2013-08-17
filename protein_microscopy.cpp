@@ -361,13 +361,19 @@ string triangle_section (double y, double z) {
   }
 
   //get bisecting points and lines:
-  double y_21 = y1; double z_21 = (z2 + z1)/2.0;
+  double y_21 = (y1 + y2)/2.0; double z_21 = (z2 + z1)/2.0;
   double y_32 = (y3 + y2)/2.0; double z_32 = (z3 + z2)/2.0;
   double y_13 = (y1 + y3)/2.0; double z_13 = (z1 + z3)/2.0;
   double slope1 = (y_32-y1)/(z_32-z1); // from left corner to right line
   double slope2 = (y2-y_13)/(z2-z_13); //from right corner to left line
   double slope3 = (y_21-y3)/(z_21-z3); //from top corner to bottom
-
+  //running into nan issues when z3 is same as z_21, so I brute force a large negative slope:
+  if (z_21-z3 < .000001){
+    slope3 = -1000000;
+  }
+  if (only_once==true){
+    printf("slope1 = %g slope2 = %g slope3 = %g\n",slope1,slope2,slope3);
+  }
   //find centroid, which is where all three lines above intersect:
   double z_cen = (y3 - y1 + slope1*z1 - slope3*z3)/(slope1 -slope3);
   double y_cen = slope1*(z_cen-z1) + y1;
@@ -398,7 +404,7 @@ int main (int argc, char *argv[]) {
   C = atof(argv[4]);
   D = atof(argv[5]);
   density_factor = atof(argv[6]);
-  dx=.15;
+  dx=.05;
 
   //flag checking
   for (int i=0; i<argc; i++) {
@@ -407,7 +413,7 @@ int main (int argc, char *argv[]) {
       printf("Area rating printout.\n");
     }
     if (strcmp(argv[i],"-hires")==0) {
-      dx=.05;
+      dx=.025;
       printf("Using high resolution.\n");
       sprintf(hires_flag_str,"hires-");
     }
@@ -425,8 +431,8 @@ int main (int argc, char *argv[]) {
   //fixed simulation parameters
   tot_time = 2500; //sec
   time_step = .1*dx*dx/difD;//sec
-  //iter = int(20*1000);
-  iter = int(tot_time/time_step);
+  iter = int(20*1000);
+  //iter = int(tot_time/time_step);
   printout_iterations = int(5.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
@@ -720,6 +726,10 @@ int main (int argc, char *argv[]) {
   char* outfilename = new char[1024];
   sprintf(outfilename,"data/shape-%s/membrane_files/membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
+  if (out==0){
+    printf ("couldn't print outfile\n");
+    //exit();
+  }
   double marker;
   //  double inmarker; unused
   //  double zt = A/2; double yt = B/2; double xt = C/2; unused
