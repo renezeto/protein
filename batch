@@ -52,7 +52,7 @@ def runSim(commands,options):
         sruncmd = []
     jobList = getJobs(options)
     for job in jobList:
-        subProcess.Popen(sruncmd + ["./protein_microscopy"] + [arg for arg in job])
+        subprocess.Popen(sruncmd + ["./protein_microscopy"] + [arg for arg in job])
     return 0
 
 #starts plots matching commands and options
@@ -77,6 +77,7 @@ def main():
     options = parseKwargs(sys.argv)
     if "sim" in commands:
         runSim(commands,options)
+        #while simulation set is not empty os.sleep or something
     if "plot" in commands:
         runPlots(commands,options)
     return 0
