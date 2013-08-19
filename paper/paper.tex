@@ -62,25 +62,26 @@ were able to define a cell shape on the grid, and solve the
 reaction-diffusion equations numerically to observe the time evolution of
 the MinD and MinE concentrations inside the cell.
 
-Modelled cells have a total cell volume that is roughly equivelent to
-that observed experimentally by Kubitschek.\cite{kubitschek1990cell}
-He observes mean cell volumes of 0.69$\mu m^3$ and 0.58$\mu m^3$ in
-different strains and shows as well that newborn cells have roughly half
-the volume of those on the brink of cell division.  Because we are
-interested in the protein system during the cell division process, we
-use cells that have cell volumes of roughly 1 $\mu m^3$
+Kubitschek\cite{kubitschek1990cell} \cite{kubitschek1968linear} has
+shown in multiple experiments that at the time of cell division cells
+have a volume that is within a range of roughly $1\mu m^3$ to $2\mu
+m^3$.  We follow Huang's simulations\cite{huang2003dynamic} and
+Mannik's experiments \cite{mannik2012robustness} and model cells that
+are slightly larger than this range.
 
+We mean to study cells that are parrallel to those lodged into
+crevices by Mannik so our flattened (non-pill shaped) cells have a
+hieght of 0.25 \cite{mannick2012robustness} and appropriate
+dimensions otherwise to yield the desired volume range.
 
 Our simulation used the same diffusion constants and reaction rates as
 Huang et al, which are
-
 \begin{gather*} %format better
   \mathcal{D}_D = \mathcal{D}_{E}  = 2.5 \mu \textrm{m$^2$ / sec}, \\
   \sigma_D^{\textrm{ADP $\rightarrow$ ATP}}  = 1/\textrm{sec},  \sigma_D = 0.025 \mu \textrm{m/sec}, \\
   \sigma_{dD}  = 0.0015 \mu \textrm{m$^3$/sec}, \\
   \sigma_{de}  = 0.7/\textrm{sec}, \sigma_E = 0.093 \mu \textrm{m$^3$/sec}.
 \end{gather*}
-
 To test our computational model, we implemented a pill shaped cell, and
 tested using the same cell parameters as Huang et al, which were a radius
 of 0.5 $\mu$m in the middle and at the spherical endcaps, and two different

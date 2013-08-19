@@ -361,13 +361,19 @@ string triangle_section (double y, double z) {
   }
 
   //get bisecting points and lines:
-  double y_21 = y1; double z_21 = (z2 + z1)/2.0;
+  double y_21 = (y1 + y2)/2.0; double z_21 = (z2 + z1)/2.0;
   double y_32 = (y3 + y2)/2.0; double z_32 = (z3 + z2)/2.0;
   double y_13 = (y1 + y3)/2.0; double z_13 = (z1 + z3)/2.0;
   double slope1 = (y_32-y1)/(z_32-z1); // from left corner to right line
   double slope2 = (y2-y_13)/(z2-z_13); //from right corner to left line
   double slope3 = (y_21-y3)/(z_21-z3); //from top corner to bottom
-
+  //running into nan issues when z3 is same as z_21, so I brute force a large negative slope:
+  if (z_21-z3 < .000001){
+    slope3 = -1000000;
+  }
+  if (only_once==true){
+    printf("slope1 = %g slope2 = %g slope3 = %g\n",slope1,slope2,slope3);
+  }
   //find centroid, which is where all three lines above intersect:
   double z_cen = (y3 - y1 + slope1*z1 - slope3*z3)/(slope1 -slope3);
   double y_cen = slope1*(z_cen-z1) + y1;
@@ -398,7 +404,7 @@ int main (int argc, char *argv[]) {
   C = atof(argv[4]);
   D = atof(argv[5]);
   density_factor = atof(argv[6]);
-  dx=.15;
+  dx=.05;
 
   //flag checking
   for (int i=0; i<argc; i++) {
@@ -407,7 +413,7 @@ int main (int argc, char *argv[]) {
       printf("Area rating printout.\n");
     }
     if (strcmp(argv[i],"-hires")==0) {
-      dx=.05;
+      dx=.025;
       printf("Using high resolution.\n");
       sprintf(hires_flag_str,"hires-");
     }
@@ -425,8 +431,8 @@ int main (int argc, char *argv[]) {
   //fixed simulation parameters
   tot_time = 2500; //sec
   time_step = .1*dx*dx/difD;//sec
-  //iter = int(20*1000);
-  iter = int(tot_time/time_step);
+  iter = int(20*1000);
+  //iter = int(tot_time/time_step);
   printout_iterations = int(5.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
@@ -504,6 +510,17 @@ int main (int argc, char *argv[]) {
                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  for (int i=0;i<100;i++){
+    printf("guass96[%d] = %g\n",i,guass96[i]);
+    guass96[i] = guass96[i]/1.4;
+    printf("guass96[%d] = %g\n",i,guass96[i]);
+  }
+  for (int i=0;i<100;i++){
+    printf("guass97[%d] = %g\n",i,guass97[i]);
+    guass97[i] = 1.3*guass97[i];
+    printf("guass97[%d] = %g\n",i,guass97[i]);
+  }
+ printf("Those are all the guassians!\n");
   if (rand_seed == 99){
     for (int i=0;i<3*5;i++){
       guass[i]=guass99[i];
@@ -655,7 +672,7 @@ int main (int argc, char *argv[]) {
       total_cell_volume += dx*dx*dx;
     }
   }
-  printf("total_cell_volume = %g\n",total_cell_volume);
+  printf("total_cell_volume = %g and dx = %g\n",total_cell_volume,dx);
   fprintf(out_file, "total_cell_volume = %g\n",total_cell_volume);
 
   //add cell params file
@@ -720,6 +737,10 @@ int main (int argc, char *argv[]) {
   char* outfilename = new char[1024];
   sprintf(outfilename,"data/shape-%s/membrane_files/membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
+  if (out==0){
+    printf ("couldn't print outfile\n");
+    //exit();
+  }
   double marker;
   //  double inmarker; unused
   //  double zt = A/2; double yt = B/2; double xt = C/2; unused
@@ -740,27 +761,29 @@ int main (int argc, char *argv[]) {
   fclose(out);
   printf("\nMembrane file printed.\n");
 
-  char* outfilename_sections = new char[1024];
-  sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
-  for (int j=0;j<Ny;j++){
-    for (int i=0;i<Nz;i++) {
-      if (triangle_section(j*dx,i*dx)=="Right"){
-        marker = 1;
+  if (mem_f_shape=="triangle") {
+    char* outfilename_sections = new char[1024];
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+    FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
+    for (int j=0;j<Ny;j++){
+      for (int i=0;i<Nz;i++) {
+        if (triangle_section(j*dx,i*dx)=="Right"){
+          marker = 1;
+        }
+        if (triangle_section(j*dx,i*dx)=="Mid"){
+          marker = 2;
+        }
+        if (triangle_section(j*dx,i*dx)=="Left"){
+          marker = 3;
+        }
+        fprintf(outfile_sections,"%g ",marker);
       }
-      if (triangle_section(j*dx,i*dx)=="Mid"){
-        marker = 2;
-      }
-      if (triangle_section(j*dx,i*dx)=="Left"){
-        marker = 3;
-      }
-      fprintf(outfile_sections,"%g ",marker);
+      fprintf(outfile_sections,"\n");
     }
-    fprintf(outfile_sections,"\n");
+    fflush(stdout);
+    fclose(outfile_sections);
+    printf("\nMembrane sections file printed.\n");
   }
-  fflush(stdout);
-  fclose(outfile_sections);
-  printf("\nMembrane sections file printed.\n");
 
 //end membrane printing
 
