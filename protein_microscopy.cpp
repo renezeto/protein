@@ -510,6 +510,17 @@ int main (int argc, char *argv[]) {
                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  for (int i=0;i<100;i++){
+    printf("guass96[%d] = %g\n",i,guass96[i]);
+    guass96[i] = guass96[i]/1.4;
+    printf("guass96[%d] = %g\n",i,guass96[i]);
+  }
+  for (int i=0;i<100;i++){
+    printf("guass97[%d] = %g\n",i,guass97[i]);
+    guass97[i] = 1.3*guass97[i];
+    printf("guass97[%d] = %g\n",i,guass97[i]);
+  }
+ printf("Those are all the guassians!\n");
   if (rand_seed == 99){
     for (int i=0;i<3*5;i++){
       guass[i]=guass99[i];
@@ -750,27 +761,29 @@ int main (int argc, char *argv[]) {
   fclose(out);
   printf("\nMembrane file printed.\n");
 
-  char* outfilename_sections = new char[1024];
-  sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
-  FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
-  for (int j=0;j<Ny;j++){
-    for (int i=0;i<Nz;i++) {
-      if (triangle_section(j*dx,i*dx)=="Right"){
-        marker = 1;
+  if (mem_f_shape=="triangle") {
+    char* outfilename_sections = new char[1024];
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+    FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
+    for (int j=0;j<Ny;j++){
+      for (int i=0;i<Nz;i++) {
+        if (triangle_section(j*dx,i*dx)=="Right"){
+          marker = 1;
+        }
+        if (triangle_section(j*dx,i*dx)=="Mid"){
+          marker = 2;
+        }
+        if (triangle_section(j*dx,i*dx)=="Left"){
+          marker = 3;
+        }
+        fprintf(outfile_sections,"%g ",marker);
       }
-      if (triangle_section(j*dx,i*dx)=="Mid"){
-        marker = 2;
-      }
-      if (triangle_section(j*dx,i*dx)=="Left"){
-        marker = 3;
-      }
-      fprintf(outfile_sections,"%g ",marker);
+      fprintf(outfile_sections,"\n");
     }
-    fprintf(outfile_sections,"\n");
+    fflush(stdout);
+    fclose(outfile_sections);
+    printf("\nMembrane sections file printed.\n");
   }
-  fflush(stdout);
-  fclose(outfile_sections);
-  printf("\nMembrane sections file printed.\n");
 
 //end membrane printing
 
