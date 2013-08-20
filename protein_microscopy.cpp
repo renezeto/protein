@@ -338,7 +338,9 @@ struct protein {
   double* numLeftDown;
 
   //arrow_plot
-  double* maxloc;
+  double* maxval;
+  double* ymax;
+  double* zmax;
 };
 
 char* print_filename(const char* plotname, const char* proteinname) {
@@ -404,7 +406,7 @@ int main (int argc, char *argv[]) {
   C = atof(argv[4]);
   D = atof(argv[5]);
   density_factor = atof(argv[6]);
-  dx=.05;
+  dx=.15;
 
   //flag checking
   for (int i=0; i<argc; i++) {
@@ -431,7 +433,7 @@ int main (int argc, char *argv[]) {
   //fixed simulation parameters
   tot_time = 2500; //sec
   time_step = .1*dx*dx/difD;//sec
-  iter = int(20*1000);
+  iter = int(tot_time/time_step);
   //iter = int(tot_time/time_step);
   printout_iterations = int(5.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
@@ -567,7 +569,7 @@ int main (int argc, char *argv[]) {
   double *JyE = new double[Nx*Ny*Nz];
   double *JzE = new double[Nx*Ny*Nz];
   double *mem_A = new double[Nx*Ny*Nz];
-  double *curvature = new double[Nx*Ny*Nz];
+  //double *curvature = new double[Nx*Ny*Nz];
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
 
@@ -597,6 +599,10 @@ int main (int argc, char *argv[]) {
     proteinList[pNum]->numRightDown = new double[iter];
     proteinList[pNum]->numLeftUp = new double[iter];
     proteinList[pNum]->numLeftDown = new double[iter];
+
+    proteinList[pNum]->maxval = new double[iter];
+    proteinList[pNum]->ymax = new double[iter];
+    proteinList[pNum]->zmax = new double[iter];
   }
 
   sprintf(proteinList[0]->name,"D_nATP");
@@ -605,8 +611,8 @@ int main (int argc, char *argv[]) {
   sprintf(proteinList[3]->name,"D_ND");
   sprintf(proteinList[4]->name,"D_E_NDE");
 
-    set_membrane(out_file, mem_f, mem_A);
-  set_curvature(mem_A,curvature);
+  set_membrane(out_file, mem_f, mem_A);
+  //set_curvature(mem_A,curvature);
 
   //begin area rating
   // printf("Starting with the area rating stuff!!!!\n");
@@ -862,10 +868,8 @@ int main (int argc, char *argv[]) {
       printf("Finished sim loop # i=%d, We're %1.2f percent done\n",i,double(100*i/iter));
     }
 
-    //capture plot information at each time step -- need to work after first 10%
+    //time map
     for (int pNum=0; pNum<numProteins; pNum++) {
-
-      //time map
       for (int a=0; a<Ny; a++) {
         for (int b=0; b<Nz; b++) {
           if (slice_flag==0) {
@@ -960,6 +964,38 @@ int main (int argc, char *argv[]) {
         }
       }
     }
+
+    //arrow plot
+    for (int pNum=0; pNum<numProteins; pNum++) {
+      double storemaxval = 0;
+      double currentval;
+      for (int a=0; a<Ny; a++) {
+	for (int b=0; b<Nz; b++) {
+	  if (slice_flag==0) {
+	    currentval=0;
+	    for (int c=0; c<Nx; c++) {
+	      currentval += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+	    }
+	    if (currentval > storemaxval) {
+	      storemaxval = currentval;
+	      proteinList[pNum]->maxval[i] = storemaxval;
+	      proteinList[pNum]->ymax[i] = a;
+	      proteinList[pNum]->zmax[i] = b;
+	    }
+	  }
+	  else {
+	    currentval = accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
+	    if (currentval > storemaxval) {
+	      storemaxval = currentval;
+	      proteinList[pNum]->maxval[i] = storemaxval;
+	      proteinList[pNum]->ymax[i] = a;
+	      proteinList[pNum]->zmax[i] = b;
+	    }
+	  }
+	}
+      }
+    }
+
 
     //begin file printing
     if ((dump_flag == 1) && (i%printout_iterations == 0)) {
@@ -1333,6 +1369,38 @@ int main (int argc, char *argv[]) {
   fclose(ave_plot);
   delete[] avename;
 
+  //arrow plot
+  for (int pNum=0; pNum<numProteins; pNum++) {
+    //filter local maxima in time
+    int* time_maxima_y = new int[iter];
+    int* time_maxima_z = new int[iter];
+    for (int i=1; i<(iter-1); i++) {
+      if( (proteinList[pNum]->maxval[i] > proteinList[pNum]->maxval[i-1]) && (proteinList[pNum]->maxval[i] > proteinList[pNum]->maxval[i+1]) ) {
+	time_maxima_y[i] = proteinList[pNum]->zmax[i];
+	time_maxima_z[i] = proteinList[pNum]->ymax[i];
+      }
+    }
+
+    // for (int i=1; i<(iter-1); i++) {
+    //   if ((time_maxima_y[i] != 0) && (time_maxima_z[i] != 0)) {
+    // 	printf("%d %d\n", time_maxima_y[i], time_maxima_z[i]);
+    //   }
+    // }
+
+    //print to file
+    char *arrowname = new char[1024];
+    sprintf(arrowname,"%s",print_filename("arrow-plot",proteinList[pNum]->name));
+    FILE* arrowfile = fopen(arrowname,"w");
+
+    for (int i=0; i<iter; i++) {
+      if ((time_maxima_y[i] != 0) && (time_maxima_z[i] != 0)) {
+	fprintf(arrowfile,"%d\t%d\n",time_maxima_y[i],time_maxima_z[i]);
+      }
+    }
+    fclose(arrowfile);
+    delete[] arrowname;
+  }
+
   //printing to the project directory so we have a shortlist of what we've done.
   char *fname = new char[1024];
   sprintf(fname,"catalog.txt");
@@ -1365,6 +1433,7 @@ int main (int argc, char *argv[]) {
   delete[] fname;
   //end catalog
 
+  printf("segfault now:\n");
   return 0;
 }
 
