@@ -50,9 +50,16 @@ def runSim(commands,options):
         sruncmd = ["srun"]
     else:
         sruncmd = []
+    runningSims = set()
     jobList = getJobs(options)
     for job in jobList:
-        subprocess.Popen(sruncmd + ["./protein_microscopy"] + [arg for arg in job])
+        runningSims.add(subprocess.Popen(sruncmd + ["./protein_microscopy"] + [arg for arg in job]))
+    while len(runningSims) > 0:
+        for sim in runningSims.copy():
+            if sim.poll() is not None:
+                runningSims.remove(sim)
+                #do file writing here
+        time.sleep(30)
     return 0
 
 #starts plots matching commands and options
@@ -62,14 +69,22 @@ def runPlots(commands,options):
     else:
         sruncmd = []
     jobList = getJobs(options)
+    runningPlots = set()
     try:
         for plot in options['plots'].split():
             for job in jobList:
-                print sruncmd + ["pyplots/%s.py"%(plot)] + [arg for arg in job]
+                runningPlots.add(subProcess.Popen(sruncmd + ["python","pyplots/%s.py"%(plot)] + [arg for arg in job]))
     except KeyError:
         for job in jobList:
-            subprocess.Popen(sruncmd + ["pyplots/box_plot.py"] + [arg for arg in job])
-            subprocess.Popen(sruncmd + ["pyplots/time_map.py"] + [arg for arg in job])
+            runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/box_plot.py"] + [arg for arg in job]))
+            runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/time_map.py"] + [arg for arg in job]))
+    while len(runningPlots) > 0:
+        for plot in runningPlots.copy():
+            if plot.poll() is not None:
+                runningPlots.remove(plot)
+                #do file writing here
+            else:
+                time.sleep(30)
     return 0
 
 def main():
@@ -77,7 +92,6 @@ def main():
     options = parseKwargs(sys.argv)
     if "sim" in commands:
         runSim(commands,options)
-        #while simulation set is not empty os.sleep or something
     if "plot" in commands:
         runPlots(commands,options)
     return 0
