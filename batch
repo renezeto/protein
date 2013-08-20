@@ -59,8 +59,7 @@ def runSim(commands,options):
             if sim.poll() is not None:
                 runningSims.remove(sim)
                 #do file writing here
-            else:
-                time.sleep(30)
+        time.sleep(30)
     return 0
 
 #starts plots matching commands and options
