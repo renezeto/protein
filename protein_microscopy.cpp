@@ -522,7 +522,7 @@ int main (int argc, char *argv[]) {
     guass97[i] = 1.3*guass97[i];
     printf("guass97[%d] = %g\n",i,guass97[i]);
   }
- printf("Those are all the guassians!\n");
+  printf("Those are all the guassians!\n");
   if (rand_seed == 99){
     for (int i=0;i<3*5;i++){
       guass[i]=guass99[i];
@@ -791,7 +791,7 @@ int main (int argc, char *argv[]) {
     printf("\nMembrane sections file printed.\n");
   }
 
-//end membrane printing
+  //end membrane printing
 
   //eventually uncommend and replace membrane.dat prints with mem_f prints for extrema.py
   //begin mem_f printing for randst, tie fighter, triangle - possibly do this for other shapes if needed -- NEEDS UPDATE.
@@ -956,7 +956,7 @@ int main (int argc, char *argv[]) {
                   proteinList[pNum]->numRight[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
                 else {
-                    proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
+                  proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
               }
             }
@@ -970,29 +970,39 @@ int main (int argc, char *argv[]) {
       double storemaxval = 0;
       double currentval;
       for (int a=0; a<Ny; a++) {
-	for (int b=0; b<Nz; b++) {
-	  if (slice_flag==0) {
-	    currentval=0;
-	    for (int c=0; c<Nx; c++) {
-	      currentval += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
-	    }
-	    if (currentval > storemaxval) {
-	      storemaxval = currentval;
-	      proteinList[pNum]->maxval[i] = storemaxval;
-	      proteinList[pNum]->ymax[i] = a;
-	      proteinList[pNum]->zmax[i] = b;
-	    }
-	  }
-	  else {
-	    currentval = accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
-	    if (currentval > storemaxval) {
-	      storemaxval = currentval;
-	      proteinList[pNum]->maxval[i] = storemaxval;
-	      proteinList[pNum]->ymax[i] = a;
-	      proteinList[pNum]->zmax[i] = b;
-	    }
-	  }
-	}
+        for (int b=0; b<Nz; b++) {
+          if (slice_flag==0) {
+            currentval=0;
+            for (int c=0; c<Nx; c++) {
+              currentval += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+            }
+            if (currentval > storemaxval) {
+              storemaxval = currentval;
+              proteinList[pNum]->maxval[i] = storemaxval;
+              proteinList[pNum]->ymax[i] = a;
+              proteinList[pNum]->zmax[i] = b;
+            }
+            else {
+              proteinList[pNum]->maxval[i] = 0;
+              proteinList[pNum]->ymax[i] = 0;
+              proteinList[pNum]->zmax[i] = 0;
+            }
+          }
+          else {
+            currentval = accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
+            if (currentval > storemaxval) {
+              storemaxval = currentval;
+              proteinList[pNum]->maxval[i] = storemaxval;
+              proteinList[pNum]->ymax[i] = a;
+              proteinList[pNum]->zmax[i] = b;
+            }
+            else {
+              proteinList[pNum]->maxval[i] = 0;
+              proteinList[pNum]->ymax[i] = 0;
+              proteinList[pNum]->zmax[i] = 0;
+            }
+          }
+        }
       }
     }
 
@@ -1376,8 +1386,8 @@ int main (int argc, char *argv[]) {
     int* time_maxima_z = new int[iter];
     for (int i=1; i<(iter-1); i++) {
       if( (proteinList[pNum]->maxval[i] > proteinList[pNum]->maxval[i-1]) && (proteinList[pNum]->maxval[i] > proteinList[pNum]->maxval[i+1]) ) {
-	time_maxima_y[i] = proteinList[pNum]->zmax[i];
-	time_maxima_z[i] = proteinList[pNum]->ymax[i];
+        time_maxima_y[i] = proteinList[pNum]->ymax[i];
+        time_maxima_z[i] = proteinList[pNum]->zmax[i];
       }
     }
 
@@ -1394,7 +1404,7 @@ int main (int argc, char *argv[]) {
 
     for (int i=0; i<iter; i++) {
       if ((time_maxima_y[i] != 0) && (time_maxima_z[i] != 0)) {
-	fprintf(arrowfile,"%d\t%d\n",time_maxima_y[i],time_maxima_z[i]);
+        fprintf(arrowfile,"%d\t%d\n",time_maxima_y[i],time_maxima_z[i]);
       }
     }
     fclose(arrowfile);
