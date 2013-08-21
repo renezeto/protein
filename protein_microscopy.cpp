@@ -1394,17 +1394,12 @@ int main (int argc, char *argv[]) {
       }
     }
 
-    for (int i=1; i<(iter-1); i++) {
-      if ((time_maxima_y[i] != 0) && (time_maxima_z[i] != 0)) {
-      }
-    }
-
     //print to file
     char *arrowname = new char[1024];
     sprintf(arrowname,"%s",print_filename("arrow-plot",proteinList[pNum]->name));
     FILE* arrowfile = fopen(arrowname,"w");
 
-    for (int i=0; i<iter; i++) {
+    for (int i=1; i<(iter-1); i++) {
       if ((time_maxima_y[i] != 0) && (time_maxima_z[i] != 0)) {
         fprintf(arrowfile,"%d\t%d\n",time_maxima_y[i],time_maxima_z[i]);
       }
