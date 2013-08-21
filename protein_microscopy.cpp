@@ -315,7 +315,7 @@ double mem_f(double x, double y, double z) {
 
   else {
     double f = 1;
-  	return f;
+    return f;
   }
 }
 
@@ -339,8 +339,8 @@ struct protein {
 
   //arrow_plot
   double* maxval;
-  double* ymax;
-  double* zmax;
+  int* ymax;
+  int* zmax;
 };
 
 char* print_filename(const char* plotname, const char* proteinname) {
@@ -431,7 +431,7 @@ int main (int argc, char *argv[]) {
   }
 
   //fixed simulation parameters
-  tot_time = 2500; //sec
+  tot_time = 250; //sec
   time_step = .1*dx*dx/difD;//sec
   iter = int(tot_time/time_step);
   //iter = int(tot_time/time_step);
@@ -601,8 +601,8 @@ int main (int argc, char *argv[]) {
     proteinList[pNum]->numLeftDown = new double[iter];
 
     proteinList[pNum]->maxval = new double[iter];
-    proteinList[pNum]->ymax = new double[iter];
-    proteinList[pNum]->zmax = new double[iter];
+    proteinList[pNum]->ymax = new int[iter];
+    proteinList[pNum]->zmax = new int[iter];
   }
 
   sprintf(proteinList[0]->name,"D_nATP");
@@ -963,10 +963,8 @@ int main (int argc, char *argv[]) {
           }
         }
       }
-    }
 
-    //arrow plot
-    for (int pNum=0; pNum<numProteins; pNum++) {
+      //arrow plot
       double storemaxval = 0;
       double currentval;
       for (int a=0; a<Ny; a++) {
@@ -982,11 +980,11 @@ int main (int argc, char *argv[]) {
               proteinList[pNum]->ymax[i] = a;
               proteinList[pNum]->zmax[i] = b;
             }
-            else {
-              proteinList[pNum]->maxval[i] = 0;
-              proteinList[pNum]->ymax[i] = 0;
-              proteinList[pNum]->zmax[i] = 0;
-            }
+            // else {
+            //   proteinList[pNum]->maxval[i] = 0;
+            //   proteinList[pNum]->ymax[i] = 0;
+            //   proteinList[pNum]->zmax[i] = 0;
+            // }
           }
           else {
             currentval = accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
@@ -996,11 +994,11 @@ int main (int argc, char *argv[]) {
               proteinList[pNum]->ymax[i] = a;
               proteinList[pNum]->zmax[i] = b;
             }
-            else {
-              proteinList[pNum]->maxval[i] = 0;
-              proteinList[pNum]->ymax[i] = 0;
-              proteinList[pNum]->zmax[i] = 0;
-            }
+            // else {
+            //   proteinList[pNum]->maxval[i] = 0;
+            //   proteinList[pNum]->ymax[i] = 0;
+            //   proteinList[pNum]->zmax[i] = 0;
+            // }
           }
         }
       }
@@ -1384,18 +1382,22 @@ int main (int argc, char *argv[]) {
     //filter local maxima in time
     int* time_maxima_y = new int[iter];
     int* time_maxima_z = new int[iter];
+
     for (int i=1; i<(iter-1); i++) {
       if( (proteinList[pNum]->maxval[i] > proteinList[pNum]->maxval[i-1]) && (proteinList[pNum]->maxval[i] > proteinList[pNum]->maxval[i+1]) ) {
         time_maxima_y[i] = proteinList[pNum]->ymax[i];
         time_maxima_z[i] = proteinList[pNum]->zmax[i];
       }
+      else {
+        time_maxima_y[i] = 0;
+        time_maxima_z[i] = 0;
+      }
     }
 
-    // for (int i=1; i<(iter-1); i++) {
-    //   if ((time_maxima_y[i] != 0) && (time_maxima_z[i] != 0)) {
-    // 	printf("%d %d\n", time_maxima_y[i], time_maxima_z[i]);
-    //   }
-    // }
+    for (int i=1; i<(iter-1); i++) {
+      if ((time_maxima_y[i] != 0) && (time_maxima_z[i] != 0)) {
+      }
+    }
 
     //print to file
     char *arrowname = new char[1024];
@@ -1408,6 +1410,8 @@ int main (int argc, char *argv[]) {
       }
     }
     fclose(arrowfile);
+    delete[] time_maxima_y;
+    delete[] time_maxima_z;
     delete[] arrowname;
   }
 
