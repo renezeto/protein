@@ -5,7 +5,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import sys
 import pylab
-import file_loader_dump as load
+import file_loader as load
 
 ## WIP!!
 
@@ -119,9 +119,8 @@ def main():
     j=0
     k=0
     for i in range(len(plotCurveList_D)):
-        if i%(numBoxes)==0:
-            j+=1
         if i%(numProteinTypes_D)==0:
+            j+=1
             k=0
         if i==0:
             plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j])
@@ -142,9 +141,8 @@ def main():
     j=0
     k=0
     for i in range(len(plotCurveList_E)):
-        if i%(numBoxes)==0:
-            j+=1
         if i%(numProteinTypes_E)==0:
+            j+=1
             k=0
         if i==0:
             plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j])

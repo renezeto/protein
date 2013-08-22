@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-import file_loader_dump as load
+import file_loader as load
 import sys
 
 # WIP
