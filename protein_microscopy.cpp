@@ -28,6 +28,7 @@ int debug_flag = 0;
 
 char* hires_flag_str = new char[1024];
 char* slice_flag_str = new char[1024];
+char* debug_flag_str = new char[1024];
 
 double dx; //grid spacing
 double tot_time; //total simulation time
@@ -346,7 +347,7 @@ struct protein {
 
 char* print_filename(const char* plotname, const char* proteinname) {
   char* filename = new char[1024];
-  sprintf(filename,"data/shape-%s/%s%s%s-%s-%s-%1.2f-%1.2f-%1.2f-%1.2f-%1.2f.dat",mem_f_shape.c_str(),hires_flag_str,slice_flag_str,plotname,proteinname,mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(filename,"data/shape-%s/%s%s%s%s-%s-%s-%1.2f-%1.2f-%1.2f-%1.2f-%1.2f.dat",mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,plotname,proteinname,mem_f_shape.c_str(),A,B,C,D,density_factor);
   return filename;
 }
 
@@ -432,6 +433,7 @@ int main (int argc, char *argv[]) {
     if (strcmp(argv[i],"-debug")==0) {
       dx = .15;
       debug_flag = 1;
+      sprintf(debug_flag_str,"debug-");
       printf("=============================================\nDebug mode. dx=.15 um^3, tot_time=250s\n=============================================");
     }
   }
@@ -751,7 +753,7 @@ int main (int argc, char *argv[]) {
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
   char* outfilename = new char[1024];
-  sprintf(outfilename,"data/shape-%s/membrane_files/%s%smembrane-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(outfilename,"data/shape-%s/membrane_files/%s%s%smembrane-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
   if (out==0){
     printf ("couldn't print outfile\n");
@@ -1023,7 +1025,7 @@ int main (int argc, char *argv[]) {
 
       //begin nATP printing.
       char *outfilenameATP = new char[1024];
-      sprintf(outfilenameATP, "data/shape-%s/%s%snATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameATP, "data/shape-%s/%s%s%snATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
 
@@ -1054,7 +1056,7 @@ int main (int argc, char *argv[]) {
 
       //nE printing
       char *outfilenameE = new char[1000];
-      sprintf(outfilenameE, "data/shape-%s/%s%snE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameE, "data/shape-%s/%s%s%snE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
 
@@ -1086,7 +1088,7 @@ int main (int argc, char *argv[]) {
 
       //nADP printing
       char *outfilenameADP = new char[1000];
-      sprintf(outfilenameADP, "data/shape-%s/%s%snADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameADP, "data/shape-%s/%s%s%snADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
       delete[] outfilenameADP;
 
@@ -1117,7 +1119,7 @@ int main (int argc, char *argv[]) {
 
       //begin ND printing
       char *outfilenameD = new char[1000];
-      sprintf(outfilenameD, "data/shape-%s/%s%sND-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameD, "data/shape-%s/%s%s%sND-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *NDfile = fopen((const char *)outfilenameD,"w");
       delete[] outfilenameD;
 
@@ -1148,7 +1150,7 @@ int main (int argc, char *argv[]) {
 
       //begin NDE printing
       char *outfilenameDE = new char[1000];
-      sprintf(outfilenameDE, "data/shape-%s/%s%sNDE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameDE, "data/shape-%s/%s%s%sNDE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *NDEfile = fopen((const char *)outfilenameDE,"w");
       delete[] outfilenameDE;
 
@@ -1179,7 +1181,7 @@ int main (int argc, char *argv[]) {
 
       //begin NflE printing
       char *outfilenameflE = new char[1000];
-      sprintf(outfilenameflE, "data/shape-%s/%s%sNflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameflE, "data/shape-%s/%s%s%sNflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *NflEfile = fopen((const char *)outfilenameflE,"w");
       delete[] outfilenameflE;
 
@@ -1210,7 +1212,7 @@ int main (int argc, char *argv[]) {
 
       //begin NflD printing
       char *outfilenameflD = new char[1000];
-      sprintf(outfilenameflD, "data/shape-%s/%s%sNflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameflD, "data/shape-%s/%s%s%sNflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *NflDfile = fopen((const char *)outfilenameflD,"w");
       delete[] outfilenameflD;
 
