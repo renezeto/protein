@@ -66,7 +66,7 @@ def contourplt(protein):
     plt.figure(1)
 
     #shell command to clean up any previous .png's, just in case (perhaps a process was cancelled midway)
-    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+str(protein.protein)+"-tmp_*" \
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
 
@@ -82,18 +82,18 @@ def contourplt(protein):
         plt.title(str(protein.protein)+" volume density at time: "+str(k*5)+" sec")
         plt.xlabel("Z position")
         plt.ylabel("Y position")
-        plt.savefig('./data/shape-'+f_shape+'/plots/'+load.hires_str+load.slice_str+str(protein.protein)+'-tmp_%03d'%k+'-'+str(protein.protein)+ \
+        plt.savefig('./data/shape-'+f_shape+'/plots/'+load.debug_str+load.hires_str+load.slice_str+'-tmp_%03d'%k+'-'+str(protein.protein)+ \
                         '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
 
     #shell command to convert all of the recently generated .png's to a single .gif using convert utility
-    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+str(protein.protein)+"-tmp_*" \
+    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
     +"/plots/"+load.debug_str+load.hires_str+load.slice_str+"density_movie-"+str(protein.protein)+"-"+f_shape \
     +"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".gif")
 
     #shell command to clean up the .png's
-    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+str(protein.protein)+"-tmp_*" \
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
     return 0
