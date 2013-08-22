@@ -135,7 +135,8 @@ def main():
     plt.xlabel("Time (s)")
     plt.ylabel("Number of proteins")
     plt.legend(plotNameList_D,loc="best",prop={'size':10})
-    plt.savefig("./data/shape-%s/plots/%s%sbox-plot_D--%s-%s-%s-%s-%s-%s.pdf"%(load.f_shape,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
+    plt.savefig(load.print_string("box-plot_D",""))
+    #plt.savefig("./data/shape-%s/plots/%s%sbox-plot_D--%s-%s-%s-%s-%s-%s.pdf"%(load.f_shape,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
 
     plt.figure()
     j=0
@@ -157,7 +158,8 @@ def main():
     plt.xlabel("Time (s)")
     plt.ylabel("Number of proteins")
     plt.legend(plotNameList_E,loc="best",prop={'size':10})
-    plt.savefig("./data/shape-%s/plots/%s%sbox-plot_E--%s-%s-%s-%s-%s-%s.pdf"%(load.f_shape,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
+    plt.savefig(load.print_string("box-plot_E",""))
+    #plt.savefig("./data/shape-%s/plots/%s%sbox-plot_E--%s-%s-%s-%s-%s-%s.pdf"%(load.f_shape,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
 
     return 0
 
