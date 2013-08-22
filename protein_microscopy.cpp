@@ -513,14 +513,14 @@ int main (int argc, char *argv[]) {
   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
   for (int i=0;i<100;i++){
-    printf("guass96[%d] = %g\n",i,guass96[i]);
+    //printf("guass96[%d] = %g\n",i,guass96[i]);
     guass96[i] = guass96[i]/1.4;
-    printf("guass96[%d] = %g\n",i,guass96[i]);
+    //printf("guass96[%d] = %g\n",i,guass96[i]);
   }
   for (int i=0;i<100;i++){
-    printf("guass97[%d] = %g\n",i,guass97[i]);
+    //printf("guass97[%d] = %g\n",i,guass97[i]);
     guass97[i] = 1.3*guass97[i];
-    printf("guass97[%d] = %g\n",i,guass97[i]);
+    //printf("guass97[%d] = %g\n",i,guass97[i]);
   }
   printf("Those are all the guassians!\n");
   if (rand_seed == 99){
@@ -741,7 +741,7 @@ int main (int argc, char *argv[]) {
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
   char* outfilename = new char[1024];
-  sprintf(outfilename,"data/shape-%s/membrane_files/membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(outfilename,"data/shape-%s/membrane_files/%s%smembrane-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
   if (out==0){
     printf ("couldn't print outfile\n");
