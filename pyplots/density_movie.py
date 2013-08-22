@@ -14,8 +14,8 @@ NflD = load.data(protein="NflD")
 nATP = load.data(protein="nATP")
 nE = load.data(protein="nE")
 nADP = load.data(protein="nADP")
-Nd = load.data(protein="Nd")
-Nde = load.data(protein="Nde")
+ND = load.data(protein="ND")
+NDE = load.data(protein="NDE")
 
 f_shape = sys.argv[1]
 f_param1 = sys.argv[2]
@@ -98,10 +98,10 @@ def contourplt(protein):
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
     return 0
 
-contourplt(Nde)
+contourplt(NDE)
 contourplt(NflD)
 contourplt(NflE)
 contourplt(nATP)
 contourplt(nE)
 contourplt(nADP)
-contourplt(Nd)
+contourplt(ND)
