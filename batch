@@ -73,7 +73,7 @@ def runPlots(commands,options):
     try:
         for plot in options['plots'].split():
             for job in jobList:
-                runningPlots.add(subProcess.Popen(sruncmd + ["python","pyplots/%s.py"%(plot)] + [arg for arg in job]))
+                runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/%s.py"%(plot)] + [arg for arg in job]))
     except KeyError:
         for job in jobList:
             runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/box_plot.py"] + [arg for arg in job]))
