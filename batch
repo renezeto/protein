@@ -33,13 +33,19 @@ def parseKwargs(kwargs):
             stringDict[key]=value
     return stringDict
 
+def include(str1, str2):
+    for keyword in str1:
+        if keyword not in str2:
+            return False
+    return True
+
 #returns jobs matching options
 def getJobs(options):
     with open("jobs") as jobFile:
         jobList = jobFile.readlines()
     try:
-        shapes = options['shapes'].split()
-        parsedJobs = [line.split() for line in jobList if (line!="\n" and line.split()[0] in shapes)]
+        requiredKeywords = options['include'].split()
+        parsedJobs = [line.split() for line in jobList if include(requiredKeywords, line.split())]
     except KeyError:
         parsedJobs = [line.split() for line in jobList if line!="\n"]
     return parsedJobs
@@ -58,8 +64,7 @@ def runSim(commands,options):
         for sim in runningSims.copy():
             if sim.poll() is not None:
                 runningSims.remove(sim)
-                #do file writing here
-        time.sleep(30)
+        time.sleep(10)
     return 0
 
 #starts plots matching commands and options
@@ -83,9 +88,8 @@ def runPlots(commands,options):
         for plot in runningPlots.copy():
             if plot.poll() is not None:
                 runningPlots.remove(plot)
-                #do file writing here
             else:
-                time.sleep(30)
+                time.sleep(10)
     return 0
 
 def runMovies(commands,options):
@@ -102,9 +106,8 @@ def runMovies(commands,options):
         for plot in runningMovies.copy():
             if plot.poll() is not None:
                 runningMovies.remove(plot)
-                #do file writing here
             else:
-                time.sleep(30)
+                time.sleep(10)
     return 0
 
 
