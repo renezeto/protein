@@ -24,9 +24,11 @@ double density_factor;
 int area_rating_flag = 0;
 int slice_flag = 0;
 int dump_flag = 0;
+int debug_flag = 0;
 
 char* hires_flag_str = new char[1024];
 char* slice_flag_str = new char[1024];
+char* debug_flag_str = new char[1024];
 
 double dx; //grid spacing
 double tot_time; //total simulation time
@@ -345,7 +347,7 @@ struct protein {
 
 char* print_filename(const char* plotname, const char* proteinname) {
   char* filename = new char[1024];
-  sprintf(filename,"data/shape-%s/%s%s%s-%s-%s-%1.2f-%1.2f-%1.2f-%1.2f-%1.2f.dat",mem_f_shape.c_str(),hires_flag_str,slice_flag_str,plotname,proteinname,mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(filename,"data/shape-%s/%s%s%s%s-%s-%s-%1.2f-%1.2f-%1.2f-%1.2f-%1.2f.dat",mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,plotname,proteinname,mem_f_shape.c_str(),A,B,C,D,density_factor);
   return filename;
 }
 
@@ -406,7 +408,7 @@ int main (int argc, char *argv[]) {
   C = atof(argv[4]);
   D = atof(argv[5]);
   density_factor = atof(argv[6]);
-  dx=.15;
+  dx=.05;
 
   //flag checking
   for (int i=0; i<argc; i++) {
@@ -428,16 +430,13 @@ int main (int argc, char *argv[]) {
       dump_flag = 1;
       printf("Printing all 501 data files.\n");
     }
+    if (strcmp(argv[i],"-debug")==0) {
+      dx = .15;
+      debug_flag = 1;
+      sprintf(debug_flag_str,"debug-");
+      printf("=============================================\nDebug mode. dx=.15 um^3, tot_time=250s\n=============================================");
+    }
   }
-
-  //fixed simulation parameters
-  tot_time = 250; //sec
-  time_step = .1*dx*dx/difD;//sec
-  iter = int(tot_time/time_step);
-  //iter = int(tot_time/time_step);
-  printout_iterations = int(5.0/time_step);
-  printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
-  double dV = dx*dx*dx;
 
   //compute grid size based on cell parameters
   if (mem_f_shape=="p") {
@@ -494,6 +493,19 @@ int main (int argc, char *argv[]) {
     Nz = ceil(2*B/dx) + 4;
   }
 
+
+  //fixed simulation parameters
+  tot_time = 2500; //sec
+  if (debug_flag==1) {
+    tot_time = 250;
+  }
+  time_step = .1*dx*dx/difD;//sec
+  iter = int(tot_time/time_step);
+  //iter = int(tot_time/time_step);
+  printout_iterations = int(5.0/time_step);
+  printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
+  double dV = dx*dx*dx;
+
   //open out file to begin recording info about simulation
   char * out_file_name = new char[1024];
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
@@ -513,14 +525,14 @@ int main (int argc, char *argv[]) {
   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
   for (int i=0;i<100;i++){
-    printf("guass96[%d] = %g\n",i,guass96[i]);
+    //printf("guass96[%d] = %g\n",i,guass96[i]);
     guass96[i] = guass96[i]/1.4;
-    printf("guass96[%d] = %g\n",i,guass96[i]);
+    //printf("guass96[%d] = %g\n",i,guass96[i]);
   }
   for (int i=0;i<100;i++){
-    printf("guass97[%d] = %g\n",i,guass97[i]);
+    //printf("guass97[%d] = %g\n",i,guass97[i]);
     guass97[i] = 1.3*guass97[i];
-    printf("guass97[%d] = %g\n",i,guass97[i]);
+    //printf("guass97[%d] = %g\n",i,guass97[i]);
   }
   printf("Those are all the guassians!\n");
   if (rand_seed == 99){
@@ -741,7 +753,7 @@ int main (int argc, char *argv[]) {
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
   char* outfilename = new char[1024];
-  sprintf(outfilename,"data/shape-%s/membrane_files/membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(outfilename,"data/shape-%s/membrane_files/%s%s%smembrane-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
   if (out==0){
     printf ("couldn't print outfile\n");
@@ -1013,7 +1025,7 @@ int main (int argc, char *argv[]) {
 
       //begin nATP printing.
       char *outfilenameATP = new char[1024];
-      sprintf(outfilenameATP, "data/shape-%s/%s%snATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameATP, "data/shape-%s/%s%s%snATP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *nATPfile = fopen((const char *)outfilenameATP,"w");
       delete[] outfilenameATP;
 
@@ -1044,7 +1056,7 @@ int main (int argc, char *argv[]) {
 
       //nE printing
       char *outfilenameE = new char[1000];
-      sprintf(outfilenameE, "data/shape-%s/%s%snE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameE, "data/shape-%s/%s%s%snE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *nEfile = fopen((const char *)outfilenameE,"w");
       delete[] outfilenameE;
 
@@ -1076,7 +1088,7 @@ int main (int argc, char *argv[]) {
 
       //nADP printing
       char *outfilenameADP = new char[1000];
-      sprintf(outfilenameADP, "data/shape-%s/%s%snADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameADP, "data/shape-%s/%s%s%snADP-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *nADPfile = fopen((const char *)outfilenameADP,"w");
       delete[] outfilenameADP;
 
@@ -1107,7 +1119,7 @@ int main (int argc, char *argv[]) {
 
       //begin ND printing
       char *outfilenameD = new char[1000];
-      sprintf(outfilenameD, "data/shape-%s/%s%sND-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameD, "data/shape-%s/%s%s%sND-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *NDfile = fopen((const char *)outfilenameD,"w");
       delete[] outfilenameD;
 
@@ -1138,7 +1150,7 @@ int main (int argc, char *argv[]) {
 
       //begin NDE printing
       char *outfilenameDE = new char[1000];
-      sprintf(outfilenameDE, "data/shape-%s/%s%sNDE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameDE, "data/shape-%s/%s%s%sNDE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *NDEfile = fopen((const char *)outfilenameDE,"w");
       delete[] outfilenameDE;
 
@@ -1169,7 +1181,7 @@ int main (int argc, char *argv[]) {
 
       //begin NflE printing
       char *outfilenameflE = new char[1000];
-      sprintf(outfilenameflE, "data/shape-%s/%s%sNflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameflE, "data/shape-%s/%s%s%sNflE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *NflEfile = fopen((const char *)outfilenameflE,"w");
       delete[] outfilenameflE;
 
@@ -1200,7 +1212,7 @@ int main (int argc, char *argv[]) {
 
       //begin NflD printing
       char *outfilenameflD = new char[1000];
-      sprintf(outfilenameflD, "data/shape-%s/%s%sNflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
+      sprintf(outfilenameflD, "data/shape-%s/%s%s%sNflD-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", argv[1],debug_flag_str,hires_flag_str,slice_flag_str,argv[1],A,B,C,D,density_factor,k);
       FILE *NflDfile = fopen((const char *)outfilenameflD,"w");
       delete[] outfilenameflD;
 
@@ -1441,8 +1453,6 @@ int main (int argc, char *argv[]) {
   }
   delete[] fname;
   //end catalog
-
-  printf("segfault now:\n");
   return 0;
 }
 
