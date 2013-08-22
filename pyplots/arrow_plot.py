@@ -7,7 +7,7 @@ import file_loader as load
 import sys
 
 #membrane.dat or arrow.dat printed transposed, gotta align them:
-cell_membrane = np.transpose(np.loadtxt("./data/shape-%s/membrane_files/%s%smembrane-%s-%s-%s-%s-%s-%s.dat"%load.filename_tuple))
+cell_membrane = np.transpose(np.loadtxt("./data/shape-%s/membrane_files/%s%s%smembrane-%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5)))
 
 for protein in load.proteinList:
     tails = np.loadtxt('./data/shape-%s/%s%sarrow-plot-%s-%s-%s-%s-%s-%s-%s.dat'%(load.f_shape,load.hires_str,load.slice_str,protein,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
