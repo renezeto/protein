@@ -19,4 +19,3 @@ for protein in load.proteinList:
     plt.title("Time averaged view of %s"%(protein))
     plt.colorbar()
     plt.savefig(load.print_string("time-map",protein))
-    #plt.savefig("./data/shape-%s/plots/%s%stime-map-%s-%s-%s-%s-%s-%s-%s.pdf"%(load.f_shape,load.hires_str,load.slice_str,protein,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
