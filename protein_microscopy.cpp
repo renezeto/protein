@@ -24,6 +24,7 @@ double density_factor;
 int area_rating_flag = 0;
 int slice_flag = 0;
 int dump_flag = 0;
+int debug_flag = 0;
 
 char* hires_flag_str = new char[1024];
 char* slice_flag_str = new char[1024];
@@ -406,7 +407,7 @@ int main (int argc, char *argv[]) {
   C = atof(argv[4]);
   D = atof(argv[5]);
   density_factor = atof(argv[6]);
-  dx=.15;
+  dx=.05;
 
   //flag checking
   for (int i=0; i<argc; i++) {
@@ -428,16 +429,12 @@ int main (int argc, char *argv[]) {
       dump_flag = 1;
       printf("Printing all 501 data files.\n");
     }
+    if (strcmp(argv[i],"-debug")==0) {
+      dx = .15;
+      debug_flag = 1;
+      printf("=============================================\nDebug mode. dx=.15 um^3, tot_time=250s\n=============================================");
+    }
   }
-
-  //fixed simulation parameters
-  tot_time = 2500; //sec
-  time_step = .1*dx*dx/difD;//sec
-  iter = int(tot_time/time_step);
-  //iter = int(tot_time/time_step);
-  printout_iterations = int(5.0/time_step);
-  printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
-  double dV = dx*dx*dx;
 
   //compute grid size based on cell parameters
   if (mem_f_shape=="p") {
@@ -493,6 +490,19 @@ int main (int argc, char *argv[]) {
     Ny = ceil(2*A/dx) + 4;
     Nz = ceil(2*B/dx) + 4;
   }
+
+
+  //fixed simulation parameters
+  tot_time = 2500; //sec
+  if (debug_flag==1) {
+    tot_time = 250;
+  }
+  time_step = .1*dx*dx/difD;//sec
+  iter = int(tot_time/time_step);
+  //iter = int(tot_time/time_step);
+  printout_iterations = int(5.0/time_step);
+  printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
+  double dV = dx*dx*dx;
 
   //open out file to begin recording info about simulation
   char * out_file_name = new char[1024];
@@ -1441,8 +1451,6 @@ int main (int argc, char *argv[]) {
   }
   delete[] fname;
   //end catalog
-
-  printf("segfault now:\n");
   return 0;
 }
 
