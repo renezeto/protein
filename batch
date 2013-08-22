@@ -97,8 +97,7 @@ def runMovie(commands,options):
     runningMovies = set()
     for job in jobList:
         if "-dump" in job:
-            print sruncmd + ["python","pyplots/density_movie.py"] + [arg for arg in job if arg is not "-dump"]
-            #runningMovies.add(subProcess.Popen(sruncmd + ["python","pyplots/density_movie.py"] + [arg for arg in job if arg is not "-dump"]))
+            runningMovies.add(subProcess.Popen(sruncmd + ["python","pyplots/density_movie.py"] + [arg for arg in job if arg is not "-dump"]))
     while len(runningMovies) > 0:
         for plot in runningMovies.copy():
             if plot.poll() is not None:
