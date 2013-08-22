@@ -10,7 +10,7 @@ import sys
 cell_membrane = np.transpose(np.loadtxt("./data/shape-%s/membrane_files/%s%s%smembrane-%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5)))
 
 for protein in load.proteinList:
-    tails = np.loadtxt('./data/shape-%s/%s%sarrow-plot-%s-%s-%s-%s-%s-%s-%s.dat'%(load.f_shape,load.hires_str,load.slice_str,protein,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
+    tails = np.loadtxt('./data/shape-%s/%s%s%sarrow-plot-%s-%s-%s-%s-%s-%s-%s.dat'%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,protein,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
     tails = [list(element) for element in tails]
     heads = [[tails[1][0]-tails[0][0],tails[1][1]-tails[0][1]]]
     heads += [[tails[i+1][0]-tails[i][0], tails[i+1][1]-tails[i][1]] for i in range(1,len(tails)-1)]
