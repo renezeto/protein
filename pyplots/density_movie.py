@@ -66,7 +66,7 @@ def contourplt(protein):
     plt.figure(1)
 
     #shell command to clean up any previous .png's, just in case (perhaps a process was cancelled midway)
-    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+load.hires_str+load.m_str+str(protein.protein)+"-tmp_*" \
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.m_str+str(protein.protein)+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
 
@@ -86,29 +86,22 @@ def contourplt(protein):
                         '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
 
     #shell command to convert all of the recently generated .png's to a single .gif using convert utility
-    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/"+load.hires_str+load.m_str+str(protein.protein)+"-tmp_*" \
+    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.m_str+str(protein.protein)+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
-    +"/plots/"+load.hires_str+load.m_str+"density_movie-"+str(protein.protein)+"-"+f_shape \
+    +"/plots/"+load.debug_str+load.hires_str+load.m_str+"density_movie-"+str(protein.protein)+"-"+f_shape \
     +"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+".gif")
 
     #shell command to clean up the .png's
-    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+load.hires_str+load.m_str+str(protein.protein)+"-tmp_*" \
+    os.system("rm -f ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.m_str+str(protein.protein)+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
     return 0
 
 contourplt(Nde)
-print "Generating flourescent Min D tagging plot:"
 contourplt(NflD)
-print "Done! Generating flourescent Min E tagging plot:"
 contourplt(NflE)
-print "Generating nATP plot:"
 contourplt(nATP)
-print "Done! Generating nE plot:"
 contourplt(nE)
-print "Done! Generating nADP plot:"
 contourplt(nADP)
-print "Done! Generating nD plot:"
 contourplt(Nd)
-print "Finished generating plots."
