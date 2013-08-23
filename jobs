@@ -1,6 +1,7 @@
-p 1.50 0.60 0.00 0.00 15.00 -debug -dump
+p 1.50 0.60 0.00 0.00 15.00 -debug -dump -paper
 randst 0.50 6.00 6.00 96.00 15.00 -debug -dump
 triangle 0.50 3.00 3.00 3.00 15.00
+
 triangle 1.20 1.20 1.20 1.20 1.20
 randst 5.00 5.00 0.00 1.00 15.00
 triangle 0.25 4.00 4.00 4.00 15.00 -dump

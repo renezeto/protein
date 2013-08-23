@@ -15,14 +15,10 @@ paper/paper.pdf: paper/paper.tex $(ALL_FIGURES)
 	cd paper && pdflatex paper.tex && bibtex paper && pdflatex paper.tex && pdflatex paper.tex
 
 ALL_FIGURES = \
-	data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf \
-	data/shape-randst/plots/time-map-compare-randst-10-80-60-980-150.pdf \
-	data/shape-randst/plots/time-map-compare-randst-10-60-60-970-150.pdf \
-	data/shape-randst/plots/time-map-compare-randst-10-60-60-960-150.pdf \
-	data/shape-p/plots/time-map-compare-p-100-5-0-0-150.pdf \
-	data/shape-p/plots/time-map-compare-p-40-5-0-0-150.pdf \
-	data/shape-p/plots/time-map-compare-p-40-20-0-0-150.pdf \
-	data/shape-p/plots/time-map-compare-p-40-30-0-0-150.pdf
+	data/shape-p/plots/debug-box-plot_D--p-150-60-0-0-1500.pdf
+
+$(ALL_FIGURES): batch jobs $(wildcard data/shape-*/*.dat)
+	./batch plot include="-paper"
 
 #time maps
 data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf: pyplots/time_map.py
