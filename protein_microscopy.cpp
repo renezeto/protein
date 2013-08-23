@@ -434,7 +434,7 @@ int main (int argc, char *argv[]) {
       dx = .15;
       debug_flag = 1;
       sprintf(debug_flag_str,"debug-");
-      printf("=============================================\nDebug mode. dx=.15 um^3, tot_time=250s\n=============================================");
+      printf("=============================================\nDebug mode. dx=.15 um^3, tot_time=250s\n=============================================\n");
     }
   }
 

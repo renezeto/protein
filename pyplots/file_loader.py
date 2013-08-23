@@ -18,6 +18,7 @@ proteinList = ["D_nATP","D_nADP","D_E_NDE","E_nE","D_ND"]
 #initialize as empty lists incase arguments not present in sys.argv
 hires_str=""
 slice_str=""
+debug_str=""
 
 #change them to print the correct file names if arguments present
 if "-hires" in sys.argv:
@@ -25,6 +26,8 @@ if "-hires" in sys.argv:
     hires_str="hires-"
 if "-slice" in sys.argv:
     slice_str="slice-"
+if "-debug" in sys.argv:
+    debug_str="debug-"
 
 filename_tuple = (f_shape,hires_str,slice_str,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)
 
@@ -42,7 +45,7 @@ class data(object):
     @staticmethod
     def get_filenames(protein):
         dat_filenames = []
-        for fn in glob.iglob("./data/shape-"+f_shape+"/"+hires_str+slice_str+protein+"-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+"*.dat"):
+        for fn in glob.iglob("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)):
             dat_filenames.append(fn)
         dat_filenames = sorted(dat_filenames)
         i=0 #pop the first 10% of file names to let things equillibriate a bit
@@ -51,7 +54,7 @@ class data(object):
             i+=1
         if (dat_filenames == []):
             print "File loading error: filename list is empty."
-            print "./data/shape-"+f_shape+"/"+hires_str+slice_str+protein+"-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+"*.dat"
+            print "./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)
             exit(1)
         else:
             return dat_filenames
@@ -59,5 +62,7 @@ class data(object):
 #function for easier plot name printing. probably should be renamed itself.
 def print_string(plot_name,p):
     arg = [str(int(100*(float(i)))) for i in sys.argv[2:7]]
-    filename = "./data/shape-%s/plots/%s%s%s-%s-%s-%s-%s-%s-%s-%s.pdf"%(f_shape, hires_str, slice_str, plot_name, p, f_shape, arg[0], arg[1], arg[2], arg[3], arg[4])
+    filename = "./data/shape-%s/plots/%s%s%s%s-%s-%s-%s-%s-%s-%s-%s.pdf"%(f_shape, debug_str, hires_str, slice_str, plot_name, p, f_shape, arg[0], arg[1], arg[2], arg[3], arg[4])
     return filename
+
+#"./data/shape-"+f_shape+"/"debug_str+hires_str+slice_str+protein+"-"+f_shape+"-"+f_param1+"-"+f_param2+"-"+f_param3+"-"+f_param4+"-"+f_param5+"*.dat"

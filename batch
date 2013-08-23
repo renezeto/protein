@@ -88,6 +88,26 @@ def runPlots(commands,options):
                 time.sleep(30)
     return 0
 
+def runMovies(commands,options):
+    if "srun" in commands:
+        sruncmd = ["srun"]
+    else:
+        sruncmd = []
+    jobList = getJobs(options)
+    runningMovies = set()
+    for job in jobList:
+        if "-dump" in job:
+            runningMovies.add(subProcess.Popen(sruncmd + ["python","pyplots/density_movie.py"] + [arg for arg in job if arg is not "-dump"]))
+    while len(runningMovies) > 0:
+        for plot in runningMovies.copy():
+            if plot.poll() is not None:
+                runningMovies.remove(plot)
+                #do file writing here
+            else:
+                time.sleep(30)
+    return 0
+
+
 def main():
     commands = parseArgs(sys.argv)
     options = parseKwargs(sys.argv)
@@ -95,6 +115,8 @@ def main():
         runSim(commands,options)
     if "plot" in commands:
         runPlots(commands,options)
+    if "movie" in commands:
+        runMovies(commands,options)
     return 0
 
 if __name__ == "__main__":
