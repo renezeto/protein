@@ -497,7 +497,7 @@ int main (int argc, char *argv[]) {
   //fixed simulation parameters
   tot_time = 2500; //sec
   if (debug_flag==1) {
-    tot_time = 250;
+    tot_time = 11;
   }
   time_step = .1*dx*dx/difD;//sec
   iter = int(tot_time/time_step);
