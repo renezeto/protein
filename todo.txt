@@ -3,7 +3,10 @@
 
 rene's short list:
        - modify batch submit to support special flags ("include=debug")
-
+       - section printouts
+       - make plots nicer
+       - put plots in figure
+       - integrate batch with make
 
 Pill Normal -
 Pill Short -

@@ -33,13 +33,20 @@ def parseKwargs(kwargs):
             stringDict[key]=value
     return stringDict
 
+#keyword filtering function
+def include(str1, str2):
+    for keyword in str1:
+        if keyword not in str2:
+            return False
+    return True
+
 #returns jobs matching options
 def getJobs(options):
     with open("jobs") as jobFile:
         jobList = jobFile.readlines()
     try:
-        shapes = options['shapes'].split()
-        parsedJobs = [line.split() for line in jobList if (line!="\n" and line.split()[0] in shapes)]
+        requiredKeywords = options['include'].split()
+        parsedJobs = [line.split() for line in jobList if include(requiredKeywords, line.split())]
     except KeyError:
         parsedJobs = [line.split() for line in jobList if line!="\n"]
     return parsedJobs
@@ -58,8 +65,8 @@ def runSim(commands,options):
         for sim in runningSims.copy():
             if sim.poll() is not None:
                 runningSims.remove(sim)
-                #do file writing here
-        time.sleep(30)
+            else:
+                time.sleep(10)
     return 0
 
 #starts plots matching commands and options
@@ -70,22 +77,16 @@ def runPlots(commands,options):
         sruncmd = []
     jobList = getJobs(options)
     runningPlots = set()
-    try:
-        for plot in options['plots'].split():
-            for job in jobList:
-                runningPlots.add(subProcess.Popen(sruncmd + ["python","pyplots/%s.py"%(plot)] + [arg for arg in job]))
-    except KeyError:
-        for job in jobList:
-            runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/box_plot.py"] + [arg for arg in job]))
-            runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/time_map.py"] + [arg for arg in job]))
-            runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/arrow_plot.py"] + [arg for arg in job]))
+    for job in jobList:
+        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/box_plot.py"] + [arg for arg in job]))
+        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/time_map.py"] + [arg for arg in job]))
+        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/arrow_plot.py"] + [arg for arg in job]))
     while len(runningPlots) > 0:
         for plot in runningPlots.copy():
             if plot.poll() is not None:
                 runningPlots.remove(plot)
-                #do file writing here
             else:
-                time.sleep(30)
+                time.sleep(10)
     return 0
 
 def runMovies(commands,options):
@@ -97,14 +98,13 @@ def runMovies(commands,options):
     runningMovies = set()
     for job in jobList:
         if "-dump" in job:
-            runningMovies.add(subProcess.Popen(sruncmd + ["python","pyplots/density_movie.py"] + [arg for arg in job if arg is not "-dump"]))
+            runningMovies.add(subprocess.Popen(sruncmd + ["python","pyplots/density_movie.py"] + [arg for arg in job if arg is not "-dump"]))
     while len(runningMovies) > 0:
         for plot in runningMovies.copy():
             if plot.poll() is not None:
                 runningMovies.remove(plot)
-                #do file writing here
             else:
-                time.sleep(30)
+                time.sleep(10)
     return 0
 
 
