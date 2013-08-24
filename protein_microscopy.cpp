@@ -604,6 +604,9 @@ int main (int argc, char *argv[]) {
 
   int print_denominator = 1000;
 
+  printf("Ny*Nz*sizeof(double) = %lu",Ny*Nz*sizeof(double));
+  printf("iter*sizeof(double) = %lu",iter*sizeof(double));
+
   //initialize things
   for (int pNum=0; pNum<numProteins; pNum++) {
     proteinList[pNum]->sum = new double[Ny*Nz];
@@ -622,21 +625,23 @@ int main (int argc, char *argv[]) {
     proteinList[pNum]->ymax = new int[iter];
     proteinList[pNum]->zmax = new int[iter];
 
-    memset(proteinList[pNum]->sum,0,Ny*Nz*sizeof(double));
-    memset(proteinList[pNum]->name,'\0',1024*sizeof(char));
+    // crashes rene's computer
+    // :(
+    // memset(proteinList[pNum]->sum,0,Ny*Nz*sizeof(double));
+    // memset(proteinList[pNum]->name,'\0',1024*sizeof(char));
 
-    memset(proteinList[pNum]->numLeft,0,iter*sizeof(double));
-    memset(proteinList[pNum]->numMid,0,iter*sizeof(double));
-    memset(proteinList[pNum]->numRight,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numLeft,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numMid,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numRight,0,iter*sizeof(double));
 
-    memset(proteinList[pNum]->numRightUp,0,iter*sizeof(double));
-    memset(proteinList[pNum]->numRightDown,0,iter*sizeof(double));
-    memset(proteinList[pNum]->numLeftUp,0,iter*sizeof(double));
-    memset(proteinList[pNum]->numLeftDown,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numRightUp,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numRightDown,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numLeftUp,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numLeftDown,0,iter*sizeof(double));
 
-    memset(proteinList[pNum]->maxval,0,iter*sizeof(double));
-    memset(proteinList[pNum]->ymax,0,iter*sizeof(int));
-    memset(proteinList[pNum]->zmax,0,iter*sizeof(int));
+    // memset(proteinList[pNum]->maxval,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->ymax,0,iter*sizeof(int));
+    // memset(proteinList[pNum]->zmax,0,iter*sizeof(int));
   }
 
   sprintf(proteinList[0]->name,"D_nATP");
