@@ -623,7 +623,7 @@ int main (int argc, char *argv[]) {
     proteinList[pNum]->zmax = new int[iter];
 
     memset(proteinList[pNum]->sum,0,Ny*Nz*sizeof(double));
-    memset(proteinList[pNum]->name,0,1024*sizeof(char));
+    memset(proteinList[pNum]->name,'\0',1024*sizeof(char));
 
     memset(proteinList[pNum]->numLeft,0,iter*sizeof(double));
     memset(proteinList[pNum]->numMid,0,iter*sizeof(double));
