@@ -352,6 +352,8 @@ char* print_filename(const char* plotname, const char* proteinname) {
   return filename;
 }
 
+
+
 bool only_once = true;
 string triangle_section (double y, double z) {
   //needs editing!!!!!
@@ -811,7 +813,8 @@ int main (int argc, char *argv[]) {
 
   if (mem_f_shape=="triangle") {
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+            debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int j=0;j<Ny;j++){
       for (int i=0;i<Nz;i++) {
@@ -845,7 +848,8 @@ int main (int argc, char *argv[]) {
 
   if (mem_f_shape=="p"){
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+            debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int a=0; a<Ny; a++) {
       for (int b=0; b<Nz; b++) {
@@ -905,7 +909,8 @@ int main (int argc, char *argv[]) {
   }
   if (mem_f_shape=="randst") {
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+            debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int a=0; a<Ny; a++) {
       for (int b=0; b<Nz; b++) {
