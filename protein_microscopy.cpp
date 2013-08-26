@@ -943,10 +943,10 @@ int main (int argc, char *argv[]) {
             if (b < vert_div && a < hor_div) {
               marker = 1;
             }
-            else if (b < vert_div && a >= hor_div) {
+            else if (b < vert_div && a > hor_div) {
               marker = 2;
             }
-            else if (b >= vert_div && a < hor_div) {
+            else if (b > vert_div && a < hor_div) {
               marker = 3;
             }
             else {
@@ -1030,10 +1030,10 @@ int main (int argc, char *argv[]) {
                   if (b < vert_div) {
                     proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  else if (b > vert_div && a > hor_div_two) {
+                  else if (a > hor_div_two) {
                     proteinList[pNum]->numRightUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  else if (b > vert_div && a < hor_div) {
+                  else if (a < hor_div) {
                     proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else {
