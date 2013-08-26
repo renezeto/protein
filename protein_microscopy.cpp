@@ -625,7 +625,7 @@ int main (int argc, char *argv[]) {
     proteinList[pNum]->ymax = new int[iter];
     proteinList[pNum]->zmax = new int[iter];
 
-    // crashes rene's computer
+    // makes for a nice valgrind but crashes rene's computer
     // :(
     // memset(proteinList[pNum]->sum,0,Ny*Nz*sizeof(double));
     // memset(proteinList[pNum]->name,'\0',1024*sizeof(char));
