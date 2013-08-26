@@ -30,6 +30,7 @@ char* hires_flag_str = new char[1024];
 char* slice_flag_str = new char[1024];
 char* debug_flag_str = new char[1024];
 
+
 double dx; //grid spacing
 double tot_time; //total simulation time
 double time_step; //simulation time step
@@ -410,6 +411,10 @@ int main (int argc, char *argv[]) {
   density_factor = atof(argv[6]);
   dx=.05;
 
+  memset(hires_flag_str,0,1024*sizeof(char));
+  memset(slice_flag_str,0,1024*sizeof(char));
+  memset(debug_flag_str,0,1024*sizeof(char));
+
   //flag checking
   for (int i=0; i<argc; i++) {
     if (strcmp(argv[i],"-area")==0) {
@@ -497,7 +502,7 @@ int main (int argc, char *argv[]) {
   //fixed simulation parameters
   tot_time = 2500; //sec
   if (debug_flag==1) {
-    tot_time = 250;
+    tot_time = 11;
   }
   time_step = .1*dx*dx/difD;//sec
   iter = int(tot_time/time_step);
@@ -510,6 +515,7 @@ int main (int argc, char *argv[]) {
   char * out_file_name = new char[1024];
   sprintf(out_file_name,"data/shape-%s/out_files/%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.out",mem_f_shape.c_str(),mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE * out_file = fopen((const char *)out_file_name,"w");
+  delete[] out_file_name;
 
   //random stuff that needs to be contained
   fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
@@ -598,6 +604,9 @@ int main (int argc, char *argv[]) {
 
   int print_denominator = 1000;
 
+  printf("Ny*Nz*sizeof(double) = %lu",Ny*Nz*sizeof(double));
+  printf("iter*sizeof(double) = %lu",iter*sizeof(double));
+
   //initialize things
   for (int pNum=0; pNum<numProteins; pNum++) {
     proteinList[pNum]->sum = new double[Ny*Nz];
@@ -615,6 +624,24 @@ int main (int argc, char *argv[]) {
     proteinList[pNum]->maxval = new double[iter];
     proteinList[pNum]->ymax = new int[iter];
     proteinList[pNum]->zmax = new int[iter];
+
+    // crashes rene's computer
+    // :(
+    // memset(proteinList[pNum]->sum,0,Ny*Nz*sizeof(double));
+    // memset(proteinList[pNum]->name,'\0',1024*sizeof(char));
+
+    // memset(proteinList[pNum]->numLeft,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numMid,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numRight,0,iter*sizeof(double));
+
+    // memset(proteinList[pNum]->numRightUp,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numRightDown,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numLeftUp,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->numLeftDown,0,iter*sizeof(double));
+
+    // memset(proteinList[pNum]->maxval,0,iter*sizeof(double));
+    // memset(proteinList[pNum]->ymax,0,iter*sizeof(int));
+    // memset(proteinList[pNum]->zmax,0,iter*sizeof(int));
   }
 
   sprintf(proteinList[0]->name,"D_nATP");
@@ -804,30 +831,6 @@ int main (int argc, char *argv[]) {
   }
 
   //end membrane printing
-
-  //eventually uncommend and replace membrane.dat prints with mem_f prints for extrema.py
-  //begin mem_f printing for randst, tie fighter, triangle - possibly do this for other shapes if needed -- NEEDS UPDATE.
-  // if (mem_f_shape == "randst"||mem_f_shape == "TIE_fighter"||mem_f_shape == "triangle") {
-  //   char *f_file_name = new char[1024];
-  //   if(f_file_name==NULL) {
-  //     fprintf(out_file,"Error: f_file_name is null.");
-  //     exit(1);
-  //   }
-  //   sprintf(f_file_name,"data/shape-%s/membrane_files/f_membrane-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat", mem_f_shape.c_str(),A,B,C,D,density_factor);
-  //   FILE *f_file = fopen((const char *)f_file_name,"w");
-  //   double x = Nx/2.0*dx;
-  //   for (int i=0;i<Ny;i++) {
-  //     for (int j=0;j<Nz;j++) {
-  //       fprintf(f_file,"%g\t%g\t%g\n",i*dx,j*dx,mem_f(x,i*dx,j*dx));
-  //     }
-  //   }
-  //   fclose(f_file);
-  //   fprintf(out_file,"Finished printing out the mem_f_shape function.\n");
-  //   fflush(stdout);
-  // }
-  // fprintf (out_file,"Membrane set with density in it.\n");
-  // fflush(out_file);
-  //end mem_f printing
 
   set_density(nATP, nE, mem_A);
   fflush(out_file);
@@ -1247,15 +1250,25 @@ int main (int argc, char *argv[]) {
   //end file printing
   //end simulation
 
+  delete[] JxATP;
+  delete[] JyATP;
+  delete[] JzATP;
+  delete[] JxADP;
+  delete[] JyADP;
+  delete[] JzADP;
+  delete[] JxE;
+  delete[] JyE;
+  delete[] JzE;
+
   fclose(out_file);
 
   //printing plot information
   for (int pNum=0; pNum<numProteins; pNum++) {
 
     //time map
-    char *timename = new char[1024];
-    sprintf(timename,"%s",print_filename("time-map",proteinList[pNum]->name));
+    char *timename = print_filename("time-map",proteinList[pNum]->name);
     FILE* time_map = fopen(timename,"w");
+    delete[] timename;
 
     for (int a=0; a<Ny; a++) {
       for (int b=0; b<Nz; b++) {
@@ -1264,12 +1277,14 @@ int main (int argc, char *argv[]) {
       fprintf(time_map,"\n");
     }
 
+    delete[] proteinList[pNum]->sum;
+
     fclose(time_map);
-    delete[] timename;
+
   }
-  char *boxname = new char[1024];
-  sprintf(boxname,"%s",print_filename("box-plot",""));
+  char *boxname = print_filename("box-plot","");
   FILE* box_plot = fopen(boxname,"w");
+  delete[] boxname;
 
   for (int pNum=0; pNum<numProteins; pNum++) {
 
@@ -1288,6 +1303,9 @@ int main (int argc, char *argv[]) {
       for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_dat]));
       }
+      delete[] proteinList[pNum]->numLeft;
+      delete[] proteinList[pNum]->numMid;
+      delete[] proteinList[pNum]->numRight;
       fprintf(box_plot,"\n");
       fprintf(box_plot,"\n");
     }
@@ -1311,6 +1329,10 @@ int main (int argc, char *argv[]) {
       for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_dat]));
       }
+      delete[] proteinList[pNum]->numLeft;
+      delete[] proteinList[pNum]->numRightUp;
+      delete[] proteinList[pNum]->numMid;
+      delete[] proteinList[pNum]->numRightDown;
       fprintf(box_plot,"\n");
       fprintf(box_plot,"\n");
     }
@@ -1334,13 +1356,16 @@ int main (int argc, char *argv[]) {
       for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_dat]));
       }
+      delete[] proteinList[pNum]->numRightUp;
+      delete[] proteinList[pNum]->numLeftUp;
+      delete[] proteinList[pNum]->numLeftDown;
+      delete[] proteinList[pNum]->numRightDown;
       fprintf(box_plot,"\n");
       fprintf(box_plot,"\n");
     }
   }
 
   fclose(box_plot);
-  delete[] boxname;
 
   // char *avename = new char[1024];
   // sprintf(avename,"%s",print_filename("ave_plot",""));
@@ -1406,10 +1431,14 @@ int main (int argc, char *argv[]) {
       }
     }
 
+    delete[] proteinList[pNum]->maxval;
+    delete[] proteinList[pNum]->ymax;
+    delete[] proteinList[pNum]->zmax;
+
     //print to file
-    char *arrowname = new char[1024];
-    sprintf(arrowname,"%s",print_filename("arrow-plot",proteinList[pNum]->name));
+    char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
     FILE* arrowfile = fopen(arrowname,"w");
+    delete[] arrowname;
 
     for (int i=1; i<(iter-1); i++) {
       if ((time_maxima_y[i] != 0) && (time_maxima_z[i] != 0)) {
@@ -1419,7 +1448,6 @@ int main (int argc, char *argv[]) {
     fclose(arrowfile);
     delete[] time_maxima_y;
     delete[] time_maxima_z;
-    delete[] arrowname;
   }
 
   //printing to the project directory so we have a shortlist of what we've done.
@@ -1452,7 +1480,15 @@ int main (int argc, char *argv[]) {
     fclose(catalog);
   }
   delete[] fname;
-  //end catalog
+  delete[] debug_flag_str;
+  delete[] hires_flag_str;
+  delete[] slice_flag_str;
+
+  for (int pNum=0; pNum<numProteins; pNum++) {
+    delete[] proteinList[pNum]->name;
+    delete proteinList[pNum];
+  }
+
   return 0;
 }
 
