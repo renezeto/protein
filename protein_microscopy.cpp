@@ -503,7 +503,6 @@ int main (int argc, char *argv[]) {
     Nz = ceil(2*B/dx) + 4;
   }
 
-
   //fixed simulation parameters
   tot_time = 2500/2; //sec
   if (debug_flag==1) {
@@ -964,6 +963,7 @@ int main (int argc, char *argv[]) {
     printf("Randst sections file printed !!!\n");
     fflush(stdout);
   }
+
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
