@@ -505,13 +505,12 @@ int main (int argc, char *argv[]) {
 
 
   //fixed simulation parameters
-  tot_time = 2500; //sec
+  tot_time = 2500/2; //sec
   if (debug_flag==1) {
     tot_time = 11;
   }
   time_step = .1*dx*dx/difD;//sec
-  iter = int(tot_time/time_step);
-  //iter = int(tot_time/time_step);
+  iter = int(tot_time/time_step)/4.2;//this will give us triangle data in about a day and randst in two days
   printout_iterations = int(5.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
@@ -943,10 +942,10 @@ int main (int argc, char *argv[]) {
             if (b < vert_div && a < hor_div) {
               marker = 1;
             }
-            else if (b < vert_div && a > hor_div) {
+            else if (b < vert_div && a >= hor_div) {
               marker = 2;
             }
-            else if (b > vert_div && a < hor_div) {
+            else if (b >= vert_div && a < hor_div) {
               marker = 3;
             }
             else {
@@ -1044,10 +1043,10 @@ int main (int argc, char *argv[]) {
                   if (b < vert_div && a < hor_div) {
                     proteinList[pNum]->numLeftDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  else if (b < vert_div_two && a > hor_div) {
+                  else if (b < vert_div_two && a >= hor_div) {
                     proteinList[pNum]->numLeftUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  else if (b > vert_div_two && a < hor_div) {
+                  else if (b >= vert_div_two && a < hor_div) {
                     proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else {
