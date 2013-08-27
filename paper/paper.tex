@@ -33,7 +33,7 @@
 \end{abstract}
 \section{Introduction}
 \fixme{I need a lot of references here!!!  (And the writing is just terrible)}
-%It is vital that the process of bacterial cell division result in a single
+It is vital that the process of bacterial cell division result in a single
 nucleiod in each daughter cell.  The cell must avoid minicelling, or
 splitting into daughter cells with lopsided volumes.  One of the mechanisms
 the cell employs in order to avoid this is to allow a long FtsZ polymer
@@ -54,59 +54,64 @@ oscillatory behavior (cramming into spaces).
 \subsection{What is the MinD system and why is it important?}
 \subsection{How proteins move in cell}
 \section{Methods and Initial Conditions}
-The model for the behavior of the MinD and MinE proteins inside the cell
-implemented the same set of 5 reaction-diffusion equations described in the paper
-by Huang et al (equations 1, 2, 3, 4, and 5). A 3d grid was constructed in
-cartesian coordinates with a grid spacing of .05 $\mu$m. From there, we
-were able to define a cell shape on the grid, and solve the
-reaction-diffusion equations numerically to observe the time evolution of
-the MinD and MinE concentrations inside the cell.
+The model for the behavior of the MinD and MinE proteins inside the
+cell implements the same set of 5 reaction-diffusion equations studied in
+the work of Huang et al (equations 1, 2, 3, 4, and
+5)\cite{huang2003dynamic}. A 3d grid is constructed in cartesian
+coordinates with a grid spacing of .05 $\mu$m. We define our cell
+shapes and solve the reaction-diffusion equations numerically to
+observe the time evolution of the MinD and MinE concentrations inside
+the cell.
 
-Kubitschek\cite{kubitschek1990cell} \cite{kubitschek1968linear} has
-shown in multiple experiments that at the time of cell division cells
-have a volume that is within a range of roughly $1\mu m^3$ to $2\mu
-m^3$.  We follow Huang's simulations\cite{huang2003dynamic} and
-Mannik's experiments \cite{mannik2012robustness} and model cells that
-are slightly larger than this range.
-
-We mean to study cells that are parrallel to those lodged into
-crevices by Mannik so our flattened (non-pill shaped) cells have a
-hieght of 0.25 \cite{mannick2012robustness} and appropriate
-dimensions otherwise to yield the desired volume range.
-
-Our simulation used the same diffusion constants and reaction rates as
-Huang et al, which are
+We start our cells with the MinD and MinE concentrations that are
+reported as wild type concentrations by Huang et al . We as well use the same reaction
+diffusion constants and and reaction rates,
 \begin{gather*} %format better
   \mathcal{D}_D = \mathcal{D}_{E}  = 2.5 \mu \textrm{m$^2$ / sec}, \\
   \sigma_D^{\textrm{ADP $\rightarrow$ ATP}}  = 1/\textrm{sec},  \sigma_D = 0.025 \mu \textrm{m/sec}, \\
   \sigma_{dD}  = 0.0015 \mu \textrm{m$^3$/sec}, \\
   \sigma_{de}  = 0.7/\textrm{sec}, \sigma_E = 0.093 \mu \textrm{m$^3$/sec}.
 \end{gather*}
-To test our computational model, we implemented a pill shaped cell, and
-tested using the same cell parameters as Huang et al, which were a radius
-of 0.5 $\mu$m in the middle and at the spherical endcaps, and two different
-cell lengths of 4 $\mu$m and 10 $\mu$m. We found the same type of
-oscillations as in their paper using these initial conditions, verifying
-that our model works as intended. Below are snapshots of MinD and MinE
-concentrations at 5 second timestamps in the 4 $\mu$m cell:
-\newline
-\newline
-[insert 5 second time stamps of 4 $\mu$m sim]
-\newline
-\newline
-We then began to define other, non-traditional cell shapes for the purpose of
-modeling squished and perturbed E. coli cells, which were created
-experimentally in Mannick et al. To achieve this, we went with a
-cartesian lattice rather than the cylindrical lattice used in Huang et
-al's simulations, as it allows for more flexibility in defining the
-cell shape. Some of the cell shape models included a flattened pill
-(stadium shape), an ellipsoid, a spherical cell, and various randomly
-generated smooth shapes, such as those in the figures below.
-\newline
-\newline
-[insert memf print of 2-3 cell shapes]
-\newline
-\newline
+
+
+We study cell shapes that are similar to those studied by Huang and
+also new, flattened pancake-like shapes, inspired by the experimental work of
+Mannik \cite{mannick2012robustness}.  Our pill shapes differ from
+Huangs in that they are cylinders with hemisphere endcaps instead of
+pure cylindridrical shapes.  Our cylinderidrical radius is $0.50\mu$
+and the lengths of our cells (measured between the tips of the
+endcaps) are $5\mu$, $4\mu$, $3\mu$, and $2.5\mu$.
+
+With our flattened cell shapes we mean to study cells that are
+parrallel to those lodged into crevices by Mannik so we give them
+height of $0.25\mu$ \cite{mannick2012robustness}.  Viewed from the top
+down the cells will have the shapes described below and viewed from
+the side they have at their edges a semicircular protrusion (one may
+imagine the edges of a pancake).
+
+Our first group of (three) flattened cell shapes are triangular.  One
+of them is equilateral, one has a 3-4-5 right angle shape, and the
+last is iscoscolese.
+
+Our second group of (four) flattened cells are our own creations,
+designed to investigate different patterns of protein oscillation
+behavoir.
+
+The cell shapes and the sections that we split them into in our data
+analysis are shown in Figure \fixme{We need a big figure with all of this!!}.
+
+Kubitschek\cite{kubitschek1990cell} \cite{kubitschek1968linear} has
+shown in multiple experiments that at the time of cell division cells
+have a volume that is within a range of roughly $1\mu m^3$ to $2\mu
+m^3$.  We follow Huang's simulations\cite{huang2003dynamic} and
+Mannik's experiments \cite{mannik2012robustness} and model cells that
+are slightly larger than this range.  Amoung our flattened cells the
+two dimensional length scales are tuned so that every total cell
+volume is very close to $3\mu^3$.  \fixme{should we just leave it to
+  the reader to figure out for themselves what our pill shape volumes
+  are?}
+
+
 To interpret the results, we generated several different plot views of
 the printed simulation data. These plots included a time averaged view
 of the protein densities in the cell; a plot tracking the location of
@@ -131,119 +136,63 @@ protein concentrations in the cell over time.
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-400-50-0-0-1500}
-  \caption{Total protein fluctuation in the right, middle, and
-    left parts of a 4$\mu m$ by 1$\mu m$ pill shaped cell.  The
-    different forms of protein changes while the total number of
-    proteins remains constant.}
-  \label{total-oscillation-plot-40-05-0-0-150}
-\end{figure}
-
-\begin{figure}
   \includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-200-50-0-0-1500}
-  \caption{Total protein fluctuation in the right, middle, and
-    left parts of a 2$\mu m$ by 1$\mu m$ pill shaped cell.}
-  \label{total-oscillation-plot-20-05-0-0-150}
+  \caption{Total protein fluctuation in the right, middle, and left
+    parts of a 5$\mu m$ by 1$\mu m$ pill shaped cell (above) and a
+    3$\mu m$ by 1$\mu m$ pill shaped cell (below).  The vertical axis shows
+    stacked the total number of proteins that are of four different
+    compound stages and in the right section of the cell (bottom four
+    colors), in the middle of the cell (middle four colors) and in the
+    left section of the cell (top four colors). The different forms of
+    protein changes while the total number of MinD protein in the cell
+    remains constant, shown by the fact that the very top line is
+    horizontal.}
+  \label{total-oscillation-plot}
 \end{figure}
 
-Make sure to talk about length of periods as well
+Figure \ref{total-oscillation-plot} shows total protein
+results for pill shaped cell of length $5\mu$ and radius $.5\mu$.  The
+plot shows both the transerence between different stages of protein
+compound and movement within the cell.  Starting at the beginning of a
+period, we can see that first there is a spike on the left of MinD-ATP
+attached to the wall that is accompanied by a growing number of
+cytoplasmic MinD-ATP and MinD-ADP that are entering the left section,
+followed by a high peak in MinD-MinE-ATP.  This peak gives way through
+the middle to peaks on the right side of the cell, the first being a
+small bump in cytoplasmic MinD-ATP that dissapears into a much larger
+spike in wall attached MinD-ATP, which is followed by a peak in wall
+attached MinD-MinE-ATP.  The pattern during each period clearly shows
+the cycle of proteins rections, as well as the very regular nature of
+the pole to pole protein oscillations.
 
-Figure \ref{total-oscillation-plot-40-05-0-0-150} shows results for a
-pill shaped cell of length $4\mu$ and radius $.5\mu$.  The plot shows
-both the transerence between different protein compounds and movement
-within the cell.  Starting at the beginning of a period, we can see
-that first there is a spike 
+\fixme{our 5 length cells are labeled as 4 cells in the file labels,
+  since 4 is the length of the cylinder. In the text I'll refer to the
+  5 length cells (file says 4) as 5 length cells.  What huang's paper
+  calls 4 length cells will be labeled by our files as 3 length cells,
+  but will be refered in our text as 4 length cells}.  We can see a
+clear difference in period between the $5\mu$, $4\mu$, and $2\mu$
+length cells.  The oscillation periods for our $4\mu$ show excellent
+agreement with the simulations of Huang et all
+\cite{huang2003dynamic}.  This is to be expected since we begin our
+simulations with their reported wild type concentrations of MinD and
+MinE proteins. The periods for the different pill lengths are shown in
+the table below.  We can see a direct correltation between size and
+period, as the proteins must diffuse further in a longer cell before
+they accumulate on the opposite wall.
+\newline
+\newline
+Period According to Pill Length
+\begin{tabular}{|r|c|c|c|l|}
+  \hline
+  Length($\mu$) & 2.50 & 3.00 & 4.00 & 5.00\\
+  \hline
+  Period(sec) & sim & 33 & 38 & 48 \\ \cline{2-2}
+  \hline
+\end{tabular}
 
-\fixme{Be more exact about what exactly Nd is versus nATP, in terms of
-  the unit and dimensions.  The plotting may need to be changed}
-Figure %%\ref{frequency-plot-40-20-0-0-150} shows the protein density
-fluctuations at a point in space adjecent to a polar wall.  At each
-collection of peaks the proteins reach their zenith in an order that
-agrees with the qualitative picture described by
-Huang\cite{huang2003dynamic}, except for nADP peak.  The peaks start
-with a maxima of ATP-MinD accumulating at the walls \fixme{Need a
-  better way to refer to compounds}. This peak is followed by a peak
-in Nde, or ATP-MinD-MinE, as the cell is converted on the wall from
-the former to the latter compound.  As this compound splits apart and
-leaves the wall we see a peak in nE, or MinE in the cytoplasm.  This
-is then followed by a broader peak in nATP, or the MinD-ATP compound,
-as minD-ADP is (changed but I forgot the name for it) into minD-ATP in
-the cytoplasm.  The minD-ATP naturally diffuses away from the pole,
-which is shown by the broad nature of this peak.  All of these peaks
-fit the qualitative picture except for the sharp MinD-ADP peak.  One
-could except that it is a sharp peak, meaning that the MinD-ADP proteins
-do not last in the cytoplasm for very long before they are converted
-(once again forgot the name) into MinD-ATP.  The location of the peak
-in the time dimension is troubling, however, since that we would
-expect it to occur just after the peak in Nde, since the wall-bound
-MinD-ATP-MinE proteins are the ones that split up and leave the wall,
-creating both the MinE and the MinD-ADP.  One would expect to see the
-minD-ADP peak to coincide in time with the minE peak, but it instead
-coincides with the wall-bound MinD-ATP-MinE peak. (Although you can
-maybe sort of convince yourself otherwiase, really looking at it).
 
-%% \begin{figure}
-%%   \includegraphics[width=\columnwidth]{../data/shape-p/plots/frequency_plot_all_middle-p-40-20-0-0-150.pdf}
-%%   \caption{A comparison of protein density fluctuation with time
-%%     against the polar wall and at a point in the center of the
-%%     z-length and adjacent to the wall, in the cytoplasm.  The cell is
-%%     pill shaped and has dimensions of 4$\mu m$ by 2$\mu m$.  }
-%%   \label{frequency-plot-40-20-0-0-150}
-%% \end{figure}
 
-The theory states that the aversion of the FtsZ polymer to the MinC
-protein is responsible for the FtsZ polymer setting up in the center
-of the cell as opposed to at the cellular poles.  The MinC protein in
-turn natrually associates with the minD protein that is modelled in
-Huang's differential equations.  \fixme{look this up and write this
-  again} The theory is dependent on there being a significant
-difference in protein density between the center and polar regions. It
-is worthwhile examining this difference in detail.  Figure
-%%\ref{frequency-plot-40-20-0-0-150} shows a comparison of density
-fluctuation over time at a point adjacent to the polar cell wall and
-at a point adjacent to the cell wall in the center region of the cell.
-The different proteins show different relationships between their
-maxima and minima.  The MinD-ADP show sharp spikes at the poles and
-much smaller oscillations at in the middle.  The values at the poles
-are always greater than those in the middle, and the polar peaks
-exhibit densities that are roughly 2.5 times greater than the maxima
-in the center (\fixme{this factor and the following factors will be put
-  into a table of comparisons for each protein and for the different
-  cell sizes}).  The MinD-ATP densities show a very different trend.
-For these it is the center density that is almost always greater than
-the polar density.  The difference in density at the pole versus the
-middle is a factor of roughly .85 (once again we'll do this more
-officially in a table).  The MinE is similar to the MinD-ADP
-comparison.  It shows a difference in maxima by a factor of roughly 2.
-The MinC protein is associated with the minD protein, so perhaps the
-most important camparison is between the nfl-MinD (MinD protein in all
-its forms) at the ends and in the center of the pill.  This shows
-sharp spikes at the pills and a maxima difference factor of roughly
-1.25. \fixme{I'd like to analyze further what this means for the FtZ
-  polymer.  Would a difference like this really have a big effect?
-  What sort of effect should it have, looking at experimental data?
-  One thing is that Mannik (is it Mannik?) genetically deletes the
-  MinC protein and they get 73 percent proper cell division.  It
-  really would be good to do a more extensive analysis here,
-  referencing what other papers say about this.}
 
-It would be good here to add the time map plots and discuss the idea
-about the proteins spending most of their time in the center of the
-cell.
-
-Figure \ref{frequency-plot-40-20-0-0-150} also shows that the middle
-density oscillates at a frequency that is twice that of the polar
-regions, which is to be expected considering the symmetry of the
-center compared to the that of the polar regions.  Also, the
-difference between density maxima and minima each oscillation is
-smaller for the middle points than for the polar points.  This is
-evident from simply watching the simulation movies - the fluctulations
-are more extreme in the polar regions.
-
-Add a table here that shows the period of oscillations versus the cell
-dimensions.  Do the mathematical solution of the differential
-equations for an infinite long cylinder with different widths to see
-how fast the mxima move and compare (Dr. Roundy says that making the
-radial speed infinite would help.
 
 
 \subsection{Randst shape}
@@ -366,6 +315,99 @@ protein concentrations in the cell over time.
 \section{Specific Results}
 %-Datahjhuj and plots that show concrete results. Pill normal is for the establishing that we have what works, reference  other paper, then modify, is the idea.
 \section{Pill Shape}
+\fixme{Be more exact about what exactly Nd is versus nATP, in terms of
+  the unit and dimensions.  The plotting may need to be changed}
+Figure %%\ref{frequency-plot-40-20-0-0-150} shows the protein density
+fluctuations at a point in space adjecent to a polar wall.  At each
+collection of peaks the proteins reach their zenith in an order that
+agrees with the qualitative picture described by
+Huang\cite{huang2003dynamic}, except for nADP peak.  The peaks start
+with a maxima of ATP-MinD accumulating at the walls \fixme{Need a
+  better way to refer to compounds}. This peak is followed by a peak
+in Nde, or ATP-MinD-MinE, as the cell is converted on the wall from
+the former to the latter compound.  As this compound splits apart and
+leaves the wall we see a peak in nE, or MinE in the cytoplasm.  This
+is then followed by a broader peak in nATP, or the MinD-ATP compound,
+as minD-ADP is (changed but I forgot the name for it) into minD-ATP in
+the cytoplasm.  The minD-ATP naturally diffuses away from the pole,
+which is shown by the broad nature of this peak.  All of these peaks
+fit the qualitative picture except for the sharp MinD-ADP peak.  One
+could except that it is a sharp peak, meaning that the MinD-ADP proteins
+do not last in the cytoplasm for very long before they are converted
+(once again forgot the name) into MinD-ATP.  The location of the peak
+in the time dimension is troubling, however, since that we would
+expect it to occur just after the peak in Nde, since the wall-bound
+MinD-ATP-MinE proteins are the ones that split up and leave the wall,
+creating both the MinE and the MinD-ADP.  One would expect to see the
+minD-ADP peak to coincide in time with the minE peak, but it instead
+coincides with the wall-bound MinD-ATP-MinE peak. (Although you can
+maybe sort of convince yourself otherwiase, really looking at it).
+
+%% \begin{figure}
+%%   \includegraphics[width=\columnwidth]{../data/shape-p/plots/frequency_plot_all_middle-p-40-20-0-0-150.pdf}
+%%   \caption{A comparison of protein density fluctuation with time
+%%     against the polar wall and at a point in the center of the
+%%     z-length and adjacent to the wall, in the cytoplasm.  The cell is
+%%     pill shaped and has dimensions of 4$\mu m$ by 2$\mu m$.  }
+%%   \label{frequency-plot-40-20-0-0-150}
+%% \end{figure}
+
+The theory states that the aversion of the FtsZ polymer to the MinC
+protein is responsible for the FtsZ polymer setting up in the center
+of the cell as opposed to at the cellular poles.  The MinC protein in
+turn natrually associates with the minD protein that is modelled in
+Huang's differential equations.  \fixme{look this up and write this
+  again} The theory is dependent on there being a significant
+difference in protein density between the center and polar regions. It
+is worthwhile examining this difference in detail.  Figure
+%%\ref{frequency-plot-40-20-0-0-150} shows a comparison of density
+fluctuation over time at a point adjacent to the polar cell wall and
+at a point adjacent to the cell wall in the center region of the cell.
+The different proteins show different relationships between their
+maxima and minima.  The MinD-ADP show sharp spikes at the poles and
+much smaller oscillations at in the middle.  The values at the poles
+are always greater than those in the middle, and the polar peaks
+exhibit densities that are roughly 2.5 times greater than the maxima
+in the center (\fixme{this factor and the following factors will be put
+  into a table of comparisons for each protein and for the different
+  cell sizes}).  The MinD-ATP densities show a very different trend.
+For these it is the center density that is almost always greater than
+the polar density.  The difference in density at the pole versus the
+middle is a factor of roughly .85 (once again we'll do this more
+officially in a table).  The MinE is similar to the MinD-ADP
+comparison.  It shows a difference in maxima by a factor of roughly 2.
+The MinC protein is associated with the minD protein, so perhaps the
+most important camparison is between the nfl-MinD (MinD protein in all
+its forms) at the ends and in the center of the pill.  This shows
+sharp spikes at the pills and a maxima difference factor of roughly
+1.25. \fixme{I'd like to analyze further what this means for the FtZ
+  polymer.  Would a difference like this really have a big effect?
+  What sort of effect should it have, looking at experimental data?
+  One thing is that Mannik (is it Mannik?) genetically deletes the
+  MinC protein and they get 73 percent proper cell division.  It
+  really would be good to do a more extensive analysis here,
+  referencing what other papers say about this.}
+
+It would be good here to add the time map plots and discuss the idea
+about the proteins spending most of their time in the center of the
+cell.
+
+Figure \ref{frequency-plot-40-20-0-0-150} also shows that the middle
+density oscillates at a frequency that is twice that of the polar
+regions, which is to be expected considering the symmetry of the
+center compared to the that of the polar regions.  Also, the
+difference between density maxima and minima each oscillation is
+smaller for the middle points than for the polar points.  This is
+evident from simply watching the simulation movies - the fluctulations
+are more extreme in the polar regions.
+
+Add a table here that shows the period of oscillations versus the cell
+dimensions.  Do the mathematical solution of the differential
+equations for an infinite long cylinder with different widths to see
+how fast the mxima move and compare (Dr. Roundy says that making the
+radial speed infinite would help.
+
+
 Pill Normal section -
 Our goal with this project was to test whether or not the computational
 model developed by Huang et al was consistent with the newer experimental
