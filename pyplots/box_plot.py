@@ -123,10 +123,10 @@ def main():
             j+=1
             k=0
         if i==0:
-            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j])
+            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j],alpha=alphaScale_D[k])
             plt.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_D[i][start:end],alpha=alphaScale_D[k],facecolor=colorScale[j])
         elif i!=0:
-            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j])
+            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j],alpha=alphaScale_D[k])
             plt.fill_between(timeAxis[start:end],plotCurveList_D[i-1][start:end],plotCurveList_D[i][start:end],alpha=alphaScale_D[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
@@ -145,10 +145,10 @@ def main():
             j+=1
             k=0
         if i==0:
-            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j])
+            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j],alpha=alphaScale_E[k])
             plt.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
         elif i!=0:
-            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j])
+            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j],alpha=alphaScale_E[k])
             plt.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
