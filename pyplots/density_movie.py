@@ -76,7 +76,7 @@ def contourplt(protein):
         page = protein.dataset[k]
         plt.clf()
         plt.axes().set_aspect('equal', 'datalim')
-        CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval+10,5))
+        CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval+10,1))
         cbar = plt.colorbar(CS)
         plt.clim(minval,maxval)
         plt.title(str(protein.protein)+" volume density at time: "+str(k*5)+" sec")
