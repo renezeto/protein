@@ -352,15 +352,17 @@ char* print_filename(const char* plotname, const char* proteinname) {
   return filename;
 }
 
+
+
 bool only_once = true;
 string triangle_section (double y, double z) {
   //needs editing!!!!!
-  double Y = Ny*dx; double Z = Nz*dx; // total height and width of grid
+  //double Y = Ny*dx; double Z = Nz*dx; // total height and width of grid
   double z1 = A/2.0+2*dx; double y1 = A/2.0+2*dx; // lower left corner of triangle
-  double z2 = Z-A/2.0-2*dx; double y2 = y1; // lower right corner of triangle
+  double z2 = B+A/2.0+2*dx; double y2 = y1; // lower right corner of triangle
   //Using law of cosines from lengths of sides we get top corner:
-  double cos_theta = (B*B+D*D-C*C)/(2*B*D);
-  double z3 = A/2.0+2*dx+D*cos_theta; double y3 = Y-A/2.0-2*dx; // top corner of triangle
+  double theta = acos((B*B+D*D-C*C)/(2*B*D));
+  double z3 = A/2.0+2*dx+D*cos(theta); double y3 = y1+D*sin(theta); // top corner of triangle
   if (only_once == true) {
     printf("z1 = %g y1 = %g\nz2 = %g y2 = %g\nz3 %g y3 = %g\n",z1,y1,z2,y2,z3,y3);
   }
@@ -373,8 +375,11 @@ string triangle_section (double y, double z) {
   double slope2 = (y2-y_13)/(z2-z_13); //from right corner to left line
   double slope3 = (y_21-y3)/(z_21-z3); //from top corner to bottom
   //running into nan issues when z3 is same as z_21, so I brute force a large negative slope:
-  if (z_21-z3 < .000001){
-    slope3 = -1000000;
+  if (abs(z_21-z3) < .000001){
+    slope3 = 1000000*(y_21-y3);
+  }
+  if (abs(z2-z_13) < .000001){
+    slope2 = 1000000*(y2-y_13);
   }
   if (only_once==true){
     printf("slope1 = %g slope2 = %g slope3 = %g\n",slope1,slope2,slope3);
@@ -808,7 +813,8 @@ int main (int argc, char *argv[]) {
 
   if (mem_f_shape=="triangle") {
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/membrane_files/sections-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+            debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int j=0;j<Ny;j++){
       for (int i=0;i<Nz;i++) {
@@ -821,13 +827,17 @@ int main (int argc, char *argv[]) {
         if (triangle_section(j*dx,i*dx)=="Left"){
           marker = 3;
         }
+        if (inside(int(Nx/2),j,i)==false) {
+          marker = 0;
+        }
         fprintf(outfile_sections,"%g ",marker);
       }
       fprintf(outfile_sections,"\n");
     }
-    fflush(stdout);
     fclose(outfile_sections);
     printf("\nMembrane sections file printed.\n");
+    fflush(stdout);
+    delete[] outfilename_sections;
   }
 
   //end membrane printing
@@ -836,21 +846,47 @@ int main (int argc, char *argv[]) {
   fflush(out_file);
   printf("density set.\n");
 
-  //   Reference for creating the randst dividers:
-  //   the arrays are structured in the order of y,z,width, etc.  of the guassians that define the shape
-  //   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
-  //   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
-  //   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
-  //                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
-  //   double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
-  //                       4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
-
+  if (mem_f_shape=="p"){
+    char* outfilename_sections = new char[1024];
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+            debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
+    FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
+    for (int a=0; a<Ny; a++) {
+      for (int b=0; b<Nz; b++) {
+        if (mem_f_shape == "p") {
+          if (b < box_divider_left) {
+            marker = 1;
+          }
+          if (b > box_divider_right) {
+            marker = 2;
+          }
+          if ((b <= box_divider_right) && (b >= box_divider_left)) {
+            marker = 3;
+          }
+        }
+        fprintf(outfile_sections, "%g ",marker);
+      }
+      fprintf(outfile_sections,"\n");
+    }
+    fclose(outfile_sections);
+    delete[] outfilename_sections;
+    printf("Finished printing sections file!!\n");
+    fflush(stdout);
+  }
 
   double vert_div;
   double vert_div_two;
   double hor_div;
   double hor_div_two;
 
+  //refernce for setting up the section divisions:
+  // double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
+//   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
+//   double guass97[] = {1.4,3,.4,   1.8,3,.4,   2.2,3,.4,   2.6,3,.4,   3,3,.4,   3.4,3,.4,
+//                       3.8,3,.4,   4.2,3,.4,   4.6,3,.4,   5,3,.4,   5.4,3,.4,   3.4,2.4,.6};
+//   double guass96[] = {1.3,1.3,   ,2.1,2,   ,3,2,   ,3.9,2,   ,4.7,1.3,   ,4,2.1,   ,4,3,   ,4,3.9,   ,
+//                       4.7,4.7,   ,3.9,4,   ,3,4,   ,2.3,4,   ,1.3,4.7,   ,2.1,3.9,   ,3,3.9,   ,2.1,3.9,   };
+//guass 97 mult by 1.3
 
   if (mem_f_shape=="randst") {
     if (rand_seed == 99) {
@@ -862,17 +898,73 @@ int main (int argc, char *argv[]) {
       vert_div_two = 4.8/dx;
     }
     if (rand_seed == 97) {
-      vert_div = 2.6/dx;
-      hor_div = 1.8/dx;
-      hor_div_two = 3.0/dx;
+      vert_div = 3.0/dx;
+      hor_div = 3.2/dx;
+      hor_div_two = 5.6/dx;
     }
     if (rand_seed == 96) {
-      vert_div = 1.7/dx;
-      hor_div = 1.7/dx;
+      vert_div = (3.0-.3)/dx;
+      hor_div = 3.0/dx;
     }
   }
-
-
+  if (mem_f_shape=="randst") {
+    char* outfilename_sections = new char[1024];
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+            debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
+    FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
+    for (int a=0; a<Ny; a++) {
+      for (int b=0; b<Nz; b++) {
+        if (rand_seed == 99 || rand_seed == 98) {
+            if (b < vert_div) {
+              marker = 1;
+            }
+            else if (b > vert_div_two) {
+              marker = 2;
+            }
+            else {
+              marker = 3;
+            }
+          }
+          if (rand_seed == 97) {
+            if (b < vert_div) {
+              marker = 1;
+            }
+            else if (a > hor_div_two) {
+              marker = 2;
+            }
+            else if (a < hor_div) {
+              marker = 3;
+            }
+            else {
+              marker = 4;
+            }
+          }
+          if (rand_seed == 96) {
+            if (b < vert_div && a < hor_div) {
+              marker = 1;
+            }
+            else if (b < vert_div && a > hor_div) {
+              marker = 2;
+            }
+            else if (b > vert_div && a < hor_div) {
+              marker = 3;
+            }
+            else {
+              marker = 4;
+            }
+          }
+          if (inside(int(Nx/2),a,b)==false) {
+            marker = 0;
+          }
+          fprintf(outfile_sections, "%g ",marker);
+      }
+      fprintf(outfile_sections, "\n");
+    }
+    fclose(outfile_sections);
+    delete[] outfilename_sections;
+    printf("Randst sections file printed !!!\n");
+    fflush(stdout);
+  }
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
@@ -938,10 +1030,10 @@ int main (int argc, char *argv[]) {
                   if (b < vert_div) {
                     proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  else if (b > vert_div && a > hor_div_two) {
+                  else if (a > hor_div_two) {
                     proteinList[pNum]->numRightUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  else if (b > vert_div && a < hor_div) {
+                  else if (a < hor_div) {
                     proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else {
