@@ -6,17 +6,30 @@ import os
 import subprocess
 import time
 
-#working WIP
+#syntax:
+#add jobs to jobs file, one per new line, with the same form as running a sim using protein_microscopy.cpp or
+#any of the plotting programs.
 
-#notes:
-#./batch sim plot shapes="p randst triangle" plots="time" specific="[4.00, 2.00, 0.00, 0.00, 15.00]" simflags="-hires"
-#specific needed? can make handle running sim if data not present for python?
-#reset command for doing everything in the jobs list from scatch?
-#include command for only doing things marked in include?
-#confirmation dialog
-#store PID in outfile
+#   shape A B C D E [-simflags] [-batchflags]
 
-#commands
+#the -simflags alter the simulation being run and are: -debug, -dump, -hires, -slice
+#the batch flags do nothing but mark the simulation for batch to pick up if you want to be able to keyword filter
+#to a particular set up simulations. for example:
+
+#   p 1.50 0.50 0.00 0.00 15.00 -hires -slice -group1
+#   triangle 0.25 1.00 1.00 1.00 15.00 -slice -group1
+#   p 2.00 0.75 0.00 0.00 15.00 -hires -group1
+
+#then to sim and plot only these two jobs, ./batch sim plot srun include="-group1"
+#or, to do only the two in group1 that are pills, ./batch sim plot srun include="-group1 p"
+#or, only the two that are in group1 and slices, ./batch sim plot srun include="-group1 -slice"
+#etc
+
+#possible additions:
+#confirmation dialog?
+#store PID in outfile?
+
+#commands (single words in sys.argv)
 def parseArgs(args):
     stringList = []
     for arg in args:
@@ -24,7 +37,7 @@ def parseArgs(args):
             stringList += [arg]
     return stringList
 
-#options
+#options (like python kwargs, "include='whatever yellow 5'"
 def parseKwargs(kwargs):
     stringDict = {}
     for kwarg in kwargs:
@@ -33,43 +46,61 @@ def parseKwargs(kwargs):
             stringDict[key]=value
     return stringDict
 
-#keyword filtering function
+#keyword filtering bool function. checks for exact keyword matches only.
 def include(str1, str2):
     for keyword in str1:
         if keyword not in str2:
             return False
     return True
 
-#returns jobs matching options
+#returns list of jobs matching optional keyword filter.
 def getJobs(options):
+
+    #open the file, grab each line and store in a list
     with open("jobs") as jobFile:
         jobList = jobFile.readlines()
+
+    #filters jobs from jobList if include keyword is present. otherwise, does all the jobs.
     try:
         requiredKeywords = options['include'].split()
         parsedJobs = [line.split() for line in jobList if include(requiredKeywords, line.split())]
     except KeyError:
         parsedJobs = [line.split() for line in jobList if line!="\n"]
+
     return parsedJobs
 
 #starts simulations matching commands and options
 def runSim(commands,options):
+
+    #srun needs to come after ./batch, not before
     if "srun" in commands:
         sruncmd = ["srun"]
     else:
         sruncmd = []
+
+    #create empty set for sims and fill it up with each job in joblist matching the command line args
     runningSims = set()
     jobList = getJobs(options)
     for job in jobList:
         runningSims.add(subprocess.Popen(sruncmd + ["./protein_microscopy"] + [arg for arg in job]))
+
+
+    #runningSims is the set of currently running simulations (subprocess module object)
     while len(runningSims) > 0:
+
+        #we can't change the modify the size of a set while it's being iterated over, so iterate over a duplicate of the set instead
         for sim in runningSims.copy():
+
+            #sim.poll() returns None if the simulation is still running, otherwise a return code.
             if sim.poll() is not None:
                 runningSims.remove(sim)
+
+            #waits for all sims to finish before returning (so we can plot them afterwards)
             else:
                 time.sleep(10)
     return 0
 
-#starts plots matching commands and options
+#starts plots matching commands and options. works the same as runSim
 def runPlots(commands,options):
     if "srun" in commands:
         sruncmd = ["srun"]
@@ -89,6 +120,7 @@ def runPlots(commands,options):
                 time.sleep(10)
     return 0
 
+#starts the movie .gif generation for jobs matching commands and options (with -dump present in jobs file). works the same as runSim and runPlots
 def runMovies(commands,options):
     if "srun" in commands:
         sruncmd = ["srun"]
