@@ -1,4 +1,4 @@
-*.dat
+*-???.dat
 *.out
 .\#*
 \#*
@@ -8,11 +8,11 @@
 *.pyc
 *protein*
 *protein_microscopy*
-*.dat
 *catalog.txt*
 *.png
 *.pdf
 *.gif
+
 # for latex:
 *.aux
 *.log

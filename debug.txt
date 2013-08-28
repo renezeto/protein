@@ -1,0 +1,5 @@
+==2874== Memcheck, a memory error detector
+==2874== Copyright (C) 2002-2012, and GNU GPL'd, by Julian Seward et al.
+==2874== Using Valgrind-3.8.1 and LibVEX; rerun with -h for copyright info
+==2874== Command: ./protein_microscopy p 1.30 0.75 0.00 0.00 15.00
+==2874== 
