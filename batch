@@ -109,9 +109,10 @@ def runPlots(commands,options):
     jobList = getJobs(options)
     runningPlots = set()
     for job in jobList:
-        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/box_plot.py"] + [arg for arg in job]))
-        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/time_map.py"] + [arg for arg in job]))
-        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/arrow_plot.py"] + [arg for arg in job]))
+        os.system('mkdir -p data/shape-%s/plots' % job[0])
+        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/box_plot.py"] + job))
+        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/time_map.py"] + job))
+        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/arrow_plot.py"] + job))
     while len(runningPlots) > 0:
         for plot in runningPlots.copy():
             if plot.poll() is not None:
