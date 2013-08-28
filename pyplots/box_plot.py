@@ -52,7 +52,8 @@ def stackData(plotList):
     for i in range(1,len(tempList)):
         stackedPlotList += [[j+k for (j,k) in zip(stackedPlotList[i-1],tempList[i])]]
 
-    return stackedPlotList
+    output = np.array(stackedPlotList)
+    return output/output[len(output[:,0])-1, 0] # normalize output as a fraction of total
 
 def main():
 
@@ -118,22 +119,33 @@ def main():
     plt.figure()
     j=0
     k=0
-    for i in range(len(plotCurveList_D)):
+    for i in range(len(plotCurveList_D[:,0])):
         if i%(numProteinTypes_D)==0:
             j+=1
             k=0
         if i==0:
-            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j],alpha=alphaScale_D[k])
-            plt.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_D[i][start:end],alpha=alphaScale_D[k],facecolor=colorScale[j])
+            plt.plot(timeAxis[start:end],
+                     plotCurveList_D[i, start:end],
+                     color=colorScale[j],alpha=alphaScale_D[k])
+            plt.fill_between(timeAxis[start:end],
+                             [0 for x in range(len(timeAxis))[start:end]],
+                             plotCurveList_D[i, start:end],
+                             alpha=alphaScale_D[k],facecolor=colorScale[j])
         elif i!=0:
-            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j],alpha=alphaScale_D[k])
-            plt.fill_between(timeAxis[start:end],plotCurveList_D[i-1][start:end],plotCurveList_D[i][start:end],alpha=alphaScale_D[k],facecolor=colorScale[j])
+            plt.plot(timeAxis[start:end],
+                     plotCurveList_D[i, start:end],
+                     color=colorScale[j],alpha=alphaScale_D[k])
+            plt.fill_between(timeAxis[start:end],
+                             plotCurveList_D[i-1, start:end],
+                             plotCurveList_D[i, start:end],
+                             alpha=alphaScale_D[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
     plt.xlim(start,end+.40*(end-start))
+    plt.ylim(0, 1)
     plt.title("Min D protein counts over time")
     plt.xlabel("Time (s)")
-    plt.ylabel("Number of proteins")
+    plt.ylabel("Fraction of proteins")
     plt.legend(plotNameList_D,loc="best",prop={'size':10})
     plt.savefig(load.print_string("box-plot_D",""))
 
@@ -153,9 +165,10 @@ def main():
         #print "i is ",i," || k is", k," || j is",j
         k+=1
     plt.xlim(start,end+.40*(end-start))
+    plt.ylim(0, 1)
     plt.title("Min E protein counts over time")
     plt.xlabel("Time (s)")
-    plt.ylabel("Number of proteins")
+    plt.ylabel("Fraction of proteins")
     plt.legend(plotNameList_E,loc="best",prop={'size':10})
     plt.savefig(load.print_string("box-plot_E",""))
 
