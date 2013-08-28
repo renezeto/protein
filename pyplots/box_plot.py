@@ -34,7 +34,6 @@ def returnData(boxName,proteinType):
     proteinsOverTime = proteinsOverTime[0].split('\t')
     proteinsOverTime = proteinsOverTime[2:-1]
     proteinsOverTime = [float(i) for i in proteinsOverTime]
-
     return proteinsOverTime
 
 #takes input format: ["proteinType1-boxNum1","proteinType1-boxnum2",proteinType2-boxnum1"...]. will return a list of lists
@@ -100,7 +99,7 @@ def main():
     timeAxis = range(len(plotCurveList_D[0]))
 
     #begin messy code (to deal with matplotlib) - don't judge me
-    (start, end) = (6*int(len(timeAxis)/10),7*int(len(timeAxis)/10))
+    (start, end) = (0*int(len(timeAxis)/10),10*int(len(timeAxis)/10))
 
     #get num on each plot
     for proteinType in proteinTypeList:
