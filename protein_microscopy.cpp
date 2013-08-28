@@ -391,6 +391,8 @@ string triangle_section (double y, double z) {
     printf("z_cen = %g y_cen = %g\n",z_cen,y_cen);
     only_once = false;
   }
+  //The density will start higher in the Right section, although there won't be a
+  //lot of symmetry (will also have some in the middle section).
   if (z > z_cen) {
     if (y > slope1*(z-z_cen)+y_cen) {
       return "Mid";
@@ -1012,7 +1014,6 @@ int main (int argc, char *argv[]) {
                   proteinList[pNum]->numMid[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                 }
               }
-
               if (mem_f_shape == "randst") {
                 if (rand_seed == 99 || rand_seed == 98) {
                   if (b < vert_div) {
@@ -1043,10 +1044,10 @@ int main (int argc, char *argv[]) {
                   if (b < vert_div && a < hor_div) {
                     proteinList[pNum]->numLeftDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  else if (b < vert_div_two && a >= hor_div) {
+                  else if (b < vert_div && a >= hor_div) {
                     proteinList[pNum]->numLeftUp[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
-                  else if (b >= vert_div_two && a < hor_div) {
+                  else if (b >= vert_div && a < hor_div) {
                     proteinList[pNum]->numRightDown[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
                   else {
@@ -1410,8 +1411,8 @@ int main (int argc, char *argv[]) {
       for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_dat]));
       }
-      fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
       fprintf(box_plot,"\n");
+      fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
       for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_dat]));
       }

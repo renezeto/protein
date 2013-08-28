@@ -135,7 +135,7 @@ protein concentrations in the cell over time.
 %% \end{figure}
 
 \begin{figure}
-  \includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-400-50-0-0-1500}
+  %%\includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-400-50-0-0-1500}
   \includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-200-50-0-0-1500}
   \caption{Total protein fluctuation in the right, middle, and left
     parts of a 5$\mu m$ by 1$\mu m$ pill shaped cell (above) and a
@@ -194,12 +194,147 @@ Period According to Pill Length
 
 
 
+\subsection{Triangular Shapes}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{../data/shape-triangle/plots/box-plot_D--triangle-25-400-400-400-1500}
+  \includegraphics[width=\columnwidth]{../data/shape-triangle/plots/box-plot_D--triangle-25-500-500-300-1500}
+  \includegraphics[width=\columnwidth]{../data/shape-triangle/plots/box-plot_D--triangle-25-360-480-600-1500}
+  \caption{Total protein fluctuation in the right, middle, and left
+    parts of a equilateral (top), iscoscolese (middle), and 3-4-5
+    (bottom) triangle.  The vertical axis shows stacked the total
+    number of proteins that are of four different compound stages and
+    in the different sections of the cell.}
+  \label{total-oscillation-triangle-plot}
+\end{figure}
+
+Figure \ref{total-oscillation-triangle-plot} shows the equivalent
+motion and transference between compound states for the triangular
+states as Figure \ref{total-oscillation-plot} does for the pill shaped
+cells.  The equilateral triangular shows that in all three sections
+there is a spike in wall attached MinD-ATP directly followed by a
+spike in wall attached MinD-MinE-ATP.  The pill had shown a similar
+pattern except that the mid section exhibited no such pronounced
+spike.  Interestingly, the right and mid sections show spikes at
+similar times when compared to the left section spikes, which seem to
+oscillate in a manner shifted pi off from the other two.  This
+behavoir shows itself in the animations, which show a relaxation into
+a stable oscillation from a maxima in one corner to a double maxima in
+the other two corners, and back again.  The left section heights are
+roughly twice that of the right section heights.  The simulations are
+started with higher concentrations of proteins in primarily the right
+section, with some overlap into the middle section, so that perhpas
+this oscillation pattern seems reasonable.  However, it's interesting
+to note that the oscillations, started with assymmetric density, do
+not naturally rotate around the corners of the triangle in a circular
+pattern.
+
+It seems as well that there is a desired oscillation maxima for the
+particular shape and size of the cell, as can be seen by the
+relaxation, over the first four periods, to a regular maximal height
+of the right and left sections' total protein at the height of each spike.
+
+\fixme{Note to make sure I'm interpreting the iscosolese triangle data
+  correctly: the triangle sides are 5,5,3, and the higher density
+  starts in the corner that is opposite the short side.  This corner
+  is covered by the right section.  I've verified this by looking at
+  the protein_microscopy and drawing a little picture, which is on my
+  desk...if you dare look for something on my desk!!!}  The iscosolese
+triangle starts its simulation with a higher concentration of protein
+in the section that is opposite the shorter side.  It quickly relaxes
+into a stable oscillation pattern.  This pattern shows that right
+corner section regularly has higher spikes in total protein than the
+other sections, and that its spikes appear one pi removed from the
+spikes for the other two sections.  This a similar behavoir to that
+which is seen in the equilateral triangle, differening in that it
+converges more quickly towards this behavoir and that it shows a
+greater exageration in the height of protein buildup in the right most
+section.
+
+\fixme{Note on interpretation of 3-4-5 triangle: the higher density
+  starts to the right of a vertical line that is parrallel to the
+  second longest side in the triangle (the longer of the two
+  non-hypotonuse sides).  This means the higher concentration covers
+  the right angle and also the smaller angle in the triangle} The
+3-4-5 triangle exhibits behavoir that I need more data to properly
+observe.  I does not converge as quickly as that for the iscosolese or
+equilateral triangles.
 
 \subsection{Randst shape}
+\fixme{Cheat sheet for the shapes, need to put these into a big figure
+  from the sections output: 96=star shape, 97=sideways sideways
+  flying saucer pancake, 98=manniks squished cell, 99=an A}
+
+
+\begin{figure}
+
+\end{figure}
 \subsubsection{Randst-96-Star}
+The animations seem to relax into a pattern in which the oscillations
+go from the smallest corner, out to the other three, and then back to
+the smallest corner.  \fixme{There isn't enough data to see properly
+  though, need to run for longer.}
+
 \subsubsection{Randst-97-}
-\subsubsection{Randst-98-Actually Random}
-\subsubsection{Randst-99}
+The sideways flying saucer pancake shape shows a truly interesting
+breakdown of an unstable equilibrium oscillation.  For the first
+number of oscillations the maxima trade off right to left, from a high
+peak in the leftward compartment to vertically opposed peaks in the
+poles of the long axis of the cell.  This is perhaps due to the fact
+that the starting density is highly concentrated to the right of a
+dividing line that runs parrallel to the right vertical side.  After a
+few oscillations the back and forth oscillations tip toward the
+vertical direction and the system loses its initial oscillation
+pattern.
+
+\subsubsection{Randst-98-C-Reminiscent of Mannik's cell}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/box-plot_D--randst-25-600-800-9800-1500}
+  %%\includegraphics[width=\columnwidth]{../data/shape-randst/plots/box-plot_D--randst-25-600-600-9600-1500}
+  \caption{Total protein fluctuation in the manniks squished cell
+    shape.  The vertical axis shows stacked the total number of
+    proteins that are of four different compound stages and in the
+    different sections of the cell.}
+  \label{total-oscillation-randst-98-plot}
+\end{figure}
+
+Our animations and total protein fluctuation plots (Figure
+\ref{total-oscillation-randst-98-plot} for our C shape (reminiscent of
+the flattened cell shown in Mannik's work) shows a very regular,
+stable, simple oscillation pattern.  There are two clear ends of this
+cell that oppose one another, and the protein maximum travels to one
+end, where it reaches a peak, then travels through the cell to the
+other end, reaching another peak, and then repeats the process.  In a
+way it is similar to the simple pill shapes, in that there are two
+clear endcaps and a middle section (that is in this case bends and
+curves).  The protein fluctuation plots show our familiar pattern of
+high spikes in wall attached MinD-ATP immediately followed by spikes
+in wall attached MinD-MinE-ATP, followed by a drop in both as the
+proteins move towards the other side.
+
+
+
+\subsubsection{Randst-99 our A shape}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/box-plot_D--randst-25-600-600-9900-1500}
+  %%\includegraphics[width=\columnwidth]{../data/shape-randst/plots/box-plot_D--randst-25-600-600-9600-1500}
+  \caption{Total protein fluctuation in the A shaped shape.  The vertical axis shows stacked the total number
+    of proteins that are of four different compound stages and in the
+    different sections of the cell.}
+  \label{total-oscillation-randst-96-plot}
+\end{figure}
+Our animations for this plot show a very interesting pattern.  The
+maxima oscillates from the right corner to the top corner, then
+\emph{back to the right corner} then to the top corner again, then to
+the left corner, then back to the top, then to the left, then to the
+top again, then back to the right side.  It's fascinating that there
+must be two back and forth motions before proceeding to the other side
+\fixme{would this happen over and over or would there be a chaos,
+  breakdown sort of thing at some point.  Need longer sim}.  The total
+fluctuation plot shows this double maxima corner pattern, with two
+spikes on the right, then two spikes on the left, then two back on the
+right.
+
+
 \section{Interpretation of Data}
 \section{Conclusion}
 \section*{Appendix}
