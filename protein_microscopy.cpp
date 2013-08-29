@@ -506,13 +506,12 @@ int main (int argc, char *argv[]) {
   }
 
   //fixed simulation parameters
-  //tot_time = 2500/2; //sec
-  tot_time = 20;
+  tot_time = 1000; //sec
   if (debug_flag==1) {
     tot_time = 11;
   }
   time_step = .1*dx*dx/difD;//sec
-  iter = int(tot_time/time_step)/4.2;//this will give us triangle data in about a day and randst in two days
+  iter = int(tot_time/time_step);//this will give us triangle data in about two days and randst in four days?
   printout_iterations = int(5.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
@@ -1339,9 +1338,195 @@ int main (int argc, char *argv[]) {
       k++;
       fflush(out_file);
     }
+
+    time_step = .1*dx*dx/difD;//sec
+    int plot_denominator = 100000;
+    int i_dat = i/print_denominator;
+    if (i%plot_denominator==0){
+      //boxplot
+      char *boxname = print_filename("box-plot","");
+      FILE* box_plot = fopen(boxname,"w");
+      delete[] boxname;
+      for (int pNum=0; pNum<numProteins; pNum++) {
+
+        if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98 || mem_f_shape == "triangle") {
+          fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"%s\tright\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"\n");
+        }
+        if (rand_seed == 97) {
+          fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"%s\trightup\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"%s\trightdown\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"\n");
+        }
+        if (rand_seed == 96) {
+          fprintf(box_plot,"%s\trightup\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"%s\tleftup\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftUp[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"%s\tleftdown\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftDown[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"%s\trightdown\t",proteinList[pNum]->name);
+          for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
+            fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_plot_dat]));
+          }
+          fprintf(box_plot,"\n");
+          fprintf(box_plot,"\n");
+        }
+      }
+      fclose(box_plot);
+
+      for (int pNum=0; pNum<numProteins; pNum++) {
+        char *avename = new char[1024];
+        sprintf(avename,"%s",print_filename("ave_plot",""));
+        FILE* ave_plot = fopen(avename,"w");
+        double left_area_total = 0;
+        double middle_area_total = 0;
+        double right_area_total = 0;
+        for (int a=0;a<Ny; a++) {
+          for (int b=0; b<Nz; b++) {
+            for (int c=0; c<Nx; c++) {
+              if (b < box_divider_left) {
+                left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
+              else if (b > box_divider_right) {
+                right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
+              else {
+                middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
+            }
+          }
+        }
+        printf("left area = %g middle area = %g right area = %g\n",left_area_total,middle_area_total,right_area_total);
+        fflush(stdout);
+        if (mem_f_shape == "p"){
+          for (int pNum=3; pNum<numProteins; pNum++) {
+            fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_plot_dat]/left_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\tmid\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_plot_dat]/middle_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\tright\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_plot_dat]/right_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"\n");
+          }
+        }
+        fclose(ave_plot);
+        delete[] avename;
+      }
+
+      for (int pNum=0; pNum<numProteins; pNum++) {
+
+        //time map
+        char *timename = print_filename("time-map",proteinList[pNum]->name);
+        FILE* time_map = fopen(timename,"w");
+        delete[] timename;
+        for (int a=0; a<Ny; a++) {
+          for (int b=0; b<Nz; b++) {
+            fprintf(time_map,"%1.2f\t",(proteinList[pNum]->sum[a*Nz+b])/((double)iter));
+          }
+          fprintf(time_map,"\n");
+        }
+        fclose(time_map);
+      }
+
+      for (int pNum=0; pNum<numProteins; pNum++) {
+        //arrow plot
+        //filter local maxima in time
+        int* time_maxima_y = new int[iter];
+        int* time_maxima_z = new int[iter];
+
+        for (int p=1; p<(i-1); p++) {
+          if( (proteinList[pNum]->maxval[p] > proteinList[pNum]->maxval[p-1]) && (proteinList[pNum]->maxval[p] > proteinList[pNum]->maxval[p+1]) ) {
+            time_maxima_y[p] = proteinList[pNum]->ymax[p];
+            time_maxima_z[p] = proteinList[pNum]->zmax[p];
+          }
+          else {
+            time_maxima_y[p] = 0;
+            time_maxima_z[p] = 0;
+          }
+        }
+        //print to file
+        char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
+        FILE* arrowfile = fopen(arrowname,"w");
+        delete[] arrowname;
+        for (int p=1; p<(i-1); p++) {
+          if ((time_maxima_y[p] != 0) && (time_maxima_z[p] != 0)) {
+            fprintf(arrowfile,"%d\t%d\n",time_maxima_y[p],time_maxima_z[p]);
+          }
+        }
+        fclose(arrowfile);
+        delete[] time_maxima_y;
+        delete[] time_maxima_z;
+      }
+    }
   }
+
+
   //end file printing
   //end simulation
+  for (int pNum=0; pNum<numProteins; pNum++) {
+    delete[] proteinList[pNum]->sum;
+    delete[] proteinList[pNum]->maxval;
+    delete[] proteinList[pNum]->ymax;
+    delete[] proteinList[pNum]->zmax;
+    delete[] proteinList[pNum]->numLeft;
+    delete[] proteinList[pNum]->numMid;
+    delete[] proteinList[pNum]->numRight;
+    delete[] proteinList[pNum]->numRightUp;
+    delete[] proteinList[pNum]->numRightDown;
+    delete[] proteinList[pNum]->numLeftUp;
+    delete[] proteinList[pNum]->numLeftDown;
+  }
 
   delete[] JxATP;
   delete[] JyATP;
@@ -1356,194 +1541,8 @@ int main (int argc, char *argv[]) {
   fclose(out_file);
 
   //printing plot information
-  for (int pNum=0; pNum<numProteins; pNum++) {
 
-    //time map
-    char *timename = print_filename("time-map",proteinList[pNum]->name);
-    FILE* time_map = fopen(timename,"w");
-    delete[] timename;
 
-    for (int a=0; a<Ny; a++) {
-      for (int b=0; b<Nz; b++) {
-        fprintf(time_map,"%1.2f\t",(proteinList[pNum]->sum[a*Nz+b])/((double)iter));
-      }
-      fprintf(time_map,"\n");
-    }
-
-    delete[] proteinList[pNum]->sum;
-
-    fclose(time_map);
-
-  }
-
-  //boxplot
-  char *boxname = print_filename("box-plot","");
-  FILE* box_plot = fopen(boxname,"w");
-  delete[] boxname;
-
-  for (int pNum=0; pNum<numProteins; pNum++) {
-
-    if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98 || mem_f_shape == "triangle") {
-      fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_dat]));
-      }
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_dat]));
-      }
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"%s\tright\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_dat]));
-      }
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"\n");
-    }
-    if (rand_seed == 97) {
-      fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_dat]));
-      }
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"%s\trightup\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_dat]));
-      }
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"%s\tmid\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_dat]));
-      }
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"%s\trightdown\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_dat]));
-      }
-      delete[] proteinList[pNum]->numLeft;
-      delete[] proteinList[pNum]->numRightUp;
-      delete[] proteinList[pNum]->numMid;
-      delete[] proteinList[pNum]->numRightDown;
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"\n");
-    }
-    if (rand_seed == 96) {
-      fprintf(box_plot,"%s\trightup\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_dat]));
-      }
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"%s\tleftup\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftUp[i_dat]));
-      }
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"%s\tleftdown\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeftDown[i_dat]));
-      }
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"%s\trightdown\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_dat]));
-      }
-      delete[] proteinList[pNum]->numRightUp;
-      delete[] proteinList[pNum]->numLeftUp;
-      delete[] proteinList[pNum]->numLeftDown;
-      delete[] proteinList[pNum]->numRightDown;
-      fprintf(box_plot,"\n");
-      fprintf(box_plot,"\n");
-    }
-  }
-  fclose(box_plot);
-
-  char *avename = new char[1024];
-  sprintf(avename,"%s",print_filename("ave_plot",""));
-  FILE* ave_plot = fopen(avename,"w");
-
-  double left_area_total = 0;
-  double middle_area_total = 0;
-  double right_area_total = 0;
-  for (int a=0;a<Ny; a++) {
-    for (int b=0; b<Nz; b++) {
-      for (int c=0; c<Nx; c++) {
-        if (b < box_divider_left) {
-          left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-        }
-        else if (b > box_divider_right) {
-          right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-        }
-        else {
-          middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-        }
-      }
-    }
-  }
-  printf("left area = %g middle area = %g right area = %g\n",left_area_total,middle_area_total,right_area_total);
-  fflush(stdout);
-  if (mem_f_shape == "p"){
-    for (int pNum=3; pNum<numProteins; pNum++) {
-
-      fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_dat]/left_area_total));
-      }
-      fprintf(ave_plot,"\n");
-      fprintf(ave_plot,"%s\tmid\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_dat]/middle_area_total));
-      }
-      fprintf(ave_plot,"\n");
-      fprintf(ave_plot,"%s\tright\t",proteinList[pNum]->name);
-      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-        fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_dat]/right_area_total));
-      }
-      fprintf(ave_plot,"\n");
-      fprintf(ave_plot,"\n");
-      delete[] proteinList[pNum]->numLeft;
-      delete[] proteinList[pNum]->numMid;
-      delete[] proteinList[pNum]->numRight;
-    }
-  }
-  fclose(ave_plot);
-  delete[] avename;
-
-  //arrow plot
-  for (int pNum=0; pNum<numProteins; pNum++) {
-    //filter local maxima in time
-    int* time_maxima_y = new int[iter];
-    int* time_maxima_z = new int[iter];
-
-    for (int i=1; i<(iter-1); i++) {
-      if( (proteinList[pNum]->maxval[i] > proteinList[pNum]->maxval[i-1]) && (proteinList[pNum]->maxval[i] > proteinList[pNum]->maxval[i+1]) ) {
-        time_maxima_y[i] = proteinList[pNum]->ymax[i];
-        time_maxima_z[i] = proteinList[pNum]->zmax[i];
-      }
-      else {
-        time_maxima_y[i] = 0;
-        time_maxima_z[i] = 0;
-      }
-    }
-
-    delete[] proteinList[pNum]->maxval;
-    delete[] proteinList[pNum]->ymax;
-    delete[] proteinList[pNum]->zmax;
-
-    //print to file
-    char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
-    FILE* arrowfile = fopen(arrowname,"w");
-    delete[] arrowname;
-
-    for (int i=1; i<(iter-1); i++) {
-      if ((time_maxima_y[i] != 0) && (time_maxima_z[i] != 0)) {
-        fprintf(arrowfile,"%d\t%d\n",time_maxima_y[i],time_maxima_z[i]);
-      }
-    }
-    fclose(arrowfile);
-    delete[] time_maxima_y;
-    delete[] time_maxima_z;
-  }
 
   //printing to the project directory so we have a shortlist of what we've done.
   char *fname = new char[1024];
@@ -1588,8 +1587,7 @@ int main (int argc, char *argv[]) {
 }
 
 
-void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z),
-                  double mem_A[]) {
+  void set_membrane(FILE * out_file, double (*mem_f)(double x, double y, double z), double mem_A[]) {
   clock_t old_time = clock();
   for(int xi=0;xi<Nx;xi++){
     clock_t time = clock();
