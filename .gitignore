@@ -13,6 +13,7 @@
 *.pdf
 *.gif
 
+
 # for latex:
 *.aux
 *.log
