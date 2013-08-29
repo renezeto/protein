@@ -506,7 +506,8 @@ int main (int argc, char *argv[]) {
   }
 
   //fixed simulation parameters
-  tot_time = 2500/2; //sec
+  //tot_time = 2500/2; //sec
+  tot_time = 20;
   if (debug_flag==1) {
     tot_time = 11;
   }
@@ -1374,6 +1375,8 @@ int main (int argc, char *argv[]) {
     fclose(time_map);
 
   }
+
+  //boxplot
   char *boxname = print_filename("box-plot","");
   FILE* box_plot = fopen(boxname,"w");
   delete[] boxname;
@@ -1395,9 +1398,6 @@ int main (int argc, char *argv[]) {
       for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
         fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_dat]));
       }
-      delete[] proteinList[pNum]->numLeft;
-      delete[] proteinList[pNum]->numMid;
-      delete[] proteinList[pNum]->numRight;
       fprintf(box_plot,"\n");
       fprintf(box_plot,"\n");
     }
@@ -1456,55 +1456,58 @@ int main (int argc, char *argv[]) {
       fprintf(box_plot,"\n");
     }
   }
-
   fclose(box_plot);
 
-  // char *avename = new char[1024];
-  // sprintf(avename,"%s",print_filename("ave_plot",""));
-  // FILE* ave_plot = fopen(avename,"w");
+  char *avename = new char[1024];
+  sprintf(avename,"%s",print_filename("ave_plot",""));
+  FILE* ave_plot = fopen(avename,"w");
 
-  // double left_area_total = 0;
-  // double middle_area_total = 0;
-  // double right_area_total = 0;
-  // for (int a=0;a<Ny; a++) {
-  //   for (int b=0; b<Nz; b++) {
-  //     for (int c=0; c<Nx; c++) {
-  //       if (b < box_divider_left) {
-  //         left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-  //       }
-  //       else if (b > box_divider_right) {
-  //         right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-  //       }
-  //       else {
-  //         middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-  //       }
-  //     }
-  //   }
-  // }
+  double left_area_total = 0;
+  double middle_area_total = 0;
+  double right_area_total = 0;
+  for (int a=0;a<Ny; a++) {
+    for (int b=0; b<Nz; b++) {
+      for (int c=0; c<Nx; c++) {
+        if (b < box_divider_left) {
+          left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+        }
+        else if (b > box_divider_right) {
+          right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+        }
+        else {
+          middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+        }
+      }
+    }
+  }
+  printf("left area = %g middle area = %g right area = %g\n",left_area_total,middle_area_total,right_area_total);
+  fflush(stdout);
+  if (mem_f_shape == "p"){
+    for (int pNum=3; pNum<numProteins; pNum++) {
 
-  // if (mem_f_shape == "p"){
-  //   for (int pNum=3; pNum<numProteins; pNum++) {
-
-  //     fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
-  //     for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-  //       fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_dat]/left_area_total));
-  //     }
-  //     fprintf(ave_plot,"\n");
-  //     fprintf(ave_plot,"%s\tmid\t",proteinList[pNum]->name);
-  //     for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-  //       fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_dat]/middle_area_total));
-  //     }
-  //     fprintf(ave_plot,"\n");
-  //     fprintf(ave_plot,"%s\tright\t",proteinList[pNum]->name);
-  //     for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
-  //       fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_dat]/right_area_total));
-  //     }
-  //     fprintf(ave_plot,"\n");
-  //     fprintf(ave_plot,"\n");
-  //   }
-  // }
-  // fclose(ave_plot);
-  // delete[] avename;
+      fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_dat]/left_area_total));
+      }
+      fprintf(ave_plot,"\n");
+      fprintf(ave_plot,"%s\tmid\t",proteinList[pNum]->name);
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_dat]/middle_area_total));
+      }
+      fprintf(ave_plot,"\n");
+      fprintf(ave_plot,"%s\tright\t",proteinList[pNum]->name);
+      for (int i_dat=0; i_dat<iter/print_denominator; i_dat++) {
+        fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_dat]/right_area_total));
+      }
+      fprintf(ave_plot,"\n");
+      fprintf(ave_plot,"\n");
+      delete[] proteinList[pNum]->numLeft;
+      delete[] proteinList[pNum]->numMid;
+      delete[] proteinList[pNum]->numRight;
+    }
+  }
+  fclose(ave_plot);
+  delete[] avename;
 
   //arrow plot
   for (int pNum=0; pNum<numProteins; pNum++) {
