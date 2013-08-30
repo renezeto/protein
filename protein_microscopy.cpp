@@ -1506,7 +1506,7 @@ int main (int argc, char *argv[]) {
   // fclose(ave_plot);
   // delete[] avename;
 
-  //arrow plot
+  //arrow plot - bug: for some reason, slice sims print both slice arrow plot and a duplicate file without the slice flag.
   for (int pNum=0; pNum<numProteins; pNum++) {
     //filter local maxima in time
     int* time_maxima_y = new int[iter];
