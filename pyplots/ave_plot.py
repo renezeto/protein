@@ -5,7 +5,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import sys
 import pylab
-import file_loader as load
+import file_loader_dump as load
 
 ## WIP!!
 
@@ -26,7 +26,7 @@ import file_loader as load
 def returnData(boxName,proteinType):
 
     #open the data file, grab the line with the correct protein type and box partition, load it as a [string] (so we can use list comprehensions)
-    with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
+    with open("./data/shape-%s/box-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
         proteinsOverTime = [line for line in boxData if (proteinType in line) and (boxName in line)]
 
 
@@ -34,6 +34,7 @@ def returnData(boxName,proteinType):
     proteinsOverTime = proteinsOverTime[0].split('\t')
     proteinsOverTime = proteinsOverTime[2:-1]
     proteinsOverTime = [float(i) for i in proteinsOverTime]
+
     return proteinsOverTime
 
 #takes input format: ["proteinType1-boxNum1","proteinType1-boxnum2",proteinType2-boxnum1"...]. will return a list of lists
@@ -45,20 +46,21 @@ def stackData(plotList):
         splitString = proteinData.split('-')
         (protein, boxName) = (splitString[0], splitString[1])
         tempList += [returnData(boxName,protein)]
+        print proteinData 
 
     #"stack" the lists
     stackedPlotList = [tempList[0]]
     for i in range(1,len(tempList)):
         stackedPlotList += [[j+k for (j,k) in zip(stackedPlotList[i-1],tempList[i])]]
 
-    output = np.array(stackedPlotList)
-    return output/output[len(output[:,0])-1, 0] # normalize output as a fraction of total
+    return stackedPlotList
 
 def main():
 
-    with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
+    with open("./data/shape-%s/ave-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
         fileLines = boxData.readlines()
 
+    print fileLines
     #get number of boxes and protein types. little hokey but it works. in boxData.readlines(), there is exactly one '\n' newline string
     #for each protein type block. therefor, the number of protein types is equal to the number of times "\n" appears by itself in the list.
     numProteinTypes = len([line for line in fileLines if line=="\n"])
@@ -80,6 +82,11 @@ def main():
     proteinTypeList = list(set(proteinTypeList))
     boxList = list(set(boxList))
 
+
+    #plot scales. colors limited for now.
+    colorScale = ["b","g","r","c","m","y"]
+    alphaScale = [n/numProteinTypes for n in range(1,numProteinTypes)]
+
     #generate list of proteinType and box combinations to feed into stackData
     plotNameList_D = []
     plotNameList_E = []
@@ -100,7 +107,7 @@ def main():
     timeAxis = range(len(plotCurveList_D[0]))
 
     #begin messy code (to deal with matplotlib) - don't judge me
-    (start, end) = (0*int(len(timeAxis)/10),10*int(len(timeAxis)/10))
+    (start, end) = (6*int(len(timeAxis)/10),7*int(len(timeAxis)/10))
 
     #get num on each plot
     for proteinType in proteinTypeList:
@@ -109,44 +116,30 @@ def main():
         if "E_" in proteinType:
             numProteinTypes_E +=1
 
-    #plot scales. colors limited for now.
-    colorScale = ["b","g","r","c","m","y"]
-    alphaScale_D = [n/numProteinTypes for n in range(1,numProteinTypes_D+1)]
-    alphaScale_E = [n/numProteinTypes for n in range(1,numProteinTypes_E+1)]
 
     #generate the plot
     plt.figure()
     j=0
     k=0
-    for i in range(len(plotCurveList_D[:,0])):
-        if i%(numProteinTypes_D)==0:
+    for i in range(len(plotCurveList_D)):
+        if i%(numProteinTypes_D)==0:#numProteinTypes-1)==0:
             j+=1
+        if i%(numBoxes+1)==0:
             k=0
         if i==0:
-            plt.plot(timeAxis[start:end],
-                     plotCurveList_D[i, start:end],
-                     color=colorScale[j],alpha=alphaScale_D[k])
-            plt.fill_between(timeAxis[start:end],
-                             [0 for x in range(len(timeAxis))[start:end]],
-                             plotCurveList_D[i, start:end],
-                             alpha=alphaScale_D[k],facecolor=colorScale[j])
+            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j])
+            plt.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_D[i][start:end],alpha=alphaScale[k],facecolor=colorScale[j])
         elif i!=0:
-            plt.plot(timeAxis[start:end],
-                     plotCurveList_D[i, start:end],
-                     color=colorScale[j],alpha=alphaScale_D[k])
-            plt.fill_between(timeAxis[start:end],
-                             plotCurveList_D[i-1, start:end],
-                             plotCurveList_D[i, start:end],
-                             alpha=alphaScale_D[k],facecolor=colorScale[j])
+            plt.plot(timeAxis[start:end],plotCurveList_D[i][start:end],color=colorScale[j])
+            plt.fill_between(timeAxis[start:end],plotCurveList_D[i-1][start:end],plotCurveList_D[i][start:end],alpha=alphaScale[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
     plt.xlim(start,end+.40*(end-start))
-    plt.ylim(0, 1)
     plt.title("Min D protein counts over time")
     plt.xlabel("Time (s)")
-    plt.ylabel("Fraction of proteins")
+    plt.ylabel("Number of proteins")
     plt.legend(plotNameList_D,loc="best",prop={'size':10})
-    plt.savefig(load.print_string("box-plot_D",""))
+    plt.savefig("./data/shape-%s/plots/box-plot_D--%s-%s-%s-%s-%s-%s.pdf"%(load.f_shape,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
 
     plt.figure()
     j=0
@@ -154,22 +147,22 @@ def main():
     for i in range(len(plotCurveList_E)):
         if i%(numProteinTypes_E)==0:
             j+=1
+        if i%(numBoxes+1)==0:
             k=0
         if i==0:
-            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j],alpha=alphaScale_E[k])
-            plt.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
+            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j])
+            plt.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_E[i][start:end],alpha=alphaScale[k],facecolor=colorScale[j])
         elif i!=0:
-            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j],alpha=alphaScale_E[k])
-            plt.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
+            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j])
+            plt.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
     plt.xlim(start,end+.40*(end-start))
-    plt.ylim(0, 1)
     plt.title("Min E protein counts over time")
     plt.xlabel("Time (s)")
-    plt.ylabel("Fraction of proteins")
+    plt.ylabel("Number of proteins")
     plt.legend(plotNameList_E,loc="best",prop={'size':10})
-    plt.savefig(load.print_string("box-plot_E",""))
+    plt.savefig("./data/shape-%s/plots/box-plot_E--%s-%s-%s-%s-%s-%s.pdf"%(load.f_shape,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
 
     return 0
 
