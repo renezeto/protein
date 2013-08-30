@@ -153,6 +153,8 @@ def dataStatus(commands, options):
     proteinTypes = ["D_nATP","D_ND","D_E_NDE","E_nE","D_nADP"]
     simFlags = ["debug","dump","hires","slice"]
 
+    miscFiles = 0
+
     numArrowPlots = {}
     numBoxPlots = {}
     numTimeMaps = {}
@@ -162,6 +164,11 @@ def dataStatus(commands, options):
         numBoxPlots[' '.join(job)] = 0
         numTimeMaps[' '.join(job)] = 0
         numAvePlots[' '.join(job)] = 0
+        numArrowPlots['status'] = 'MISSING or INCOMPLETE'
+        numBoxPlots['status'] = 'MISSING or INCOMPLETE'
+        numTimeMaps['status'] = 'MISSING or INCOMPLETE'
+        numAvePlots['status'] = 'MISSING or INCOMPLETE'
+
 
     for fileName in fileGenerator:
 
@@ -173,8 +180,10 @@ def dataStatus(commands, options):
                 fileParams[i] = "-"+fileParams[i]
         simParams = [elem for elem in fileParams if ((elem not in miscKeywords) and (elem not in proteinTypes))]
 
+        counted=False
         for job in jobList:
             if include(simParams,job):
+                counted=True
                 if ("arrow" in fileParams):
                     numArrowPlots[' '.join(job)] += 1
                 if ("box" in fileParams):
@@ -184,25 +193,21 @@ def dataStatus(commands, options):
                 if ("ave_plot" in fileParams):
                     numAvePlots[' '.join(job)] += 1
 
+        if not counted:
+            miscFiles += 1
+
+        for job in jobList:
             if numTimeMaps[' '.join(job)] == 5:
                 numTimeMaps['status'] = 'OK'
-            else:
-                numTimeMaps['status'] = 'MISSING or INCOMPLETE'
 
             if numArrowPlots[' '.join(job)] == 5:
                 numArrowPlots['status'] = 'OK'
-            else:
-                numArrowPlots['status'] = 'MISSING or INCOMPLETE'
 
             if numAvePlots[' '.join(job)] == 1:
                 numAvePlots['status'] = 'OK'
-            elif numAvePlots[' '.join(job)] == 0:
-                numAvePlots['status'] = 'MISSING or INCOMPLETE'
 
             if numBoxPlots[' '.join(job)] == 1:
                 numBoxPlots['status'] = 'OK'
-            elif numBoxPlots[' '.join(job)] == 0:
-                numBoxPlots['status'] = 'MISSING or INCOMPLETE'
 
     for job in jobList:
         print "==== job: %s"%(' '.join(job))
@@ -214,10 +219,12 @@ def dataStatus(commands, options):
 
     print "======== summary:"
     for job in jobList:
-        status = 'all data accounted for'
         if (numArrowPlots['status'] or numTimeMaps['status'] or numAvePlots['status'] or numBoxPlots['status'])!='OK':
             status = 'missing data'
+        else:
+            status = 'all data accounted for'
         print "JOB: (%s) STATUS: %s"%(' '.join(job),status)
+    print "%d data files exist which are not present in this filter of jobs"%(miscFiles)
 
 def main():
     commands = parseArgs(sys.argv)
