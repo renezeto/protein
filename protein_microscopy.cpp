@@ -785,7 +785,7 @@ int main (int argc, char *argv[]) {
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
   char* outfilename = new char[1024];
-  sprintf(outfilename,"data/shape-%s/membrane_files/%s%s%smembrane-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(outfilename,"data/shape-%s/%s%s%smembrane-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
   if (out==0){
     printf ("couldn't print outfile\n");
@@ -813,7 +813,7 @@ int main (int argc, char *argv[]) {
 
   if (mem_f_shape=="triangle") {
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+    sprintf(outfilename_sections, "data/shape-%s/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int j=0;j<Ny;j++){
@@ -848,7 +848,7 @@ int main (int argc, char *argv[]) {
 
   if (mem_f_shape=="p"){
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+    sprintf(outfilename_sections, "data/shape-%s/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int a=0; a<Ny; a++) {
@@ -909,7 +909,7 @@ int main (int argc, char *argv[]) {
   }
   if (mem_f_shape=="randst") {
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+    sprintf(outfilename_sections, "data/shape-%s/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int a=0; a<Ny; a++) {
