@@ -10,6 +10,6 @@ randst 0.25 6.00 6.00 99.00 15.00  -dump -paper -debug
 p 4.00 0.50 0.00 0.00 15.00 -paper -debug
 p 2.00 0.50 0.00 0.00 15.00 -paper -debug
 
-p 1.50 0.50 0.00 0.00 15.00 -haung -debug
+p 1.50 0.50 0.00 0.00 15.00 -haung -debug -slice -hires
 p 1.50 0.50 0.00 0.00 15.00 -haung -debug
 p 3.00 0.50 0.00 0.00 15.00 -haung -debug
