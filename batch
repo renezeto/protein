@@ -4,6 +4,7 @@ import numpy as np
 import glob
 import sys
 import os
+import re
 import subprocess
 import time
 
@@ -219,7 +220,7 @@ def dataStatus(commands, options):
 
     print "======== summary:"
     for job in jobList:
-        if (numArrowPlots['status'] or numTimeMaps['status'] or numAvePlots['status'] or numBoxPlots['status'])!='OK':
+        if (numArrowPlots['status']!='OK' or numTimeMaps['status']!='OK' or numAvePlots['status']!='OK' or numBoxPlots['status']!='OK'):
             status = 'missing data'
         else:
             status = 'all data accounted for'
