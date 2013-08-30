@@ -150,7 +150,7 @@ def dataStatus(commands, options):
     jobList = getJobs(options)
     fileGenerator = glob.iglob("data/shape-*/*.dat")
 
-    miscKeywords = ["time","arrow","box","ave_plot","plot","map","","ave"]
+    miscKeywords = ["time","arrow","box","ave_plot","plot","map","","ave","membrane","sections"]
     proteinTypes = ["D_nATP","D_ND","D_E_NDE","E_nE","D_nADP"]
     simFlags = ["debug","dump","hires","slice"]
 
@@ -160,16 +160,18 @@ def dataStatus(commands, options):
     numBoxPlots = {}
     numTimeMaps = {}
     numAvePlots = {}
+    numCellInfo = {}
     for job in jobList:
         numArrowPlots[' '.join(job)] = 0
         numBoxPlots[' '.join(job)] = 0
         numTimeMaps[' '.join(job)] = 0
         numAvePlots[' '.join(job)] = 0
+        numCellInfo[' '.join(job)] = 0
         numArrowPlots[' '.join(job)+' status'] = 'MISSING or INCOMPLETE'
         numBoxPlots[' '.join(job)+' status'] = 'MISSING or INCOMPLETE'
         numTimeMaps[' '.join(job)+' status'] = 'MISSING or INCOMPLETE'
         numAvePlots[' '.join(job)+' status'] = 'MISSING or INCOMPLETE'
-
+        numCellInfo[' '.join(job)+' status'] = 'MISSING or INCOMPLETE'
 
     for fileName in fileGenerator:
 
@@ -193,6 +195,10 @@ def dataStatus(commands, options):
                     numTimeMaps[' '.join(job)] += 1
                 if ("ave_plot" in fileParams):
                     numAvePlots[' '.join(job)] += 1
+                if ("membrane" in fileParams):
+                    numCellInfo[' '.join(job)] += 1
+                if ("sections" in fileParams):
+                    numCellInfo[' '.join(job)] += 1
 
         if not counted:
             miscFiles += 1
@@ -210,17 +216,21 @@ def dataStatus(commands, options):
             if numBoxPlots[' '.join(job)] == 1:
                 numBoxPlots[' '.join(job)+' status'] = 'OK'
 
+            if numCellInfo[' '.join(job)] == 2:
+                numCellInfo[' '.join(job)+' status'] = 'OK'
+
     for job in jobList:
         print "==== job: %s"%(' '.join(job))
         print "# time-maps: %d, should have: 5"%(numTimeMaps[' '.join(job)])
         print "# ave-plots: %d, should have: 1"%(numAvePlots[' '.join(job)])
         print "# arrow-plots: %d, should have: 5"%(numArrowPlots[' '.join(job)])
         print "# box-plots: %d, should have: 1"%(numBoxPlots[' '.join(job)])
+        print "# cell-info: %d, should have: 2"%(numCellInfo[' '.join(job)])
         print ""
 
     print "======== summary:"
     for job in jobList:
-        if (numArrowPlots[' '.join(job)+' status']!='OK' or numTimeMaps[' '.join(job)+' status']!='OK' or numAvePlots[' '.join(job)+' status']!='OK' or numBoxPlots[' '.join(job)+' status']!='OK'):
+        if (numArrowPlots[' '.join(job)+' status']!='OK' or numTimeMaps[' '.join(job)+' status']!='OK' or numAvePlots[' '.join(job)+' status']!='OK' or numBoxPlots[' '.join(job)+' status']!='OK' or numCellInfo[' '.join(job)+' status']!='OK'):
             status = 'missing data'
         else:
             status = 'all data accounted for'
