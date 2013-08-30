@@ -846,7 +846,26 @@ int main (int argc, char *argv[]) {
   fflush(out_file);
   printf("density set.\n");
 
+  double left_area_total = 0;
+  double middle_area_total = 0;
+  double right_area_total = 0;
+
   if (mem_f_shape=="p"){
+    for (int a=0;a<Ny; a++) {
+      for (int b=0; b<Nz; b++) {
+        for (int c=0; c<Nx; c++) {
+          if (b < box_divider_left) {
+            left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
+          else if (b > box_divider_right) {
+            right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
+          else {
+            middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
+        }
+      }
+    }
     char* outfilename_sections = new char[1024];
     sprintf(outfilename_sections, "data/shape-%s/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
@@ -1420,24 +1439,7 @@ int main (int argc, char *argv[]) {
         char *avename = new char[1024];
         sprintf(avename,"%s",print_filename("ave_plot",""));
         FILE* ave_plot = fopen(avename,"w");
-        double left_area_total = 0;
-        double middle_area_total = 0;
-        double right_area_total = 0;
-        for (int a=0;a<Ny; a++) {
-          for (int b=0; b<Nz; b++) {
-            for (int c=0; c<Nx; c++) {
-              if (b < box_divider_left) {
-                left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-              }
-              else if (b > box_divider_right) {
-                right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-              }
-              else {
-                middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-              }
-            }
-          }
-        }
+
         printf("left area = %g middle area = %g right area = %g\n",left_area_total,middle_area_total,right_area_total);
         fflush(stdout);
         if (mem_f_shape == "p"){
