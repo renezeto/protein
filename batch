@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from __future__ import division
 import numpy as np
+import glob
 import sys
 import os
 import subprocess
@@ -140,10 +141,30 @@ def runMovies(commands,options):
                 time.sleep(10)
     return 0
 
+def dataStatus(commands, options):
+    #job data status: OK, MISSING, INCOMPLETE
+    #option to mark file in jobs for re-run of data
+    #extra data list
+
+    boxplotName = "%s%s%sbox-plot-%s-%s-%s-%s-%s-%s.dat"
+    arrowplotName = "%s%s%sarrow-plot-%s-%s-%s-%s-%s-%s.dat"
+    timemapName = "%s%s%stime-map-%s-%s-%s-%s-%s-%s.dat"
+
+    jobList = getJobs(options)
+    fileGenerator = glob.iglob("data/shape-*/*.dat")
+
+    miscKeywords = ["box","arrow","time","plot","map","data","shape"]
+    proteinTypes = ["D_nATP","D_ND","D_E_NDE","E_NE","D_nADP"]
+
+    for fileName in fileGenerator:
+        fromJob = [param for param in fileName.split("-")][-6:] # if param not in (miscKeywords or proteinTypes)]
+        print fromJob
+        
 
 def main():
     commands = parseArgs(sys.argv)
     options = parseKwargs(sys.argv)
+    dataStatus(commands, options)
     if "sim" in commands:
         runSim(commands,options)
     if "plot" in commands:
