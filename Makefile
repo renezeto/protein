@@ -3,7 +3,7 @@ CXXFLAGS = -g -Wall -Werror
 .SUFFIXES: .tex .dvi .ps .bib .bbl .pdf .fig .eps .aux .jpg .png .svg \
 		.gp .mf .2602gf .pl .xgr
 
-all: sim paper/paper.pdf ${ALL_FIGURES}
+all: sim #paper/paper.pdf ${ALL_FIGURES}
 
 test: test.cpp
 
@@ -11,16 +11,15 @@ clean: rm -f protein_microscopy paper/paper.pdf
 
 sim: protein_microscopy
 
-ALL_FIGURES = \
+#ALL_FIGURES = \
 	data/shape-p/plots/debug-box-plot_D--p-150-60-0-0-1500.pdf
 
-paper/paper.pdf: paper/paper.tex ${ALL_FIGURES}
-	echo ${ALL_FIGURES}
-	cd paper && pdflatex paper.tex && bibtex paper && pdflatex paper.tex && pdflatex paper.tex
+#paper/paper.pdf: paper/paper.tex #${ALL_FIGURES}
+#	cd paper && pdflatex paper.tex && bibtex paper && pdflatex paper.tex && pdflatex paper.tex
 
 
-${ALL_FIGURES}: batch jobs $(wildcard data/shape-*/*.dat)
-	./batch plot include="-paper"
+#${ALL_FIGURES}: batch jobs $(wildcard data/shape-*/*.dat)
+#	./batch plot include="-paper"
 
 #time maps
 data/shape-randst/plots/time-map-compare-randst-10-60-60-990-150.pdf: pyplots/time_map.py
