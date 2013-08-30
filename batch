@@ -165,10 +165,10 @@ def dataStatus(commands, options):
         numBoxPlots[' '.join(job)] = 0
         numTimeMaps[' '.join(job)] = 0
         numAvePlots[' '.join(job)] = 0
-        numArrowPlots['status'] = 'MISSING or INCOMPLETE'
-        numBoxPlots['status'] = 'MISSING or INCOMPLETE'
-        numTimeMaps['status'] = 'MISSING or INCOMPLETE'
-        numAvePlots['status'] = 'MISSING or INCOMPLETE'
+        numArrowPlots[' '.join(job)+' status'] = 'MISSING or INCOMPLETE'
+        numBoxPlots[' '.join(job)+' status'] = 'MISSING or INCOMPLETE'
+        numTimeMaps[' '.join(job)+' status'] = 'MISSING or INCOMPLETE'
+        numAvePlots[' '.join(job)+' status'] = 'MISSING or INCOMPLETE'
 
 
     for fileName in fileGenerator:
@@ -199,16 +199,16 @@ def dataStatus(commands, options):
 
         for job in jobList:
             if numTimeMaps[' '.join(job)] == 5:
-                numTimeMaps['status'] = 'OK'
+                numTimeMaps[' '.join(job)+' status'] = 'OK'
 
             if numArrowPlots[' '.join(job)] == 5:
-                numArrowPlots['status'] = 'OK'
+                numArrowPlots[' '.join(job)+' status'] = 'OK'
 
             if numAvePlots[' '.join(job)] == 1:
-                numAvePlots['status'] = 'OK'
+                numAvePlots[' '.join(job)+' status'] = 'OK'
 
             if numBoxPlots[' '.join(job)] == 1:
-                numBoxPlots['status'] = 'OK'
+                numBoxPlots[' '.join(job)+' status'] = 'OK'
 
     for job in jobList:
         print "==== job: %s"%(' '.join(job))
@@ -220,7 +220,7 @@ def dataStatus(commands, options):
 
     print "======== summary:"
     for job in jobList:
-        if (numArrowPlots['status']!='OK' or numTimeMaps['status']!='OK' or numAvePlots['status']!='OK' or numBoxPlots['status']!='OK'):
+        if (numArrowPlots[' '.join(job)+' status']!='OK' or numTimeMaps[' '.join(job)+' status']!='OK' or numAvePlots[' '.join(job)+' status']!='OK' or numBoxPlots[' '.join(job)+' status']!='OK'):
             status = 'missing data'
         else:
             status = 'all data accounted for'
