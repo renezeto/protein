@@ -159,7 +159,7 @@ def dataStatus(commands, options):
     for fileName in fileGenerator:
         fromJob = [param for param in fileName.split("-")][-6:] # if param not in (miscKeywords or proteinTypes)]
         print fromJob
-        
+
 
 def main():
     commands = parseArgs(sys.argv)
