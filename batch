@@ -146,25 +146,84 @@ def dataStatus(commands, options):
     #option to mark file in jobs for re-run of data
     #extra data list
 
-    boxplotName = "%s%s%sbox-plot-%s-%s-%s-%s-%s-%s.dat"
-    arrowplotName = "%s%s%sarrow-plot-%s-%s-%s-%s-%s-%s.dat"
-    timemapName = "%s%s%stime-map-%s-%s-%s-%s-%s-%s.dat"
-
     jobList = getJobs(options)
     fileGenerator = glob.iglob("data/shape-*/*.dat")
 
-    miscKeywords = ["box","arrow","time","plot","map","data","shape"]
-    proteinTypes = ["D_nATP","D_ND","D_E_NDE","E_NE","D_nADP"]
+    miscKeywords = ["time","arrow","box","ave_plot","plot","map","","ave"]
+    proteinTypes = ["D_nATP","D_ND","D_E_NDE","E_nE","D_nADP"]
+    simFlags = ["debug","dump","hires","slice"]
+
+    numArrowPlots = {}
+    numBoxPlots = {}
+    numTimeMaps = {}
+    numAvePlots = {}
+    for job in jobList:
+        numArrowPlots[' '.join(job)] = 0
+        numBoxPlots[' '.join(job)] = 0
+        numTimeMaps[' '.join(job)] = 0
+        numAvePlots[' '.join(job)] = 0
 
     for fileName in fileGenerator:
-        fromJob = [param for param in fileName.split("-")][-6:] # if param not in (miscKeywords or proteinTypes)]
-        print fromJob
 
+        #gnarly list comprehension, but it filters the simulation parameters out of the file names correctly.
+        fileParams = [filteredParam for filteredParam in ([param for param in fileName.split("/")][2]).split("-")]
+        fileParams[-1] = fileParams[-1][:-4] #popping off the .dat from the last parameter in the filename
+        for i in range(len(fileParams)): #this needs to be range(len(list)) and not just "for string in list" because otherwise it won't update
+            if fileParams[i] in simFlags:
+                fileParams[i] = "-"+fileParams[i]
+        simParams = [elem for elem in fileParams if ((elem not in miscKeywords) and (elem not in proteinTypes))]
+
+        for job in jobList:
+            if include(simParams,job):
+                if ("arrow" in fileParams):
+                    numArrowPlots[' '.join(job)] += 1
+                if ("box" in fileParams):
+                    numBoxPlots[' '.join(job)] += 1
+                if ("time" in fileParams):
+                    numTimeMaps[' '.join(job)] += 1
+                if ("ave_plot" in fileParams):
+                    numAvePlots[' '.join(job)] += 1
+
+            if numTimeMaps[' '.join(job)] == 5:
+                numTimeMaps['status'] = 'OK'
+            else:
+                numTimeMaps['status'] = 'MISSING or INCOMPLETE'
+
+            if numArrowPlots[' '.join(job)] == 5:
+                numArrowPlots['status'] = 'OK'
+            else:
+                numArrowPlots['status'] = 'MISSING or INCOMPLETE'
+
+            if numAvePlots[' '.join(job)] == 1:
+                numAvePlots['status'] = 'OK'
+            elif numAvePlots[' '.join(job)] == 0:
+                numAvePlots['status'] = 'MISSING or INCOMPLETE'
+
+            if numBoxPlots[' '.join(job)] == 1:
+                numBoxPlots['status'] = 'OK'
+            elif numBoxPlots[' '.join(job)] == 0:
+                numBoxPlots['status'] = 'MISSING or INCOMPLETE'
+
+    for job in jobList:
+        print "==== job: %s"%(' '.join(job))
+        print "# time-maps: %d, should have: 5"%(numTimeMaps[' '.join(job)])
+        print "# ave-plots: %d, should have: 1"%(numAvePlots[' '.join(job)])
+        print "# arrow-plots: %d, should have: 5"%(numArrowPlots[' '.join(job)])
+        print "# box-plots: %d, should have: 1"%(numBoxPlots[' '.join(job)])
+        print ""
+
+    print "======== summary:"
+    for job in jobList:
+        status = 'all data accounted for'
+        if (numArrowPlots['status'] or numTimeMaps['status'] or numAvePlots['status'] or numBoxPlots['status'])!='OK':
+            status = 'missing data'
+        print "JOB: (%s) STATUS: %s"%(' '.join(job),status)
 
 def main():
     commands = parseArgs(sys.argv)
     options = parseKwargs(sys.argv)
-    dataStatus(commands, options)
+    if "status" in commands:
+        dataStatus(commands, options)
     if "sim" in commands:
         runSim(commands,options)
     if "plot" in commands:
