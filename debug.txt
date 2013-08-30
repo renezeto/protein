@@ -1,5 +1,85 @@
-==2874== Memcheck, a memory error detector
-==2874== Copyright (C) 2002-2012, and GNU GPL'd, by Julian Seward et al.
-==2874== Using Valgrind-3.8.1 and LibVEX; rerun with -h for copyright info
-==2874== Command: ./protein_microscopy p 1.30 0.75 0.00 0.00 15.00
-==2874== 
+==== job: triangle 0.25 4.00 4.00 4.00 15.00 -dump -paper
+# time-maps: 5, should have: 5
+# ave-plots: 0, should have: 1
+# arrow-plots: 5, should have: 5
+# box-plots: 1, should have: 1
+
+==== job: triangle 0.25 5.00 5.00 3.00 15.00 -dump -paper
+# time-maps: 5, should have: 5
+# ave-plots: 0, should have: 1
+# arrow-plots: 5, should have: 5
+# box-plots: 1, should have: 1
+
+==== job: triangle 0.25 3.60 4.80 6.00 15.00 -dump -paper
+# time-maps: 5, should have: 5
+# ave-plots: 0, should have: 1
+# arrow-plots: 5, should have: 5
+# box-plots: 1, should have: 1
+
+==== job: randst 0.25 6.00 6.00 96.00 15.00 -dump
+# time-maps: 5, should have: 5
+# ave-plots: 0, should have: 1
+# arrow-plots: 5, should have: 5
+# box-plots: 1, should have: 1
+
+==== job: randst 0.25 8.00 6.00 97.00 15.00 -dump
+# time-maps: 5, should have: 5
+# ave-plots: 0, should have: 1
+# arrow-plots: 5, should have: 5
+# box-plots: 1, should have: 1
+
+==== job: randst 0.25 6.00 8.00 98.00 15.00 -dump -paper
+# time-maps: 5, should have: 5
+# ave-plots: 0, should have: 1
+# arrow-plots: 5, should have: 5
+# box-plots: 1, should have: 1
+
+==== job: randst 0.25 6.00 6.00 99.00 15.00 -dump -paper
+# time-maps: 5, should have: 5
+# ave-plots: 0, should have: 1
+# arrow-plots: 5, should have: 5
+# box-plots: 1, should have: 1
+
+==== job: p 4.00 0.50 0.00 0.00 15.00 -paper
+# time-maps: 5, should have: 5
+# ave-plots: 1, should have: 1
+# arrow-plots: 0, should have: 5
+# box-plots: 1, should have: 1
+
+==== job: p 2.00 0.50 0.00 0.00 15.00 -paper
+# time-maps: 5, should have: 5
+# ave-plots: 1, should have: 1
+# arrow-plots: 5, should have: 5
+# box-plots: 1, should have: 1
+
+==== job: p 1.50 0.50 0.00 0.00 15.00 -haung
+# time-maps: 0, should have: 5
+# ave-plots: 0, should have: 1
+# arrow-plots: 0, should have: 5
+# box-plots: 0, should have: 1
+
+==== job: p 1.50 0.50 0.00 0.00 15.00 -haung
+# time-maps: 0, should have: 5
+# ave-plots: 0, should have: 1
+# arrow-plots: 0, should have: 5
+# box-plots: 0, should have: 1
+
+==== job: p 3.00 0.50 0.00 0.00 15.00 -haung
+# time-maps: 5, should have: 5
+# ave-plots: 1, should have: 1
+# arrow-plots: 0, should have: 5
+# box-plots: 1, should have: 1
+
+======== summary:
+JOB: (triangle 0.25 4.00 4.00 4.00 15.00 -dump -paper) STATUS: missing data
+JOB: (triangle 0.25 5.00 5.00 3.00 15.00 -dump -paper) STATUS: missing data
+JOB: (triangle 0.25 3.60 4.80 6.00 15.00 -dump -paper) STATUS: missing data
+JOB: (randst 0.25 6.00 6.00 96.00 15.00 -dump) STATUS: missing data
+JOB: (randst 0.25 8.00 6.00 97.00 15.00 -dump) STATUS: missing data
+JOB: (randst 0.25 6.00 8.00 98.00 15.00 -dump -paper) STATUS: missing data
+JOB: (randst 0.25 6.00 6.00 99.00 15.00 -dump -paper) STATUS: missing data
+JOB: (p 4.00 0.50 0.00 0.00 15.00 -paper) STATUS: missing data
+JOB: (p 2.00 0.50 0.00 0.00 15.00 -paper) STATUS: missing data
+JOB: (p 1.50 0.50 0.00 0.00 15.00 -haung) STATUS: missing data
+JOB: (p 1.50 0.50 0.00 0.00 15.00 -haung) STATUS: missing data
+JOB: (p 3.00 0.50 0.00 0.00 15.00 -haung) STATUS: missing data
