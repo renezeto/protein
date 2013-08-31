@@ -813,7 +813,7 @@ int main (int argc, char *argv[]) {
 
   if (mem_f_shape=="triangle") {
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int j=0;j<Ny;j++){
@@ -867,21 +867,22 @@ int main (int argc, char *argv[]) {
       }
     }
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int a=0; a<Ny; a++) {
       for (int b=0; b<Nz; b++) {
-        if (mem_f_shape == "p") {
-          if (b < box_divider_left) {
-            marker = 1;
-          }
-          if (b > box_divider_right) {
-            marker = 2;
-          }
-          if ((b <= box_divider_right) && (b >= box_divider_left)) {
-            marker = 3;
-          }
+        if (b < box_divider_left) {
+          marker = 1;
+        }
+        if (b > box_divider_right) {
+          marker = 2;
+        }
+        if ((b <= box_divider_right) && (b >= box_divider_left)) {
+          marker = 3;
+        }
+        if (inside(int(Nx/2),a,b)==false) {
+          marker = 0;
         }
         fprintf(outfile_sections, "%g ",marker);
       }
@@ -892,6 +893,7 @@ int main (int argc, char *argv[]) {
     printf("Finished printing sections file!!\n");
     fflush(stdout);
   }
+
 
   double vert_div;
   double vert_div_two;
@@ -928,7 +930,7 @@ int main (int argc, char *argv[]) {
   }
   if (mem_f_shape=="randst") {
     char* outfilename_sections = new char[1024];
-    sprintf(outfilename_sections, "data/shape-%s/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
+    sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int a=0; a<Ny; a++) {
