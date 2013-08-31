@@ -21,13 +21,23 @@ slice_str=""
 debug_str=""
 
 #change them to print the correct file names if arguments present
+expected_arg_number = 6
 if "-hires" in sys.argv:
     dx=.05
     hires_str="hires-"
+    expected_arg_number += 1
 if "-slice" in sys.argv:
     slice_str="slice-"
+    expected_arg_number += 1
 if "-debug" in sys.argv:
     debug_str="debug-"
+    expected_arg_number += 1
+if "-paper" in sys.argv:
+    expected_arg_number += 1
+
+#if len(sys.argv)>expected_arg_number:
+f_param6 = sys.argv[7]
+f_param7 = sys.argv[8]
 
 filename_tuple = (f_shape,hires_str,slice_str,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)
 
