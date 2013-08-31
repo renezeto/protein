@@ -62,8 +62,8 @@ def main():
     #prune duplicates
     proteinTypeList = list(set(proteinTypeList))
     boxList = list(set(boxList))
- 
-    #generate list of proteinType and box combinations to feed into returnData
+
+    #generate list of proteinType and box combinations to feed into ckData
     plotNameList_D = []
     plotNameList_E = []
     numProteinTypes_D = 0
@@ -75,45 +75,43 @@ def main():
             if "D_" in proteinType and "n" not in proteinType:
                 plotNameList_D += ["%s-%s"%(box,proteinType)]
                 numPlots_D += 1
-            if "E_" in proteinType and "n" not in proteinType:
-                plotNameList_E += ["%s-%s"%(box,proteinType)]
-                numPlots_E += 1
 
     for proteinType in proteinTypeList:
         if "D_" in proteinType and "n" not in proteinType:
             numProteinTypes_D += 1
-        if "E_" in proteinType and "n" not in proteinType:
-            numProteinTypes_E +=1
 
     plotCurveList_D = []
-    plotCurveList_E = []
     for proteinData in plotNameList_D:
         splitString = proteinData.split('-')
         (protein, boxName) = (splitString[0], splitString[1])
         plotCurveList_D += [returnData(boxName,protein)]
-    for proteinData in plotNameList_E:
-        splitString = proteinData.split('-')
-        (protein, boxName) = (splitString[0], splitString[1])
-        plotCurveList_E += [returnData(boxName,protein)]
 
     print len(plotCurveList_D[:][0])
-#pass plotNameList through stackData to generate the list of line data to be plotted
-    #plotCurveList_D = stackData(plotNameList_D)
-    #plotCurveList_E = stackData(plotNameList_E)
 
     #get a time axis for the plot from the length of one of the data sets we have
     timeAxis = range(len(plotCurveList_D[0]))
     #print len(plotCurveList_D[:,0])
 
     #begin messy code (to deal with matplotlib) - don't judge me
-    (start, end) = (int(5.2*int(len(timeAxis)/10)),int(6*int(len(timeAxis)/10)))
+    (start, end) = (int(5.3*int(len(timeAxis)/10)),int(5.7*int(len(timeAxis)/10)))
+
+
+    #integral of proteins over time
+    for i in range(numPlots_D):
+        integral = 0
+        for j in range(len(plotCurveList_D[0])):
+            integral += plotCurveList_D[i][j]
+        print plotNameList_D[i]
+        print integral/1000
+
 
     #plot scales. colors limited for now.
     colorScale = ["b","g","r","c","m","y"]
     alphaScale_D = [n/numProteinTypes_D for n in range(1,numProteinTypes_D+1)]
-    alphaScale_E = [n/numProteinTypes_E for n in range(1,numProteinTypes_E+1)]
 
-
+    # yLimit = max(plotCurveList_D[0][start:end])
+    # print yLimit
+    # print "hello"
                  #generate the plot
     plt.figure()
     j=0
@@ -123,42 +121,26 @@ def main():
             j+=1
             k=0
         print i
-        print k
+        print len(plotCurveList_D[0])
         plt.plot(timeAxis[start:end],
                  plotCurveList_D[i][start:end],
                  color=colorScale[j],alpha=alphaScale_D[k])
         k+=1
     plt.xlim(start,end+.40*(end-start))
-    #plt.ylim(0,whatever)
-    plt.title("Average MinE concentration on walls over time")
+    #plt.ylim(0,10000)
+    plt.title("Min D protein counts over time")
     plt.xlabel("Time (s)")
-    plt.ylabel("proteins per uint Area")
+    plt.ylabel("Fraction of proteins")
     plt.legend(plotNameList_D,loc="best",prop={'size':10})
     plt.savefig(load.print_string("ave-plot_D",""))
 
-    plt.figure()
-    j=0
-    k=0
-    for i in range(numPlots_E):
-        if i%(numProteinTypes_E)==0:
-            j+=1
-            k=0
-        print i
-        print len(plotCurveList_E[0])
-        plt.plot(timeAxis[start:end],
-                 plotCurveList_E[i][start:end],
-                 color=colorScale[j])
-        k+=1
-    plt.xlim(start,end+.40*(end-start))
-    #plt.ylim(0,500)
-    plt.title("Average MinD concentration on walls over time")
-    plt.xlabel("Time (s)")
-    plt.ylabel("Proteins per unit Area")
-    plt.legend(plotNameList_E,loc="best",prop={'size':10})
-    plt.savefig(load.print_string("ave-plot_E",""))
     return 0
 
 if __name__ == '__main__':
     main()
 
 
+#     return 0
+
+# if __name__ == '__main__':
+#     main()
