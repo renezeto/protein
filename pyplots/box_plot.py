@@ -103,9 +103,9 @@ def main():
 
     start_time_as_frac_of_ten = float(load.f_param6)
     end_time_as_frac_of_ten = float(load.f_param7)
-    print load.f_shape
-    print start_time_as_frac_of_ten
-    print end_time_as_frac_of_ten
+    # print load.f_shape
+    # print start_time_as_frac_of_ten
+    # print end_time_as_frac_of_ten
     (start, end) = (int(start_time_as_frac_of_ten*len(timeAxis)/10),int(end_time_as_frac_of_ten*len(timeAxis)/10))
 
     #get num on each plot
