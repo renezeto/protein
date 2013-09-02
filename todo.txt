@@ -1,6 +1,8 @@
 ;This file is written in lisp.
 ;Pill normal is for the establishing that we have what works, reference other paper, then modify, is the idea.
 
+;testing new branch
+
 rene's short list:
        - modify batch submit to support special flags ("include=debug")
        - section printouts

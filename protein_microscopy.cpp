@@ -785,7 +785,7 @@ int main (int argc, char *argv[]) {
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
   char* outfilename = new char[1024];
-  sprintf(outfilename,"data/shape-%s/membrane_files/%s%s%smembrane-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
+  sprintf(outfilename,"data/shape-%s/%s%s%smembrane-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
   if (out==0){
     printf ("couldn't print outfile\n");
@@ -846,23 +846,43 @@ int main (int argc, char *argv[]) {
   fflush(out_file);
   printf("density set.\n");
 
+  double left_area_total = 0;
+  double middle_area_total = 0;
+  double right_area_total = 0;
+
   if (mem_f_shape=="p"){
+    for (int a=0;a<Ny; a++) {
+      for (int b=0; b<Nz; b++) {
+        for (int c=0; c<Nx; c++) {
+          if (b < box_divider_left) {
+            left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
+          else if (b > box_divider_right) {
+            right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
+          else {
+            middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
+        }
+      }
+    }
     char* outfilename_sections = new char[1024];
     sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int a=0; a<Ny; a++) {
       for (int b=0; b<Nz; b++) {
-        if (mem_f_shape == "p") {
-          if (b < box_divider_left) {
-            marker = 1;
-          }
-          if (b > box_divider_right) {
-            marker = 2;
-          }
-          if ((b <= box_divider_right) && (b >= box_divider_left)) {
-            marker = 3;
-          }
+        if (b < box_divider_left) {
+          marker = 1;
+        }
+        if (b > box_divider_right) {
+          marker = 2;
+        }
+        if ((b <= box_divider_right) && (b >= box_divider_left)) {
+          marker = 3;
+        }
+        if (inside(int(Nx/2),a,b)==false) {
+          marker = 0;
         }
         fprintf(outfile_sections, "%g ",marker);
       }
@@ -873,6 +893,7 @@ int main (int argc, char *argv[]) {
     printf("Finished printing sections file!!\n");
     fflush(stdout);
   }
+
 
   double vert_div;
   double vert_div_two;
@@ -1420,24 +1441,7 @@ int main (int argc, char *argv[]) {
         char *avename = new char[1024];
         sprintf(avename,"%s",print_filename("ave_plot",""));
         FILE* ave_plot = fopen(avename,"w");
-        double left_area_total = 0;
-        double middle_area_total = 0;
-        double right_area_total = 0;
-        for (int a=0;a<Ny; a++) {
-          for (int b=0; b<Nz; b++) {
-            for (int c=0; c<Nx; c++) {
-              if (b < box_divider_left) {
-                left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-              }
-              else if (b > box_divider_right) {
-                right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-              }
-              else {
-                middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-              }
-            }
-          }
-        }
+
         printf("left area = %g middle area = %g right area = %g\n",left_area_total,middle_area_total,right_area_total);
         fflush(stdout);
         if (mem_f_shape == "p"){

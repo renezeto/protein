@@ -58,7 +58,7 @@ def main():
 
     with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
         fileLines = boxData.readlines()
-
+    
     #get number of boxes and protein types. little hokey but it works. in boxData.readlines(), there is exactly one '\n' newline string
     #for each protein type block. therefor, the number of protein types is equal to the number of times "\n" appears by itself in the list.
     numProteinTypes = len([line for line in fileLines if line=="\n"])
@@ -100,7 +100,13 @@ def main():
     timeAxis = range(len(plotCurveList_D[0]))
 
     #begin messy code (to deal with matplotlib) - don't judge me
-    (start, end) = (0*int(len(timeAxis)/10),10*int(len(timeAxis)/10))
+
+    start_time_as_frac_of_ten = float(load.f_param6)
+    end_time_as_frac_of_ten = float(load.f_param7)
+    # print load.f_shape
+    # print start_time_as_frac_of_ten
+    # print end_time_as_frac_of_ten
+    (start, end) = (int(start_time_as_frac_of_ten*len(timeAxis)/10),int(end_time_as_frac_of_ten*len(timeAxis)/10))
 
     #get num on each plot
     for proteinType in proteinTypeList:
