@@ -145,7 +145,14 @@ def main():
                 mycolors[2] = colorScale[i]
             if boxList[i] == 'Left':
                 mycolors[3] = colorScale[i]
-            # FIXME: fix this
+            if boxList[i] == 'UpperLeft':
+                mycolors[1] = colorScale[i]
+            if boxList[i] == 'UpperRight':
+                mycolors[2] = colorScale[i]
+            if boxList[i] == 'LowerLeft':
+                mycolors[3] = colorScale[i]
+            if boxList[i] == 'LowerRight':
+                mycolors[4] = colorScale[i]
         mycolors = colorScale[1:]
         sectionax.contourf(X, Y, sectiondata, levels=levels, colors=mycolors)
         sectionax.set_aspect('equal')
