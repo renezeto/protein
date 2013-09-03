@@ -121,7 +121,38 @@ def main():
     alphaScale_E = [n/numProteinTypes for n in range(1,numProteinTypes_E+1)]
 
     #generate the plot
-    plt.figure()
+    f, (bax,sectionax) = plt.subplots(1, 2)
+
+    # first plot the section data...
+    sectiondata = np.loadtxt("data/shape-%s/membrane_files/%s%s%ssections-%s-%s-%s-%s-%s-%s.dat"
+                             % (load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,
+                                load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
+    def plot_sections(sectionax, sectiondata):
+        dx = 0.1 # FIXME
+        x = np.arange(sectiondata.shape[1]*1.0)*dx
+        y = np.arange(sectiondata.shape[0]*1.0)*dx
+        X,Y = np.meshgrid(x,y)
+        xmax = X[sectiondata>0].max()
+        xmin = X[sectiondata>0].min()
+        ymax = Y[sectiondata>0].max()
+        ymin = Y[sectiondata>0].min()
+        levels = [0.5, 1.5, 2.5, 3.5, 4.5]
+        mycolors = ["w","g","r","c","m","y"]
+        for i in xrange(min(4, len(boxList))):
+            if boxList[i] == 'Right':
+                mycolors[1] = colorScale[i]
+            if boxList[i] == 'Mid':
+                mycolors[2] = colorScale[i]
+            if boxList[i] == 'Left':
+                mycolors[3] = colorScale[i]
+            # FIXME: fix this
+        mycolors = colorScale[1:]
+        sectionax.contourf(X, Y, sectiondata, levels=levels, colors=mycolors)
+        sectionax.set_aspect('equal')
+        sectionax.set_xlim(xmin, xmax)
+        sectionax.set_ylim(ymin, ymax)
+    plot_sections(sectionax, sectiondata)
+
     j=0
     k=0
     for i in range(len(plotCurveList_D[:,0])):
@@ -129,32 +160,38 @@ def main():
             j+=1
             k=0
         if i==0:
-            plt.plot(timeAxis[start:end],
-                     plotCurveList_D[i, start:end],
-                     color=colorScale[j],alpha=alphaScale_D[k])
-            plt.fill_between(timeAxis[start:end],
+            bax.plot(timeAxis[start:end],
+                       plotCurveList_D[i, start:end],
+                       color=colorScale[j],alpha=alphaScale_D[k])
+            bax.fill_between(timeAxis[start:end],
                              [0 for x in range(len(timeAxis))[start:end]],
                              plotCurveList_D[i, start:end],
                              alpha=alphaScale_D[k],facecolor=colorScale[j])
         elif i!=0:
-            plt.plot(timeAxis[start:end],
+            bax.plot(timeAxis[start:end],
                      plotCurveList_D[i, start:end],
                      color=colorScale[j],alpha=alphaScale_D[k])
-            plt.fill_between(timeAxis[start:end],
+            bax.fill_between(timeAxis[start:end],
                              plotCurveList_D[i-1, start:end],
                              plotCurveList_D[i, start:end],
                              alpha=alphaScale_D[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
-    plt.xlim(start,end+.40*(end-start))
-    plt.ylim(0, 1)
-    plt.title("Min D protein counts over time")
-    plt.xlabel("Time (s)")
-    plt.ylabel("Fraction of proteins")
-    plt.legend(plotNameList_D,loc="best",prop={'size':10})
+    bax.set_xlim(start,end+.40*(end-start))
+    bax.set_ylim(0, 1)
+    bax.set_title("Min D protein counts over time")
+    bax.set_xlabel("Time (s)")
+    bax.set_ylabel("Fraction of proteins")
+    bax.legend(plotNameList_D,loc="best",prop={'size':10})
+
+
     plt.savefig(load.print_string("box-plot_D",""))
 
-    plt.figure()
+    f, (bax,sectionax) = plt.subplots(1, 2)
+
+    # First plot the section data...
+    plot_sections(sectionax, sectiondata)
+
     j=0
     k=0
     for i in range(len(plotCurveList_E)):
@@ -162,21 +199,22 @@ def main():
             j+=1
             k=0
         if i==0:
-            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j],alpha=alphaScale_E[k])
-            plt.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
+            bax.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j],alpha=alphaScale_E[k])
+            bax.fill_between(timeAxis[start:end],[0 for x in range(len(timeAxis))[start:end]],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
         elif i!=0:
-            plt.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j],alpha=alphaScale_E[k])
-            plt.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
+            bax.plot(timeAxis[start:end],plotCurveList_E[i][start:end],color=colorScale[j],alpha=alphaScale_E[k])
+            bax.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
-    plt.xlim(start,end+.40*(end-start))
-    plt.ylim(0, 1)
-    plt.title("Min E protein counts over time")
-    plt.xlabel("Time (s)")
-    plt.ylabel("Fraction of proteins")
-    plt.legend(plotNameList_E,loc="best",prop={'size':10})
+    bax.set_xlim(start,end+.40*(end-start))
+    bax.set_ylim(0, 1)
+    bax.set_title("Min E protein counts over time")
+    bax.set_xlabel("Time (s)")
+    bax.set_ylabel("Fraction of proteins")
+    bax.legend(plotNameList_E,loc="best",prop={'size':10})
     plt.savefig(load.print_string("box-plot_E",""))
 
+    plt.plot([1,2,3], [4,5,6])
     return 0
 
 if __name__ == '__main__':
