@@ -46,7 +46,7 @@ int Nx, Ny, Nz; //number of gridpoints in each direction
 string mem_f_shape; //cell shape argument
 double A, B, C, D; //specific shape parameters, set by command line args
 
-//N denotes protein number, n denotes protein number density
+//N denotes protein number, n denotes protein number density 
 double *nATP; //min D bound to an ATP
 double *nADP; //min D bound to an ADP
 double *nE; //loose min E in cytoplasm
