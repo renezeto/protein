@@ -46,7 +46,7 @@ int Nx, Ny, Nz; //number of gridpoints in each direction
 string mem_f_shape; //cell shape argument
 double A, B, C, D; //specific shape parameters, set by command line args
 
-//N denotes protein number, n denotes protein number density
+//N denotes protein number, n denotes protein number density 
 double *nATP; //min D bound to an ATP
 double *nADP; //min D bound to an ADP
 double *nE; //loose min E in cytoplasm
@@ -873,13 +873,13 @@ int main (int argc, char *argv[]) {
     for (int a=0; a<Ny; a++) {
       for (int b=0; b<Nz; b++) {
         if (b < box_divider_left) {
-          marker = 1;
+          marker = 3;
         }
         if (b > box_divider_right) {
-          marker = 2;
+          marker = 1;
         }
         if ((b <= box_divider_right) && (b >= box_divider_left)) {
-          marker = 3;
+          marker = 2;
         }
         if (inside(int(Nx/2),a,b)==false) {
           marker = 0;
@@ -937,41 +937,41 @@ int main (int argc, char *argv[]) {
       for (int b=0; b<Nz; b++) {
         if (rand_seed == 99 || rand_seed == 98) {
             if (b < vert_div) {
-              marker = 1;
+              marker = 3;
             }
             else if (b > vert_div_two) {
-              marker = 2;
+              marker = 1;
             }
             else {
-              marker = 3;
+              marker = 2;
             }
           }
           if (rand_seed == 97) {
             if (b < vert_div) {
-              marker = 1;
+              marker = 4;
             }
             else if (a > hor_div_two) {
-              marker = 2;
+              marker = 1;
             }
             else if (a < hor_div) {
               marker = 3;
             }
             else {
-              marker = 4;
+              marker = 2;
             }
           }
           if (rand_seed == 96) {
             if (b < vert_div && a < hor_div) {
-              marker = 1;
-            }
-            else if (b < vert_div && a >= hor_div) {
-              marker = 2;
-            }
-            else if (b >= vert_div && a < hor_div) {
               marker = 3;
             }
-            else {
+            else if (b < vert_div && a >= hor_div) {
               marker = 4;
+            }
+            else if (b >= vert_div && a < hor_div) {
+              marker = 1;
+            }
+            else {
+              marker = 2;
             }
           }
           if (inside(int(Nx/2),a,b)==false) {
