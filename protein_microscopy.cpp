@@ -811,6 +811,21 @@ int main (int argc, char *argv[]) {
   fclose(out);
   printf("\nMembrane file printed.\n");
 
+  set_density(nATP, nE, mem_A);
+  fflush(out_file);
+  printf("density set.\n");
+
+
+  //Starting the Sections file set up
+
+  double left_area_total = 0;
+  double middle_area_total = 0;
+  double right_area_total = 0;
+  double right_up_area_total = 0;
+  double right_down_area_total = 0;
+  double left_up_area_total = 0;
+  double left_down_area_total = 0;
+
   if (mem_f_shape=="triangle") {
     char* outfilename_sections = new char[1024];
     sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
@@ -820,12 +835,21 @@ int main (int argc, char *argv[]) {
       for (int i=0;i<Nz;i++) {
         if (triangle_section(j*dx,i*dx)=="Right"){
           marker = 1;
+          for (int a=0;a<Nx;a++){
+            right_area_total += mem_A[a*Ny*Nz+j*Nz+i];
+          }
         }
         if (triangle_section(j*dx,i*dx)=="Mid"){
           marker = 2;
+          for (int a=0;a<Nx;a++){
+            middle_area_total += mem_A[a*Ny*Nz+j*Nz+i];
+          }
         }
         if (triangle_section(j*dx,i*dx)=="Left"){
           marker = 3;
+          for (int a=0;a<Nx;a++){
+            left_area_total += mem_A[a*Ny*Nz+j*Nz+i];
+          }
         }
         if (inside(int(Nx/2),j,i)==false) {
           marker = 0;
@@ -840,32 +864,8 @@ int main (int argc, char *argv[]) {
     delete[] outfilename_sections;
   }
 
-  //end membrane printing
-
-  set_density(nATP, nE, mem_A);
-  fflush(out_file);
-  printf("density set.\n");
-
-  double left_area_total = 0;
-  double middle_area_total = 0;
-  double right_area_total = 0;
 
   if (mem_f_shape=="p"){
-    for (int a=0;a<Ny; a++) {
-      for (int b=0; b<Nz; b++) {
-        for (int c=0; c<Nx; c++) {
-          if (b < box_divider_left) {
-            left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-          }
-          else if (b > box_divider_right) {
-            right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-          }
-          else {
-            middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-          }
-        }
-      }
-    }
     char* outfilename_sections = new char[1024];
     sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
@@ -874,12 +874,21 @@ int main (int argc, char *argv[]) {
       for (int b=0; b<Nz; b++) {
         if (b < box_divider_left) {
           marker = 3;
+          for (int c=0;c<Nx;c++){
+            left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
         }
         if (b > box_divider_right) {
           marker = 1;
+          for (int c=0;c<Nx;c++){
+            right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
         }
         if ((b <= box_divider_right) && (b >= box_divider_left)) {
           marker = 2;
+          for (int c=0;c<Nx;c++){
+            middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
         }
         if (inside(int(Nx/2),a,b)==false) {
           marker = 0;
@@ -938,40 +947,73 @@ int main (int argc, char *argv[]) {
         if (rand_seed == 99 || rand_seed == 98) {
             if (b < vert_div) {
               marker = 3;
+              for (int c=0;c<Nx;c++){
+                left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (b > vert_div_two) {
               marker = 1;
+              for (int c=0;c<Nx;c++){
+                right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else {
               marker = 2;
+              for (int c=0;c<Nx;c++){
+                middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
           }
-          if (rand_seed == 97) {
+        if (rand_seed == 97) {
             if (b < vert_div) {
               marker = 4;
+              for (int c=0;c<Nx;c++){
+                left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (a > hor_div_two) {
               marker = 1;
+              for (int c=0;c<Nx;c++){
+                right_up_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (a < hor_div) {
               marker = 3;
+              for (int c=0;c<Nx;c++){
+                right_down_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else {
               marker = 2;
+              for (int c=0;c<Nx;c++){
+                middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
           }
           if (rand_seed == 96) {
             if (b < vert_div && a < hor_div) {
               marker = 3;
+              for (int c=0;c<Nx;c++){
+                left_down_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (b < vert_div && a >= hor_div) {
               marker = 4;
+              for (int c=0;c<Nx;c++){
+                left_up_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (b >= vert_div && a < hor_div) {
               marker = 1;
+              for (int c=0;c<Nx;c++){
+                right_down_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else {
               marker = 2;
+              for (int c=0;c<Nx;c++){
+                right_up_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
           }
           if (inside(int(Nx/2),a,b)==false) {
@@ -1444,7 +1486,7 @@ int main (int argc, char *argv[]) {
 
         printf("left area = %g middle area = %g right area = %g\n",left_area_total,middle_area_total,right_area_total);
         fflush(stdout);
-        if (mem_f_shape == "p"){
+        if (mem_f_shape == "p" || mem_f_shape == "triangle" || rand_seed == 98 || rand_seed == 99){
           for (int pNum=3; pNum<numProteins; pNum++) {
             fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
             for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
@@ -1459,6 +1501,56 @@ int main (int argc, char *argv[]) {
             fprintf(ave_plot,"%s\tright\t",proteinList[pNum]->name);
             for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
               fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_plot_dat]/right_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"\n");
+          }
+        }
+        if (rand_seed == 97){
+          for (int pNum=3; pNum<numProteins; pNum++) {
+            fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_plot_dat]/left_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\trightup\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_plot_dat]/right_up_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\tmid\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_plot_dat]/middle_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\trightdown\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_plot_dat]/right_down_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"\n");
+          }
+        }
+        if (rand_seed == 98){
+          for (int pNum=3; pNum<numProteins; pNum++) {
+            fprintf(ave_plot,"%s\trightup\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_plot_dat]/right_up_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\tleftup\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeftUp[i_plot_dat]/left_up_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\tleftdown\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeftDown[i_plot_dat]/left_down_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\trightdown\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_plot_dat]/right_down_area_total));
             }
             fprintf(ave_plot,"\n");
             fprintf(ave_plot,"\n");
