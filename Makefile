@@ -12,14 +12,14 @@ clean: rm -f protein_microscopy paper/paper.pdf
 sim: protein_microscopy
 
 ALL_FIGURES = \
-	data/shape-p/plots/debug-box-plot_D--p-150-60-0-0-1500.pdf
+	data/shape-p/plots/box-plot_D--p-200-50-0-0-1500.pdf
 
 paper/paper.pdf: paper/paper.tex ${ALL_FIGURES}
 	echo ${ALL_FIGURES}
 	cd paper && pdflatex paper.tex && bibtex paper && pdflatex paper.tex && pdflatex paper.tex
 
 
-${ALL_FIGURES}: batch jobs $(wildcard data/shape-*/*.dat)
+${ALL_FIGURES}: batch jobs $(wildcard data/shape-*/*.dat) $(wildcard pyplots/*.py)
 	./batch plot include="-paper"
 
 #time maps
