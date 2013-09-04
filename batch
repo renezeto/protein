@@ -202,7 +202,8 @@ def dataStatus(commands, options):
 
         if not counted:
             miscFiles += 1
-            os.system("rm %s"%fileName)
+            if "clean" in sys.argv:
+                os.system("rm %s"%fileName)
 
         for job in jobList:
             if numTimeMaps[' '.join(job)] == 5:
