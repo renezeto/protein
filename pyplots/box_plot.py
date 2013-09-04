@@ -132,10 +132,16 @@ def main():
         x = np.arange(sectiondata.shape[1]*1.0)*dx
         y = np.arange(sectiondata.shape[0]*1.0)*dx
         X,Y = np.meshgrid(x,y)
+        inmembrane = np.zeros_like(sectiondata)
+        inmembrane[sectiondata>0] = 1.0
         xmax = X[sectiondata>0].max()
         xmin = X[sectiondata>0].min()
         ymax = Y[sectiondata>0].max()
         ymin = Y[sectiondata>0].min()
+        ymean = (Y*inmembrane).sum()/inmembrane.sum()
+        xmean = (X*inmembrane).sum()/inmembrane.sum()
+        yweighted = (Y*sectiondata).sum()/sectiondata.sum()
+        xweighted = (X*sectiondata).sum()/sectiondata.sum()
         levels = [0.5, 1.5, 2.5, 3.5, 4.5]
         mycolors = ["w","g","r","c","m","y"]
         for i in xrange(min(4, len(boxList))):
@@ -154,10 +160,25 @@ def main():
             if boxList[i] == 'LowerRight':
                 mycolors[4] = colorScale[i]
         mycolors = colorScale[1:]
-        sectionax.contourf(X, Y, sectiondata, levels=levels, colors=mycolors)
+        # here we rotate and flip so that the order of sections will
+        # match the box plot as well as we can manage.
+        if yweighted - ymean > abs(xweighted - xmean):
+            sectionax.contourf(X, Y, sectiondata, levels=levels, colors=mycolors)
+            sectionax.set_xlim(xmin, xmax)
+            sectionax.set_ylim(ymin, ymax)
+        elif ymean - yweighted > abs(xweighted - xmean):
+            sectionax.contourf(X, ymax - (Y - ymin), sectiondata, levels=levels, colors=mycolors)
+            sectionax.set_xlim(xmin, xmax)
+            sectionax.set_ylim(ymin, ymax)
+        elif xweighted > xmean:
+            sectionax.contourf(Y, X, sectiondata, levels=levels, colors=mycolors)
+            sectionax.set_xlim(ymin, ymax)
+            sectionax.set_ylim(xmin, xmax)
+        else:
+            sectionax.contourf(Y, xmax - (X - xmin), sectiondata, levels=levels, colors=mycolors)
+            sectionax.set_xlim(ymin, ymax)
+            sectionax.set_ylim(xmin, xmax)
         sectionax.set_aspect('equal')
-        sectionax.set_xlim(xmin, xmax)
-        sectionax.set_ylim(ymin, ymax)
     plot_sections(sectionax, sectiondata)
 
     j=0
