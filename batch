@@ -115,6 +115,12 @@ def runPlots(commands,options):
         runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/box_plot.py"] + job))
         runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/time_map.py"] + job))
         runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/arrow_plot.py"] + job))
+        while sruncmd == [] and len(runningPlots) > 2: # don't run *everything* at once without slurm!
+            for plot in runningPlots.copy():
+                if plot.poll() is not None:
+                    runningPlots.remove(plot)
+                else:
+                    time.sleep(1)
     while len(runningPlots) > 0:
         for plot in runningPlots.copy():
             if plot.poll() is not None:
