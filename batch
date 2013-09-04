@@ -115,6 +115,7 @@ def runPlots(commands,options):
         runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/box_plot.py"] + job))
         runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/time_map.py"] + job))
         runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/arrow_plot.py"] + job))
+        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/ave_plot.py"] + job))
         while sruncmd == [] and len(runningPlots) > 2: # don't run *everything* at once without slurm!
             for plot in runningPlots.copy():
                 if plot.poll() is not None:
@@ -208,6 +209,8 @@ def dataStatus(commands, options):
 
         if not counted:
             miscFiles += 1
+            if "clean" in sys.argv:
+                os.system("rm %s"%fileName)
 
         for job in jobList:
             if numTimeMaps[' '.join(job)] == 5:
