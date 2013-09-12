@@ -86,7 +86,7 @@ def contourplt(protein):
                         '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
 
     #shell command to convert all of the recently generated .png's to a single .gif using convert utility
-    os.system("convert -delay 8 ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+"-tmp_*" \
+    os.system("convert -delay 20 ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
     +"/plots/"+load.debug_str+load.hires_str+load.slice_str+"density_movie-"+str(protein.protein)+"-"+f_shape \

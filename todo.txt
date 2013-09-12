@@ -39,7 +39,7 @@ Look more at randst plots.  Investigate with both the interplay with the differe
 
    -Want to run everything twice as long.
 
-  
+
 
 Randst 99 -
 Randst 98 -
@@ -86,3 +86,8 @@ Mon Jul 29: Test randst 96 running right now. Started at 9:28 am. Marker: 15.01 
 -time_map - put a cutoff at 1.1*(avg density) anything below doens't add to it, and see what looks like
 -looking at the difference between our all slice plots for 15 and 500, something's wrong - the amounts of density are very different.
 -somethings wrong with the last part of the normalized plots for frequency.  They look like they're getting cut off somehow (the line at the top is flat)
+
+
+
+I'm running extra triangle simulations right now.  They will have the same dimensions as previous ones except that they'll be .01 less than previous, standard ones.  The ones that are .01 les will start with a higher density of nATP on the right third of the triangle, just as in our standard simulations, but the nE will start with the same higher concentration as before except that it will be in the LEFT third, not the right.  The simulation that are .01 LONGER dimensions, so 4.01 length sides, will have a similar situation but reversed: they will have a higher concentration of nATP on the left third and a higher nE concentration of the right side.
+These simulations are all running with my others in /home/jeffschulte/Documents/temp/protein/ directory.
