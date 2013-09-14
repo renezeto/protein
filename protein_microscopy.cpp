@@ -46,7 +46,7 @@ int Nx, Ny, Nz; //number of gridpoints in each direction
 string mem_f_shape; //cell shape argument
 double A, B, C, D; //specific shape parameters, set by command line args
 
-//N denotes protein number, n denotes protein number density 
+//N denotes protein number, n denotes protein number density
 double *nATP; //min D bound to an ATP
 double *nADP; //min D bound to an ADP
 double *nE; //loose min E in cytoplasm
@@ -512,7 +512,7 @@ int main (int argc, char *argv[]) {
   }
   time_step = .1*dx*dx/difD;//sec
   iter = int(tot_time/time_step);//this will give us triangle data in about two days and randst in four days?
-  printout_iterations = int(5.0/time_step);
+  printout_iterations = int(1.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
 
@@ -535,12 +535,12 @@ int main (int argc, char *argv[]) {
   //double guass94[] = {2.3,2.3,.2,2.4,2.3,.3,3.1,3.4,.6,3.6,3.4,.4,3.5,4.3,.6,3.4,4.4,.5,3.1,5.1,.6,3.3,5.2,.6,3.3,5.3,.3};
   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
-  double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
-                      4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  //double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  double guass96[] = {3,3,.5};
   double guass95[] = {2.2,2.4,.3,2.5,3.2,.6,2.7,3.5,.4,2.9,3.5,.4,3.4,4.4,.5,3.6,4.1,.8,3.3,4.6,.6,3.25,4.3,.5};
-  for (int i=0;i<100;i++){
-    guass96[i] = guass96[i]/1.4;
-  }
+  // for (int i=0;i<100;i++){
+  //   guass96[i] = guass96[i]/1.4;
+  // }
   for (int i=0;i<100;i++){
     guass97[i] = 1.3*guass97[i];
   }
@@ -565,12 +565,12 @@ int main (int argc, char *argv[]) {
     for (int i=0;i<3*5;i++){
       guass[i]=guass98[i];
     }
-  }else if (rand_seed == 97){
+  } else if (rand_seed == 97){
     for (int i=0;i<3*12;i++){
       guass[i]=guass97[i];
     }
   } else if (rand_seed == 96){
-    for (int i=0;i<3*16;i++){
+    for (int i=0;i<3*1;i++){
       guass[i]=guass96[i];
     }
   } else if (rand_seed == 95){
@@ -2069,37 +2069,43 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
-
-  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
-
   //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
-  int gridpoints_left = 0;
-  int gridpoints_right = 0;
+  double vert_div = (2.7)/dx;
+  double hor_div = 3.0/dx;
+  int density_divider_right = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
+  int density_divider_left = int(right_most_point_z - 2*(right_most_point_z - left_most_point_z)/3);
+  int gridpoints_low_dens = 0;
+  int gridpoints_high_dens = 0;
   int gridpoints_total = 0;
+  double wall_area = 0;
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           gridpoints_total++;
-          if (k<=density_divider_z) {
-            gridpoints_left++;
+          if ((rand_seed == 96 && k>vert_div && j<hor_div) || (rand_seed != 96 && k>density_divider_right)) {
+            gridpoints_high_dens++;
           }
           else {
-            gridpoints_right++;
+            gridpoints_low_dens++;
           }
+        }
+        if ((rand_seed == 96 && k>vert_div && j<hor_div) || (rand_seed != 96 && k>density_divider_right)) {
+          wall_area += mem_A[i*Ny*Nz+j*Nz+k];
         }
       }
     }
   }
+  //compute density scale factors low_dens and high_dens of divide (to ensure correct protein #)
+  double density_factor_low_dens = gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
+  double density_factor_high_dens = density_factor*gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
 
-  //compute density scale factors left and right of divide (to ensure correct protein #)
-  double density_factor_left = gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
-  double density_factor_right = density_factor*gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
+  double proteins_per_area = dx*dx*dx*nATP_starting_density*gridpoints_high_dens*density_factor_high_dens/wall_area;
 
-  printf("Density factors: left: %f, right: %f, ratio: %f\n", density_factor_left, density_factor_right, density_factor_right/density_factor_left);
+  printf("Density factors: low_dens: %f, high_dens: %f, ratio: %f\n", density_factor_low_dens, density_factor_high_dens, density_factor_high_dens/density_factor_low_dens);
 
-  printf("Gridpoints left of the divider: %d\n",gridpoints_left);
-  printf("Gridpoints right of the divider:%d\n",gridpoints_right);
+  printf("Gridpoints low_dens of the divider: %d\n",gridpoints_low_dens);
+  printf("Gridpoints high_dens of the divider:%d\n",gridpoints_high_dens);
   printf("Gridpoints total: %d\n",gridpoints_total);
 
   //begin setting density at each gridpoint:
@@ -2107,19 +2113,19 @@ int set_density(double *nATP, double *nE, double *mem_A){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(k>density_divider_z){
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
+          if ((rand_seed == 96 && k>vert_div && j<hor_div) || (rand_seed != 96 && k>density_divider_right)) {
+            nATP[i*Ny*Nz+j*Nz+k] = 0;
             nADP[i*Ny*Nz+j*Nz+k] =0;
-            ND[i*Ny*Nz+j*Nz+k] =0;
+            ND[i*Ny*Nz+j*Nz+k] = proteins_per_area*mem_A[i*Ny*Nz+j*Nz+k]*density_factor_high_dens;
             NDE[i*Ny*Nz+j*Nz+k] = 0;
+            nE[i*Ny*Nz+j*Nz+k] = 0;
           }
           else {
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left;
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left;
+            nATP[i*Ny*Nz+j*Nz+k] = 0;
             nADP[i*Ny*Nz+j*Nz+k] =0;
-            ND[i*Ny*Nz+j*Nz+k] =0;
+            ND[i*Ny*Nz+j*Nz+k] = proteins_per_area*mem_A[i*Ny*Nz+j*Nz+k]*density_factor_low_dens;
             NDE[i*Ny*Nz+j*Nz+k] = 0;
+            nE[i*Ny*Nz+j*Nz+k] = 0;
           }
         }
         else {
@@ -2128,6 +2134,51 @@ int set_density(double *nATP, double *nE, double *mem_A){
           nADP[i*Ny*Nz+j*Nz+k] =0;
           ND[i*Ny*Nz+j*Nz+k] =0;
           NDE[i*Ny*Nz+j*Nz+k] = 0;
+        }
+      }
+    }
+  }
+  //now set nDE
+  gridpoints_low_dens = 0;
+  gridpoints_high_dens = 0;
+  gridpoints_total = 0;
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          gridpoints_total++;
+          if ((rand_seed == 96 && k<vert_div && j<hor_div) || (rand_seed != 96 && k<density_divider_left)) {
+            gridpoints_high_dens++;
+          }
+          else {
+            gridpoints_low_dens++;
+          }
+        }
+      }
+    }
+  }
+
+  //compute density scale factors low_dens and high_dens of divide (to ensure correct protein #)
+  density_factor_low_dens = gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
+  density_factor_high_dens = density_factor*gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
+
+  printf("Density factors: low_dens: %f, high_dens: %f, ratio: %f\n", density_factor_low_dens, density_factor_high_dens, density_factor_high_dens/density_factor_low_dens);
+
+  printf("Gridpoints low_dens of the divider: %d\n",gridpoints_low_dens);
+  printf("Gridpoints high_dens of the divider:%d\n",gridpoints_high_dens);
+  printf("Gridpoints total: %d\n",gridpoints_total);
+
+  //begin setting density at each gridpoint:
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          if ((rand_seed == 96 && k<vert_div && j<hor_div) || (rand_seed != 96 && k<density_divider_left)) {
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_high_dens;
+          }
+          else {
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_low_dens;
+          }
         }
       }
     }

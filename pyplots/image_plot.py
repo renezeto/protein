@@ -57,7 +57,10 @@ def build(proteins,proteinList):
     total_length = int((end_time/5)+1)- int(start_time/5)
     spread = Image.new("RGB", (120+190*total_length, 300*len(proteins)), "white")
     for i in range(len(proteins)):
-        maxval = timemax(proteins[i])
+        if (proteinList[i]=="ND" or proteinList[i]=="NDE"):
+            maxval = timemax(proteins[i])/4
+        else:
+            maxval = timemax(proteins[i])
         minval = timemin(proteins[i])
         plt.figure()
         Z, Y = np.meshgrid(np.arange(0,proteins[i].datashape[1],1), np.arange(0,proteins[i].datashape[0],1))
@@ -66,7 +69,7 @@ def build(proteins,proteinList):
             page = proteins[i].dataset[k]
             plt.clf()
             plt.axes().set_aspect('equal', 'datalim')
-            CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval,.2))
+            CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval,.1))
         #plt.axis('off')
             plt.axes().get_xaxis().set_ticks([])
             plt.axes().get_yaxis().set_ticks([])
