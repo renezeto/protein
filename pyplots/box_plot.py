@@ -121,7 +121,9 @@ def main():
     alphaScale_E = [n/numProteinTypes for n in range(1,numProteinTypes_E+1)]
 
     #generate the plot
-    f, (bax,sectionax) = plt.subplots(1, 2)
+    #f, (bax,sectionax) = plt.subplots(1, 2)
+    bax = plt.subplot2grid((2,5), (0,0), colspan=4, rowspan=2)
+    sectionax = plt.subplot2grid((2,5), (0,4), colspan=1,rowspan=2)
 
     # first plot the section data...
     sectiondata = np.loadtxt("data/shape-%s/membrane_files/%s%s%ssections-%s-%s-%s-%s-%s-%s.dat"
@@ -210,12 +212,14 @@ def main():
     bax.set_title("Min D protein counts over time")
     bax.set_xlabel("Time (s)")
     bax.set_ylabel("Fraction of proteins")
-    bax.legend(plotNameList_D,loc="best",prop={'size':10})
+    bax.legend(plotNameList_D,loc="lower right",prop={'size':8})
 
 
     plt.savefig(load.print_string("box-plot_D",""))
 
-    f, (bax,sectionax) = plt.subplots(1, 2)
+    #f, (bax,sectionax) = plt.subplots(1, 2)
+    bax = plt.subplot2grid((2,5), (0,0), colspan=4, rowspan=2)
+    sectionax = plt.subplot2grid((2,5), (0,4), colspan=1,rowspan=2)
 
     # First plot the section data...
     plot_sections(sectionax, sectiondata)
@@ -239,7 +243,7 @@ def main():
     bax.set_title("Min E protein counts over time")
     bax.set_xlabel("Time (s)")
     bax.set_ylabel("Fraction of proteins")
-    bax.legend(plotNameList_E,loc="best",prop={'size':10})
+    bax.legend(plotNameList_E,loc="lower right",prop={'size':8})
     plt.savefig(load.print_string("box-plot_E",""))
 
     plt.plot([1,2,3], [4,5,6])
