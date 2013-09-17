@@ -86,11 +86,8 @@ def main():
         (protein, boxName) = (splitString[0], splitString[1])
         plotCurveList_D += [returnData(boxName,protein)]
 
-    print len(plotCurveList_D[:][0])
-
     #get a time axis for the plot from the length of one of the data sets we have
     timeAxis = range(len(plotCurveList_D[0]))
-    #print len(plotCurveList_D[:,0])
 
     #begin messy code (to deal with matplotlib) - don't judge me
     (start, end) = (int(5.3*int(len(timeAxis)/10)),int(5.7*int(len(timeAxis)/10)))
@@ -101,17 +98,13 @@ def main():
         integral = 0
         for j in range(len(plotCurveList_D[0])):
             integral += plotCurveList_D[i][j]
-        print plotNameList_D[i]
-        print integral/1000
-
 
     #plot scales. colors limited for now.
     colorScale = ["b","g","r","c","m","y"]
     alphaScale_D = [n/numProteinTypes_D for n in range(1,numProteinTypes_D+1)]
 
     # yLimit = max(plotCurveList_D[0][start:end])
-    # print yLimit
-    # print "hello"
+
                  #generate the plot
     plt.figure()
     j=0
@@ -120,8 +113,6 @@ def main():
         if i%(numProteinTypes_D)==0:
             j+=1
             k=0
-        print i
-        print len(plotCurveList_D[0])
         plt.plot(timeAxis[start:end],
                  plotCurveList_D[i][start:end],
                  color=colorScale[j],alpha=alphaScale_D[k])
