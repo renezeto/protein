@@ -60,6 +60,44 @@ def stackData(plotList):
     output = np.array(stackedPlotList)
     return output/output[len(output[:,0])-1, 0] # normalize output as a fraction of total
 
+def find_period(f):
+    """
+      Find the period of a function that is described by the input
+      array f, and return indices for a start and end range for one
+      period.  If we cannot find the period accurately, just return
+      the entire range.
+    """
+    # first we look at the fft to get a guess at the period (probably
+    # not *too* accurate or too bad).
+    fk = np.fft.fft(f)
+    fk[0] = 0
+    kmax = 1
+    fkmax = np.abs(fk[:int(len(fk)/2)]).max()
+    for i in xrange(1,int(len(fk)/2)):
+        if np.abs(fk[i]) == fkmax:
+            kmax = i
+            break
+    #print 'kmax is', kmax
+    period_estimate = len(f)/kmax
+    plt.plot(fk)
+    plt.figure()
+    if kmax < 5:
+        return (0, len(f))
+    # now we locate the final minimum of the function.
+    lastmin = len(f)-2
+    while f[lastmin] > f[lastmin+1] or f[lastmin] > f[lastmin-1]:
+        lastmin -= 1
+    # and last (but not least), we locate the second-to-last
+    # (penultimate) minimum, which should have a very similar value to
+    # the final minimum.
+    penultimate_min = lastmin - int(period_estimate*.7)
+    while f[penultimate_min] > f[penultimate_min+1] or f[penultimate_min] > f[penultimate_min-1] or np.abs(f[penultimate_min]/f[lastmin]-1) > 0.01:
+        penultimate_min -= 1
+    #return (0, len(f) - 1)
+    if penultimate_min < 0:
+        return (0, len(f))
+    return (penultimate_min, lastmin)
+
 def main():
 
     with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
@@ -113,6 +151,7 @@ def main():
     # print start_time_as_frac_of_ten
     # print end_time_as_frac_of_ten
     (start, end) = (int(start_time_as_frac_of_ten*len(timeAxis)/10),int(end_time_as_frac_of_ten*len(timeAxis)/10))
+    (start, end) = find_period(plotCurveList_D[3])
 
     #get num on each plot
     for proteinType in proteinTypeList:
@@ -213,15 +252,16 @@ def main():
                              alpha=alphaScale_D[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
-    bax.set_xlim(start,end+.40*(end-start))
+    bax.set_xlim(start,end)
     bax.set_ylim(0, 1)
     bax.set_title("Min D protein counts over time")
     bax.set_xlabel("Time (s)")
     bax.set_ylabel("Fraction of proteins")
-    bax.legend(plotNameList_D,loc="lower right",prop={'size':8})
+    bax.legend(plotNameList_D,loc="lower right",prop={'size':8}).draw_frame(False)
 
 
     plt.savefig(load.print_string("box-plot_D",""))
+    plt.figure()
 
     #f, (bax,sectionax) = plt.subplots(1, 2)
     bax = plt.subplot2grid((2,5), (0,0), colspan=4, rowspan=2)
@@ -244,15 +284,15 @@ def main():
             bax.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
-    bax.set_xlim(start,end+.40*(end-start))
+    bax.set_xlim(start,end)
     bax.set_ylim(0, 1)
     bax.set_title("Min E protein counts over time")
     bax.set_xlabel("Time (s)")
     bax.set_ylabel("Fraction of proteins")
-    bax.legend(plotNameList_E,loc="lower right",prop={'size':8})
+    bax.legend(plotNameList_E,loc="lower right",prop={'size':8}).draw_frame(False)
     plt.savefig(load.print_string("box-plot_E",""))
 
-    plt.plot([1,2,3], [4,5,6])
+    plt.show()
     return 0
 
 if __name__ == '__main__':
