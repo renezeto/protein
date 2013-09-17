@@ -22,11 +22,15 @@ import file_loader as load
 # --------
 #where n(t) is the number of proteins of one type at time t
 
-#opens the file and grabs a particular line matching proteinType and boxName. returns list of protein counts at each time.
+#opens the file and grabs a particular line matching proteinType and
+#boxName. returns list of protein counts at each time.
 def returnData(boxName,proteinType):
 
     #open the data file, grab the line with the correct protein type and box partition, load it as a [string] (so we can use list comprehensions)
-    with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
+    with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%
+              (load.f_shape,load.debug_str,load.hires_str,load.slice_str,
+               load.f_shape,load.f_param1,load.f_param2,load.f_param3,
+               load.f_param4,load.f_param5),"r") as boxData:
         proteinsOverTime = [line for line in boxData if (proteinType in line) and (boxName in line)]
 
 
@@ -36,8 +40,10 @@ def returnData(boxName,proteinType):
     proteinsOverTime = [float(i) for i in proteinsOverTime]
     return proteinsOverTime
 
-#takes input format: ["proteinType1-boxNum1","proteinType1-boxnum2",proteinType2-boxnum1"...]. will return a list of lists
-#in the stacking order specified by the input (first entry is at the bottom).
+#takes input format:
+#["proteinType1-boxNum1","proteinType1-boxnum2",proteinType2-boxnum1"...]. will
+#return a list of lists in the stacking order specified by the input
+#(first entry is at the bottom).
 def stackData(plotList):
     #parse the input
     tempList = []
