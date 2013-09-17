@@ -1,36 +1,43 @@
 \documentclass[letterpaper,twocolumn,amsmath,amssymb,pre]{revtex4-1}
+
 \usepackage{graphicx}% Include figure files
-\usepackage{animate}
-\usepackage{dcolumn}% Align table columns on decimal point
-\usepackage{bm}% bold math
 \usepackage{color}
-\usepackage{breqn}
 
 \newcommand{\red}[1]{{\bf \color{red} #1}}
 \newcommand{\blue}[1]{{\bf \color{blue} #1}}
 \newcommand{\green}[1]{{\bf \color{green} #1}}
-\newcommand{\rr}{\textbf{r}}
-\newcommand{\refnote}{\red{[ref]}}
 
 \newcommand{\fixme}[1]{\red{[#1]}}
-
-%\newcommand{\derivation}[1]{#1} % Use this to show all derivations in detail
-\newcommand{\derivation}[1]{} % Use this for nice pegagogical paper...
-
-% needsworklater is used to annotate bits that need work, but that we
-% can postpone for a while.
-\newcommand{\needsworklater}[1]{\emph{[#1]}}
-% needsworknow is intended to prioritize stuff that needs fixing.
-\newcommand{\needsworknow}[1]{\textcolor{red}{[\emph{#1}]}}
 
 \begin{document}
 \title{E Coli Project Paper Incredibly Rough Draft}
 
-%\pacs{61.20.Ne, 61.20.Gy, 61.20.Ja}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{Jeff B. Schulte}
+\affiliation{Department of Physics, Oregon State University}
+\author{Rene WHAT. Zeto}
+\affiliation{Department of Physics, Oregon State University}
+\author{David Roundy}
+\affiliation{Department of Physics, Oregon State University}
+
 \begin{abstract}
-  This paper is about science.
+  The dynamics of the Min-protein system help Escherichia coli
+  bacteria regulate the process of cell division by identifying the
+  center of the cell.  We model the Min-protein system in bacteria
+  that have been forced into unusual flattened shapes, as have
+  recently been experimentally observed.  We find that although the
+  presence of Min oscillations is robust in a wide variety of cellular
+  configurations, the location of the peaks is strongly affected by
+  the cellular shape.  In some cases no periodic oscillations are
+  observed.  In particular, we find that cellular shapes observed
+  experimentally to present irregular oscillations do so in the
+  theoretical model, consistently \fixme{or inconsistently?} with
+  experiment.  \fixme{In agreement with previous theoretical and
+    experimental results, we observe ``rotating'' behavior in certain
+    shapes having three corners.}
 \end{abstract}
+
+\maketitle
+
 \section{Introduction}
 It is vital that during the process of bacterial cell division a cell
 avoid minicelling, or splitting into daughter cells with lopsided
@@ -273,7 +280,7 @@ concentration peaks in the caps that are roughly three times higher
 MinD-MinE-ATP) than peaks in the center.  Integrals of these plotted
 values show that the time averaged concentrations are likewise higher
 in the caps than in the center.  \fixme{am computing these integrals
-  now in ave_plot.py but need to print out into maybe a bar chart}
+  now in ave\_plot.py but need to print out into maybe a bar chart}
 
 \subsection{Triangular Shapes}
 \begin{figure}
@@ -318,7 +325,7 @@ of the right and left sections' total protein at the height of each spike.
   correctly: the triangle sides are 5,5,3, and the higher density
   starts in the corner that is opposite the short side.  This corner
   is covered by the right section.  I've verified this by looking at
-  the protein_microscopy and drawing a little picture, which is on my
+  the protein\_microscopy and drawing a little picture, which is on my
   desk...if you dare look for something on my desk!!!}  The iscosolese
 triangle starts its simulation with a higher concentration of protein
 in the section that is opposite the shorter side.  It quickly relaxes
