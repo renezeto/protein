@@ -7,9 +7,9 @@ extern double *f_mem;
 #include <stdio.h>
 
 
-int set_density(double *nATP, double *nE, double *mem_A);
+int set_density(double *nATP, double *nE, double *ND, double *mem_A);
 int get_next_density(double *mem_A, bool *insideArr, double *nATP, double *nADP,
-                     double *nE, double *Nd, double *Nde,
+                     double *nE, double *Nd, double *Nde, double *NflD, double *NflE,
                      double *JxATP, double *JyATP, double *JzATP,
                      double *JxADP, double *JyADP, double *JzADP,
                      double *JxE, double *JyE, double *JzE);

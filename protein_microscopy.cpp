@@ -52,6 +52,8 @@ double *nADP; //min D bound to an ADP
 double *nE; //loose min E in cytoplasm
 double *ND; //min D bound to ATP on the wall
 double *NDE; //min D bound to ATP and min E on the wall
+double *NflD;
+double *NflE;
 double *f_mem;
 
 const int starting_num_guassians=20;
@@ -184,7 +186,7 @@ double mem_f(double x, double y, double z) {
         f = abs(2*(x-(X/2))/A) - 1;
         return f;
       }
-      fflush(stdout);
+      //fflush(stdout);
       if (f>0) {
         double closest_y0 = -100.0;
         double closest_z0 = -100.0;
@@ -512,7 +514,7 @@ int main (int argc, char *argv[]) {
   }
   time_step = .1*dx*dx/difD;//sec
   iter = int(tot_time/time_step);//this will give us triangle data in about two days and randst in four days?
-  printout_iterations = int(1.0/time_step);
+  printout_iterations = int(3.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
 
@@ -555,7 +557,7 @@ int main (int argc, char *argv[]) {
     for (int i=0;i<3*5;i++){
       guass[i]=guass99[i];
       fprintf(out_file,"rand_seed is 99!");
-      fflush(stdout);
+      //fflush(stdout);
     }
   } else if (rand_seed == 94){
     for (int i=0;i<3*10;i++){
@@ -580,7 +582,7 @@ int main (int argc, char *argv[]) {
   } else {
     if (mem_f_shape == "randst"){
       fprintf(out_file,"rand_seed is not 99!");
-      fflush(stdout);
+      //fflush(stdout);
       randomize_cell_wall(guass);
     }
   }
@@ -592,6 +594,8 @@ int main (int argc, char *argv[]) {
   nE = new double[Nx*Ny*Nz];
   ND = new double[Nx*Ny*Nz];
   NDE = new double[Nx*Ny*Nz];
+  NflD = new double[Nx*Ny*Nz];
+  NflE = new double[Nx*Ny*Nz];
   f_mem = new double[Nx*Ny*Nz];
   fprintf(out_file,"For this simulation,\ndx = %f\ntot_time = %f\ntimestep = %f\ntotal iterations = %d\niter at five sec = %d\n",
           dx, tot_time, time_step, iter, printout_iterations);
@@ -609,16 +613,18 @@ int main (int argc, char *argv[]) {
   bool *insideArr = new bool[Nx*Ny*Nz];
   for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}
 
-  const int numProteins = 5;
+  const int numProteins = 7;
 
   protein* nATP_plot = new protein;
   protein* nE_plot = new protein;
   protein* nADP_plot = new protein;
   protein* NDE_plot = new protein;
   protein* ND_plot = new protein;
+  protein* NflD_plot = new protein;
+  protein* NflE_plot = new protein;
 
-  protein* proteinList[numProteins] = { nATP_plot, nADP_plot, nE_plot, ND_plot, NDE_plot };
-  double* accessGlobals[numProteins] = { nATP, nADP, nE, ND, NDE };
+  protein* proteinList[numProteins] = { nATP_plot, nADP_plot, nE_plot, ND_plot, NDE_plot, NflD_plot, NflE_plot };
+  double* accessGlobals[numProteins] = { nATP, nADP, nE, ND, NDE, NflD, NflE };
 
   int print_denominator = 1000;
 
@@ -667,13 +673,16 @@ int main (int argc, char *argv[]) {
   sprintf(proteinList[2]->name,"E_nE");
   sprintf(proteinList[3]->name,"D_ND");
   sprintf(proteinList[4]->name,"D_E_NDE");
+  sprintf(proteinList[5]->name,"NflD");
+  sprintf(proteinList[6]->name,"NflE");
 
   set_membrane(out_file, mem_f, mem_A);
-  //set_curvature(mem_A,curvature);
+
+    //set_curvature(mem_A,curvature);
 
   //begin area rating
   // printf("Starting with the area rating stuff!!!!\n");
-  // fflush(stdout);
+  // //fflush(stdout);
   // char *curvature_out = new char[1024];
   // if (dx==.05) {
   //   sprintf(curvature_out, "data/shape-%s/hires-curvature-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),A,B,C,D,density_factor);
@@ -742,7 +751,7 @@ int main (int argc, char *argv[]) {
 
   // int i=int(Nx/2);
   // printf("Hello!!!Nx=%d, x=%g, Nx/2=%d, x/2=%g\n",Nx,Nx*dx,i,Nx*dx/2.0);
-  // fflush(stdout);
+  // //fflush(stdout);
   // for (int j=0;j<Ny;j++){
   //   for (int k=0;k<Nz;k++){
 
@@ -776,7 +785,7 @@ int main (int argc, char *argv[]) {
   //   }
   // }
   // printf("Done with the area rating stuff!!!!\n");
-  // fflush(stdout);
+  // //fflush(stdout);
 
   // fclose(curvature_file);
   // fclose(area_rating_file_three);
@@ -790,10 +799,10 @@ int main (int argc, char *argv[]) {
   // fprintf(out_file,"Area_rating_two file is using %g as the radius of the sphere.",A);
   // fprintf(out_file,"Finished writing to the area_rating file.\n");
   // fprintf(out_file,"Total cell volume = %g.\nTotal cell area = %g.\n",total_cell_volume,total_cell_area);
-  // fflush(out_file);
+  // //fflush(out_file);
   //end area rating
 
-  fflush(out_file);
+  //fflush(out_file);
 
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
@@ -820,12 +829,12 @@ int main (int argc, char *argv[]) {
     }
     fprintf(out, "\n");
   }
-  fflush(stdout);
+  //fflush(stdout);
   fclose(out);
   printf("\nMembrane file printed.\n");
 
-  set_density(nATP, nE, mem_A);
-  fflush(out_file);
+  set_density(nATP, nE, ND, mem_A);
+  //fflush(out_file);
   printf("density set.\n");
 
 
@@ -873,7 +882,7 @@ int main (int argc, char *argv[]) {
     }
     fclose(outfile_sections);
     printf("\nMembrane sections file printed.\n");
-    fflush(stdout);
+    //fflush(stdout);
     delete[] outfilename_sections;
   }
 
@@ -913,7 +922,7 @@ int main (int argc, char *argv[]) {
     fclose(outfile_sections);
     delete[] outfilename_sections;
     printf("Finished printing sections file!!\n");
-    fflush(stdout);
+    //fflush(stdout);
   }
 
 
@@ -1047,14 +1056,14 @@ int main (int argc, char *argv[]) {
     fclose(outfile_sections);
     delete[] outfilename_sections;
     printf("Randst sections file printed !!!\n");
-    fflush(stdout);
+    //fflush(stdout);
   }
 
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
           JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
-    get_next_density(mem_A, insideArr, nATP, nADP, nE, ND, NDE, JxATP, JyATP, JzATP,
+    get_next_density(mem_A, insideArr, nATP, nADP, nE, ND, NDE, NflD, NflE, JxATP, JyATP, JzATP,
                      JxADP, JyADP, JzADP, JxE, JyE, JzE);
     if (i%print_denominator==0) {
       printf("Finished sim loop # i=%d, We're %1.2f percent done\n",i,double(100*i/iter));
@@ -1420,7 +1429,7 @@ int main (int argc, char *argv[]) {
       }
       //end NflD printing
       k++;
-      fflush(out_file);
+      //fflush(out_file);
     }
 
     time_step = .1*dx*dx/difD;//sec
@@ -1506,7 +1515,7 @@ int main (int argc, char *argv[]) {
         FILE* ave_plot = fopen(avename,"w");
 
         printf("left area = %g middle area = %g right area = %g\n",left_area_total,middle_area_total,right_area_total);
-        fflush(stdout);
+        //fflush(stdout);
         if (mem_f_shape == "p" || mem_f_shape == "triangle" || rand_seed == 98 || rand_seed == 95 || rand_seed == 94 || rand_seed == 99){
           for (int pNum=3; pNum<numProteins; pNum++) {
             fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
@@ -1601,29 +1610,40 @@ int main (int argc, char *argv[]) {
         //filter local maxima in time
         int* time_maxima_y = new int[iter];
         int* time_maxima_z = new int[iter];
+        double* time_maxima_value = new double[iter];
 
-        for (int p=1; p<(i-1); p++) {
-          if( (proteinList[pNum]->maxval[p] > proteinList[pNum]->maxval[p-1]) && (proteinList[pNum]->maxval[p] > proteinList[pNum]->maxval[p+1]) ) {
-            time_maxima_y[p] = proteinList[pNum]->ymax[p];
-            time_maxima_z[p] = proteinList[pNum]->zmax[p];
+        if (i%printout_iterations == 0) {
+          for (int p=1; p<(i-(.5/time_step)); p++) {
+            double max_value = 0;
+            for (int k = int(p-(.5/time_step)); k<(p+(.5/time_step)); k++){
+              if (proteinList[pNum]->maxval[k] > max_value) {
+                max_value = proteinList[pNum]->maxval[k];
+              }
+            }
+            if( proteinList[pNum]->maxval[p] == max_value) {
+              time_maxima_y[p] = proteinList[pNum]->ymax[p];
+              time_maxima_z[p] = proteinList[pNum]->zmax[p];
+              time_maxima_value[p] = proteinList[pNum]->maxval[p];
+            }
+            else {
+              time_maxima_y[p] = 0;
+              time_maxima_z[p] = 0;
+              time_maxima_value[p] = 0;
+            }
           }
-          else {
-            time_maxima_y[p] = 0;
-            time_maxima_z[p] = 0;
+          //print to file
+          char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
+          FILE* arrowfile = fopen(arrowname,"w");
+          delete[] arrowname;
+          for (int p=1; p<(i-1); p++) {
+            if ((time_maxima_y[p] != 0) && (time_maxima_z[p] != 0)) {
+              fprintf(arrowfile,"%d\t%d\t%g\t%g\n",time_maxima_y[p],time_maxima_z[p],p*time_step,time_maxima_value[p]);
+            }
           }
+          fclose(arrowfile);
+          delete[] time_maxima_y;
+          delete[] time_maxima_z;
         }
-        //print to file
-        char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
-        FILE* arrowfile = fopen(arrowname,"w");
-        delete[] arrowname;
-        for (int p=1; p<(i-1); p++) {
-          if ((time_maxima_y[p] != 0) && (time_maxima_z[p] != 0)) {
-            fprintf(arrowfile,"%g\t%d\t%d\n",p*time_step,time_maxima_y[p],time_maxima_z[p]);
-          }
-        }
-        fclose(arrowfile);
-        delete[] time_maxima_y;
-        delete[] time_maxima_z;
       }
     }
   }
@@ -1709,7 +1729,7 @@ int main (int argc, char *argv[]) {
   for(int xi=0;xi<Nx;xi++){
     clock_t time = clock();
     fprintf(out_file, "x row %d in set_membrane took %4.02f seconds",xi, (time-old_time)/double(CLOCKS_PER_SEC));
-    fflush(stdout);
+    //fflush(stdout);
     old_time = time;
     for(int yi=0;yi<Ny;yi++){
       for(int zi=0;zi<Nz;zi++){
@@ -1730,7 +1750,7 @@ int main (int argc, char *argv[]) {
 
 void set_curvature(double mem_A[], double curvature[]){
   printf("doing set curvature!!!\n");
-  fflush(stdout);
+  //fflush(stdout);
   double X = Nx*dx;
   double x1 = (X-A)/2.0;
   double x2 = (X+A)/2.0;
@@ -1758,7 +1778,7 @@ void set_curvature(double mem_A[], double curvature[]){
       }
     }
   }
-  fflush(stdout);
+  //fflush(stdout);
 }
 
 double find_intersection(const double fXYZ, const double fXYz, const double fXyZ, const double fXyz,
@@ -1974,7 +1994,7 @@ int get_J(double difD, double *nATP, double *nADP, double *nE,
 }
 
 int get_next_density(double *mem_A, bool *insideArr, double *nATP, double *nADP,
-                     double *nE, double *Nd, double *Nde,
+                     double *nE, double *Nd, double *Nde, double *NflD, double *NflE,
                      double *JxATP, double *JyATP, double *JzATP,
                      double *JxADP, double *JyADP, double *JzADP,
                      double *JxE, double *JyE, double *JzE){
@@ -2038,13 +2058,16 @@ int get_next_density(double *mem_A, bool *insideArr, double *nATP, double *nADP,
           ND[xi*Ny*Nz+yi*Nz+zi] -= E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
           NDE[xi*Ny*Nz+yi*Nz+zi] += E_d_to_de*mem_A[xi*Ny*Nz+yi*Nz+zi];
         }
+        NflD[xi*Ny*Nz+yi*Nz+zi] = (nATP[xi*Ny*Nz+yi*Nz+zi] + nADP[xi*Ny*Nz+yi*Nz+zi])*(dx*dx*dx) + ND[xi*Ny*Nz+yi*Nz+zi] + NDE[xi*Ny*Nz+yi*Nz+zi];
+        NflE[xi*Ny*Nz+yi*Nz+zi] = nE[xi*Ny*Nz+yi*Nz+zi]*dx*dx*dx + NDE[xi*Ny*Nz+yi*Nz+zi];
       }
     }
   }
   return 0;
 }
 
-int set_density(double *nATP, double *nE, double *mem_A){
+int set_density(double *nATP, double *nE, double *ND, double *mem_A){
+  double dV = dx*dx*dx;
   int right_most_point_z=0; //left and right most points for z
   int left_most_point_z=Nz;
   int right_most_point_y=0; //"left" and "right" most points for y, in terms of magnitude (right = larger y value)
@@ -2119,6 +2142,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
             ND[i*Ny*Nz+j*Nz+k] = proteins_per_area*mem_A[i*Ny*Nz+j*Nz+k]*density_factor_high_dens;
             NDE[i*Ny*Nz+j*Nz+k] = 0;
             nE[i*Ny*Nz+j*Nz+k] = 0;
+            NflD[i*Ny*Nz+j*Nz+k] = ND[i*Ny*Nz+j*Nz+k] + NDE[i*Ny*Nz+j*Nz+k] + (nATP[i*Ny*Nz+j*Nz+k] + nADP[i*Ny*Nz+j*Nz+k])*dV;
           }
           else {
             nATP[i*Ny*Nz+j*Nz+k] = 0;
@@ -2126,6 +2150,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
             ND[i*Ny*Nz+j*Nz+k] = proteins_per_area*mem_A[i*Ny*Nz+j*Nz+k]*density_factor_low_dens;
             NDE[i*Ny*Nz+j*Nz+k] = 0;
             nE[i*Ny*Nz+j*Nz+k] = 0;
+            NflD[i*Ny*Nz+j*Nz+k] = ND[i*Ny*Nz+j*Nz+k] + NDE[i*Ny*Nz+j*Nz+k] + (nATP[i*Ny*Nz+j*Nz+k] + nADP[i*Ny*Nz+j*Nz+k])*dV;
           }
         }
         else {
@@ -2134,6 +2159,7 @@ int set_density(double *nATP, double *nE, double *mem_A){
           nADP[i*Ny*Nz+j*Nz+k] =0;
           ND[i*Ny*Nz+j*Nz+k] =0;
           NDE[i*Ny*Nz+j*Nz+k] = 0;
+          NflD[i*Ny*Nz+j*Nz+k] = ND[i*Ny*Nz+j*Nz+k] + NDE[i*Ny*Nz+j*Nz+k] + (nATP[i*Ny*Nz+j*Nz+k] + nADP[i*Ny*Nz+j*Nz+k])*dV;
         }
       }
     }
@@ -2175,9 +2201,11 @@ int set_density(double *nATP, double *nE, double *mem_A){
         if (inside(i,j,k)){
           if ((rand_seed == 96 && k<vert_div && j<hor_div) || (rand_seed != 96 && k<density_divider_left)) {
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_high_dens;
+            NflE[i*Ny*Nz+j*Nz+k] = NDE[i*Ny*Nz+j*Nz+k] + nE[i*Ny*Nz+j*Nz+k]*dV;
           }
           else {
             nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_low_dens;
+            NflE[i*Ny*Nz+j*Nz+k] = NDE[i*Ny*Nz+j*Nz+k] + nE[i*Ny*Nz+j*Nz+k]*dV;
           }
         }
       }
