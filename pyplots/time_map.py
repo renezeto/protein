@@ -11,7 +11,8 @@ import sys
 for protein in load.proteinList:
     file = np.loadtxt("./data/shape-%s/%s%s%stime-map-%s-%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,protein,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
     plt.figure()
-    plt.pcolor(file)
+    plt.pcolormesh(file)
+    plt.axes().set_aspect('equal')
     plt.xlim(0,file.shape[1])
     plt.ylim(0,file.shape[0])
     plt.xlabel("Z grid position")

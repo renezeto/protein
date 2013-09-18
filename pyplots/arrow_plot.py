@@ -19,7 +19,7 @@ for protein in load.proteinList:
     plt.figure()
     plt.axes().set_aspect('equal', 'datalim')
     plt.ax = plt.gca()
-    plt.pcolor(cell_membrane)
+    plt.contourf(cell_membrane, levels=[0.5, 1])
     plt.ax.quiver(X,Y,U,V,scale_units='xy',angles='xy',scale=1)
     plt.xlim((0,cell_membrane.shape[1]))
     plt.ylim((0,cell_membrane.shape[0]))
