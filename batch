@@ -73,19 +73,15 @@ def getJobs(options):
 
 #starts simulations matching commands and options
 def runSim(commands,options):
-
-    #srun needs to come after ./batch, not before
-    if "srun" in commands:
-        sruncmd = ["srun"]
-    else:
-        sruncmd = []
-
     #create empty set for sims and fill it up with each job in joblist matching the command line args
     runningSims = set()
     jobList = getJobs(options)
     for job in jobList:
-        runningSims.add(subprocess.Popen(sruncmd + ["./protein_microscopy"] + [arg for arg in job]))
-
+        if "srun" in commands:
+            sruncmd = ["srun","-J",string.join(job)]
+        else:
+            sruncmd = []
+        runningSims.add(subprocess.Popen(sruncmd + ["./protein_microscopy"] + job))
 
     #runningSims is the set of currently running simulations (subprocess module object)
     while len(runningSims) > 0:
