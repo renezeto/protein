@@ -813,7 +813,7 @@ int main (int argc, char *argv[]) {
     printf ("couldn't print outfile\n");
     //exit();
   }
-  double marker;
+  double marker = 0;
   //  double inmarker; unused
   //  double zt = A/2; double yt = B/2; double xt = C/2; unused
   //  double ft = mem_f(zt,yt,xt); unused
@@ -926,10 +926,10 @@ int main (int argc, char *argv[]) {
   }
 
 
-  double vert_div;
-  double vert_div_two;
-  double hor_div;
-  double hor_div_two;
+  double vert_div = 0;
+  double vert_div_two = 0;
+  double hor_div = 0;
+  double hor_div_two = 0;
 
   //refernce for setting up the section divisions:
   // double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
