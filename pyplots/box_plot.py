@@ -7,6 +7,8 @@ import sys
 import pylab
 import file_loader as load
 
+from mpl_toolkits.axes_grid.anchored_artists import AnchoredSizeBar
+
 ## WIP!!
 
 #reads a special kind of data file printed by protein_microscopy.cpp
@@ -79,8 +81,8 @@ def find_period(f):
             break
     #print 'kmax is', kmax
     period_estimate = len(f)/kmax
-    plt.plot(fk)
-    plt.figure()
+    #plt.plot(np.abs(fk))
+    #plt.figure()
     if kmax < 5:
         return (0, len(f))
     # now we locate the final minimum of the function.
@@ -175,7 +177,7 @@ def main():
                              % (load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,
                                 load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
     def plot_sections(sectionax, sectiondata):
-        dx = 0.1 # FIXME
+        dx = load.dx
         x = np.arange(sectiondata.shape[1]*1.0)*dx
         y = np.arange(sectiondata.shape[0]*1.0)*dx
         X,Y = np.meshgrid(x,y)
@@ -209,23 +211,35 @@ def main():
         mycolors = colorScale[1:]
         # here we rotate and flip so that the order of sections will
         # match the box plot as well as we can manage.
+        extrayspace = 2
         if yweighted - ymean > abs(xweighted - xmean):
             sectionax.contourf(X, Y, sectiondata, levels=levels, colors=mycolors)
             sectionax.set_xlim(xmin, xmax)
-            sectionax.set_ylim(ymin, ymax)
+            sectionax.set_ylim(ymin-extrayspace, ymax)
         elif ymean - yweighted > abs(xweighted - xmean):
             sectionax.contourf(X, ymax - (Y - ymin), sectiondata, levels=levels, colors=mycolors)
             sectionax.set_xlim(xmin, xmax)
-            sectionax.set_ylim(ymin, ymax)
+            sectionax.set_ylim(ymin-extrayspace, ymax)
         elif xweighted > xmean:
             sectionax.contourf(Y, X, sectiondata, levels=levels, colors=mycolors)
             sectionax.set_xlim(ymin, ymax)
-            sectionax.set_ylim(xmin, xmax)
+            sectionax.set_ylim(xmin-extrayspace, xmax)
         else:
             sectionax.contourf(Y, xmax - (X - xmin), sectiondata, levels=levels, colors=mycolors)
             sectionax.set_xlim(ymin, ymax)
-            sectionax.set_ylim(xmin, xmax)
+            sectionax.set_ylim(xmin-extrayspace, xmax)
         sectionax.set_aspect('equal')
+        sectionax.set_frame_on(False)
+        sectionax.axes.get_xaxis().set_visible(False)
+        sectionax.axes.get_yaxis().set_visible(False)
+        sectionax.add_artist(AnchoredSizeBar(
+                sectionax.transData,
+                1., # length of the bar in the data reference
+                "1$\mu$", # label of the bar
+                loc=4, # 'best', # location (lower right)
+                pad=0.1, borderpad=0.25, sep=5,
+                frameon=False
+                ))
     plot_sections(sectionax, sectiondata)
 
     j=0
