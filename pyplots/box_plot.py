@@ -209,25 +209,20 @@ def main():
             if boxList[i] == 'LowerRight':
                 mycolors[4] = colorScale[i]
         mycolors = colorScale[1:]
-        # here we rotate and flip so that the order of sections will
-        # match the box plot as well as we can manage.
+        # here we rotate so that the order of sections will match the
+        # box plot.
+        xdir, ydir = xweighted - xmean, yweighted - ymean
+        xdir, ydir = xdir/np.sqrt(xdir**2+ydir**2), ydir/np.sqrt(xdir**2+ydir**2)
         extrayspace = 2
-        if yweighted - ymean > abs(xweighted - xmean):
-            sectionax.contourf(X, Y, sectiondata, levels=levels, colors=mycolors)
-            sectionax.set_xlim(xmin, xmax)
-            sectionax.set_ylim(ymin-extrayspace, ymax)
-        elif ymean - yweighted > abs(xweighted - xmean):
-            sectionax.contourf(X, ymax - (Y - ymin), sectiondata, levels=levels, colors=mycolors)
-            sectionax.set_xlim(xmin, xmax)
-            sectionax.set_ylim(ymin-extrayspace, ymax)
-        elif xweighted > xmean:
-            sectionax.contourf(Y, X, sectiondata, levels=levels, colors=mycolors)
-            sectionax.set_xlim(ymin, ymax)
-            sectionax.set_ylim(xmin-extrayspace, xmax)
-        else:
-            sectionax.contourf(Y, xmax - (X - xmin), sectiondata, levels=levels, colors=mycolors)
-            sectionax.set_xlim(ymin, ymax)
-            sectionax.set_ylim(xmin-extrayspace, xmax)
+        Yrotated = X*xdir + Y*ydir
+        Xrotated = X*ydir - Y*xdir
+        sectionax.contourf(Xrotated, Yrotated, sectiondata, levels=levels, colors=mycolors)
+        xmin = Xrotated[sectiondata>0].min()
+        xmax = Xrotated[sectiondata>0].max()
+        ymin = Yrotated[sectiondata>0].min()
+        ymax = Yrotated[sectiondata>0].max()
+        sectionax.set_xlim(xmin, xmax)
+        sectionax.set_ylim(ymin-extrayspace, ymax)
         sectionax.set_aspect('equal')
         sectionax.set_frame_on(False)
         sectionax.axes.get_xaxis().set_visible(False)
