@@ -104,7 +104,7 @@ def main():
 
     with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
         fileLines = boxData.readlines()
-    
+
     #get number of boxes and protein types. little hokey but it works. in boxData.readlines(), there is exactly one '\n' newline string
     #for each protein type block. therefor, the number of protein types is equal to the number of times "\n" appears by itself in the list.
     numProteinTypes = len([line for line in fileLines if line=="\n"])
@@ -143,7 +143,11 @@ def main():
     plotCurveList_E = stackData(plotNameList_E)
 
     #get a time axis for the plot from the length of one of the data sets we have
-    timeAxis = range(len(plotCurveList_D[0]))
+    difD = 2.5 # (um)^2 s^- 1
+    time_step = .1*load.dx*load.dx/difD #sec
+    print_denominator = 1000 #This is from the c++ I wanted to format things the same here.
+    box_time_step = time_step*print_denominator
+    timeAxis = np.linspace(0,box_time_step*len(plotCurveList_D[0]),len(plotCurveList_D[0]))
 
     #begin messy code (to deal with matplotlib) - don't judge me
 
@@ -154,6 +158,7 @@ def main():
     # print end_time_as_frac_of_ten
     (start, end) = (int(start_time_as_frac_of_ten*len(timeAxis)/10),int(end_time_as_frac_of_ten*len(timeAxis)/10))
     (start, end) = find_period(plotCurveList_D[3])
+
 
     #get num on each plot
     for proteinType in proteinTypeList:
@@ -261,7 +266,7 @@ def main():
                              alpha=alphaScale_D[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
-    bax.set_xlim(start,end)
+    bax.set_xlim(box_time_step*start,box_time_step*end)
     bax.set_ylim(0, 1)
     bax.set_title("Min D protein counts over time")
     bax.set_xlabel("Time (s)")
@@ -293,7 +298,7 @@ def main():
             bax.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
-    bax.set_xlim(start,end)
+    bax.set_xlim(box_time_step*start,box_time_step*end)
     bax.set_ylim(0, 1)
     bax.set_title("Min E protein counts over time")
     bax.set_xlabel("Time (s)")
