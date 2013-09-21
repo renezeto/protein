@@ -188,8 +188,8 @@ double mem_f(double x, double y, double z) {
     double closest_y0 = -100.0;
     double closest_z0 = -100.0;
     //bool there_is_closest_point=0; unused
-    for (double y0 = y-(A/2.0+2.0*dx); y0<y+(A/2.0+2.0*dx); y0+=dx) {
-      for (double z0 = z-(A/2.0+2.0*dx); z0<z+(A/2.0+2.0*dx); z0+=dx) {
+    for (double y0 = y-(A/2.0+2.0*dx); y0<y+(A/2.0+2.0*dx); y0+=dx/2.0) {
+      for (double z0 = z-(A/2.0+2.0*dx); z0<z+(A/2.0+2.0*dx); z0+=dx/2.0) {
         if ( (y-y0)*(y-y0)+(z-z0)*(z-z0) < (y-closest_y0)*(y-closest_y0)+(z-closest_z0)*(z-closest_z0) ) {
           double f0 = 0;
           if(mem_f_shape=="randst") f0 = f_2D_randst(y0,z0);
@@ -497,13 +497,13 @@ int main (int argc, char *argv[]) {
   }
 
   //fixed simulation parameters
-  tot_time = 3000; //sec
+  tot_time = 6; //sec
   if (debug_flag==1) {
     tot_time = 11;
   }
   time_step = .1*dx*dx/difD;//sec
   iter = int(tot_time/time_step);//this will give us triangle data in about two days and randst in four days?
-  printout_iterations = int(3.0/time_step);
+  printout_iterations = int(2.5/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
 
@@ -526,27 +526,31 @@ int main (int argc, char *argv[]) {
   //double guass94[] = {2.3,2.3,.2,2.4,2.3,.3,3.1,3.4,.6,3.6,3.4,.4,3.5,4.3,.6,3.4,4.4,.5,3.1,5.1,.6,3.3,5.2,.6,3.3,5.3,.3};
   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
-  //double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
-  double guass96[] = {3,3,.5};
+  double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  //double guass96[] = {3,3,.5};
   double guass95[] = {2.2,2.4,.3,2.5,3.2,.6,2.7,3.5,.4,2.9,3.5,.4,3.4,4.4,.5,3.6,4.1,.8,3.3,4.6,.6,3.25,4.3,.5};
   // for (int i=0;i<100;i++){
   //   guass96[i] = guass96[i]/1.4;
   // }
-  for (int i=0;i<100;i++){
-    guass97[i] = 1.3*guass97[i];
+  if (rand_seed == 97) {
+    for (int i=0;i<100;i++){
+      guass97[i] = 1.3*guass97[i];
+    }
   }
-  for (int i=0;i<100;i++){
-    guass95[i] = 1.8*guass95[i];
+  if (rand_seed == 95) {
+    for (int i=0;i<100;i++){
+      guass95[i] = 1.8*guass95[i];
+    }
   }
-  for (int i=0;i<100;i++){
-    guass94[i] = 1.6*guass94[i];
+  if (rand_seed == 94) {
+    for (int i=0;i<100;i++){
+      guass94[i] = 1.6*guass94[i];
+    }
   }
   printf("Those are all the guassians!\n");
   if (rand_seed == 99){
     for (int i=0;i<3*5;i++){
       guass[i]=guass99[i];
-      fprintf(out_file,"rand_seed is 99!");
-      //fflush(stdout);
     }
   } else if (rand_seed == 94){
     for (int i=0;i<3*10;i++){
@@ -580,6 +584,7 @@ int main (int argc, char *argv[]) {
   double *first_mem_A = new double[Nx*Ny*Nz];
   set_membrane(out_file, mem_f, first_mem_A);
 
+  //Trimming the grid code:
   printf("initial Nx = %d Ny = %d Nz = %d\n",Nx,Ny,Nz);
   int max_xi = 0;
   min_xi = Nx;
@@ -649,6 +654,8 @@ int main (int argc, char *argv[]) {
     //printf("\n");
   }
   printf("3rd Nx = %d Ny = %d Nz = %d\n",Nx,Ny,Nz);
+  //End of trimming the grid code
+
 
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
@@ -1015,8 +1022,8 @@ int main (int argc, char *argv[]) {
       vert_div_two = 7.9/dx-min_zi+1;
     }
     if (rand_seed == 94) {
-      vert_div = 10.7/dx-min_zi+1;
-      vert_div_two = 14.7/dx-min_zi+1;
+      vert_div = 2.2/dx;
+      vert_div_two = 4.3/dx;
     }
     if (rand_seed == 97) {
       vert_div = 3.0/dx-min_zi+1;
@@ -1242,11 +1249,6 @@ int main (int argc, char *argv[]) {
               proteinList[pNum]->ymax[i] = a;
               proteinList[pNum]->zmax[i] = b;
             }
-            // else {
-            //   proteinList[pNum]->maxval[i] = 0;
-            //   proteinList[pNum]->ymax[i] = 0;
-            //   proteinList[pNum]->zmax[i] = 0;
-            // }
           }
           else {
             currentval = accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
@@ -1256,11 +1258,6 @@ int main (int argc, char *argv[]) {
               proteinList[pNum]->ymax[i] = a;
               proteinList[pNum]->zmax[i] = b;
             }
-            // else {
-            //   proteinList[pNum]->maxval[i] = 0;
-            //   proteinList[pNum]->ymax[i] = 0;
-            //   proteinList[pNum]->zmax[i] = 0;
-            // }
           }
         }
       }
@@ -1666,53 +1663,54 @@ int main (int argc, char *argv[]) {
         }
         fclose(time_map);
       }
+    }
 
-      for (int pNum=0; pNum<numProteins; pNum++) {
-        //arrow plot
-        //filter local maxima in time
-        int* time_maxima_y = new int[iter];
-        int* time_maxima_z = new int[iter];
-        double* time_maxima_value = new double[iter];
-
-        if (i%printout_iterations == 0) {
-          for (int p=1; p<(i-(.5/time_step)); p++) {
-            double max_value = 0;
-            for (int k = int(p-(.5/time_step)); k<(p+(.5/time_step)); k++){
-              if (proteinList[pNum]->maxval[k] > max_value) {
-                max_value = proteinList[pNum]->maxval[k];
-              }
-            }
-            if( proteinList[pNum]->maxval[p] == max_value) {
-              time_maxima_y[p] = proteinList[pNum]->ymax[p];
-              time_maxima_z[p] = proteinList[pNum]->zmax[p];
-              time_maxima_value[p] = proteinList[pNum]->maxval[p];
-            }
-            else {
-              time_maxima_y[p] = 0;
-              time_maxima_z[p] = 0;
-              time_maxima_value[p] = 0;
+    for (int pNum=0; pNum<numProteins; pNum++) {
+      //arrow plot
+      //filter local maxima in time
+      int* time_maxima_y = new int[iter];
+      int* time_maxima_z = new int[iter];
+      double* time_maxima_value = new double[iter];
+      if (i%printout_iterations == 0) {
+        printf("We're in the arrow printout loop now!!!\n");
+        for (int p=1; p<(i-(.5/time_step)); p++) {
+          double max_value = 0;
+          int max_k = 0;
+          for (int k = int(p-(.5/time_step)); k<(p+(.5/time_step)); k++){
+            if (proteinList[pNum]->maxval[k] > max_value) {
+              max_value = proteinList[pNum]->maxval[k];
+              max_k = k;
             }
           }
-          //print to file
-          char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
-          FILE* arrowfile = fopen(arrowname,"w");
-          delete[] arrowname;
-          for (int p=1; p<(i-1); p++) {
-            if ((time_maxima_y[p] != 0) && (time_maxima_z[p] != 0)) {
-              fprintf(arrowfile,"%d\t%d\t%g\t%g\n",time_maxima_y[p],time_maxima_z[p],p*time_step,time_maxima_value[p]);
-            }
+          if( max_k == p) {
+            time_maxima_y[p] = proteinList[pNum]->ymax[p];
+            time_maxima_z[p] = proteinList[pNum]->zmax[p];
+            time_maxima_value[p] = proteinList[pNum]->maxval[p];
           }
-          fclose(arrowfile);
-          delete[] time_maxima_y;
-          delete[] time_maxima_z;
+          else {
+            time_maxima_y[p] = 0;
+            time_maxima_z[p] = 0;
+            time_maxima_value[p] = 0;
+          }
         }
+        //print to file
+        char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
+        FILE* arrowfile = fopen(arrowname,"w");
+        delete[] arrowname;
+        for (int p=1; p<(i-1); p++) {
+          if ((time_maxima_y[p] != 0) && (time_maxima_z[p] != 0)) {
+            fprintf(arrowfile,"%d\t%d\t%g\t%g\n",time_maxima_y[p],time_maxima_z[p],p*time_step,time_maxima_value[p]);
+          }
+        }
+        fclose(arrowfile);
+        delete[] time_maxima_y;
+        delete[] time_maxima_z;
       }
     }
   }
-
-
   //end file printing
   //end simulation
+
   for (int pNum=0; pNum<numProteins; pNum++) {
     delete[] proteinList[pNum]->sum;
     delete[] proteinList[pNum]->maxval;
