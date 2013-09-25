@@ -45,18 +45,24 @@ for protein in load.proteinList:
     # if len(tails)<2:
     #     print "you need a bigger time period!"
     #     exit(1)
-    heads = [[tails[1][0]-tails[0][0],tails[1][1]-tails[0][1]]]
-    heads += [[tails[i+1][0]-tails[i][0], tails[i+1][1]-tails[i][1]] for i in range(1,len(tails)-1)]
+    if len(tails)==0:
+        print "The tails in this file has no tails!!"
+        exit(0)
+    heads = [[load.dx*(tails[1][0]-tails[0][0]),load.dx*(tails[1][1]-tails[0][1])]]
+    heads += [[load.dx*(tails[i+1][0]-tails[i][0]), load.dx*(tails[i+1][1]-tails[i][1])] for i in range(1,len(tails)-1)]
+    tails = [[load.dx*tails[i][0],load.dx*tails[i][1]] for i in range(len(tails))]
     displacements = [tail_element+head_element for (tail_element,head_element) in zip(tails,heads)] #in format: [point_x, point_y, vector_component_x, vector_component_y]
     X,Y,U,V = zip(*displacements)
     plt.figure()
     plt.axes().set_aspect('equal', 'datalim')
     plt.ax = plt.gca()
     cell_membrane[cell_membrane>0] = 1
-    plt.contour(cell_membrane, levels=[0.99])
+    cell_x = np.linspace(0,load.dx*len(cell_membrane[:,0]),len(cell_membrane[:,0]))
+    cell_y = np.linspace(0,load.dx*len(cell_membrane[0,:]),len(cell_membrane[0,:]))
+    plt.contour(cell_y,cell_x,cell_membrane, levels=[0.99])
     plt.ax.quiver(X,Y,U,V,scale_units='xy',angles='xy',scale=1)
-    plt.xlim((0,cell_membrane.shape[1]))
-    plt.ylim((0,cell_membrane.shape[0]))
+    plt.xlim((0,load.dx*cell_membrane.shape[1]))
+    plt.ylim((0,load.dx*cell_membrane.shape[0]))
     plt.xlabel("Z grid position")
     plt.ylabel("Y grid position")
     plt.title("Local temporal maxima, global spatial maxima view of %s"%(protein))
