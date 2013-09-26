@@ -497,7 +497,7 @@ int main (int argc, char *argv[]) {
   }
 
   //fixed simulation parameters
-  tot_time = 6; //sec
+  tot_time = 4000; //sec
   if (debug_flag==1) {
     tot_time = 11;
   }
@@ -1668,10 +1668,10 @@ int main (int argc, char *argv[]) {
     for (int pNum=0; pNum<numProteins; pNum++) {
       //arrow plot
       //filter local maxima in time
-      int* time_maxima_y = new int[iter];
-      int* time_maxima_z = new int[iter];
-      double* time_maxima_value = new double[iter];
       if (i%printout_iterations == 0) {
+        int* time_maxima_y = new int[iter];
+        int* time_maxima_z = new int[iter];
+        double* time_maxima_value = new double[iter];
         printf("We're in the arrow printout loop now!!!\n");
         for (int p=1; p<(i-(.5/time_step)); p++) {
           double max_value = 0;
@@ -1705,6 +1705,7 @@ int main (int argc, char *argv[]) {
         fclose(arrowfile);
         delete[] time_maxima_y;
         delete[] time_maxima_z;
+        delete[] time_maxima_value;
       }
     }
   }
@@ -2167,7 +2168,8 @@ int set_density(double *nATP, double *nE, double *ND, double *mem_A){
   int gridpoints_low_dens = 0;
   int gridpoints_high_dens = 0;
   int gridpoints_total = 0;
-  double wall_area = 0;
+  double wall_area_high = 0;
+  double wall_area_low = 0;
   printf("Hello!!!!!!!!!!!!!!!\n\n\n");
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
@@ -2176,18 +2178,11 @@ int set_density(double *nATP, double *nE, double *ND, double *mem_A){
           gridpoints_total++;
           if ((rand_seed == 96 && k>vert_div && j<hor_div) || (rand_seed != 96 && k>density_divider_right)) {
             gridpoints_high_dens++;
+            wall_area_high += mem_A[i*Ny*Nz+j*Nz+k];
           }
           else {
             gridpoints_low_dens++;
-          }
-        }
-        if (mem_A[i*Ny*Nz+j*Nz+k]!=0){
-          //printf("mem_A at x = %d y = %d z = %d is  = %g\n",i,j,k,mem_A[i*Ny*Nz+j*Nz+k]);
-        }
-        if ((rand_seed == 96 && k>vert_div && j<hor_div) || (rand_seed != 96 && k>density_divider_right)) {
-          wall_area += mem_A[i*Ny*Nz+j*Nz+k];
-          if (mem_A[i*Ny*Nz+j*Nz+k]!=0){
-            //printf("hello\n");
+            wall_area_low += mem_A[i*Ny*Nz+j*Nz+k];
           }
         }
       }
@@ -2197,8 +2192,9 @@ int set_density(double *nATP, double *nE, double *ND, double *mem_A){
   double density_factor_low_dens = gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
   double density_factor_high_dens = density_factor*gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
 
-  double proteins_per_area = dx*dx*dx*nATP_starting_density*gridpoints_high_dens*density_factor_high_dens/wall_area;
-  printf("wall_area = %g and proteins_per_area = %g\n",wall_area,proteins_per_area);
+  double MinD_proteins_per_area_high = dx*dx*dx*nATP_starting_density*gridpoints_high_dens*density_factor_high_dens/wall_area_high;
+  double MinD_proteins_per_area_low = dx*dx*dx*nATP_starting_density*gridpoints_low_dens*density_factor_low_dens/wall_area_low;
+  printf("wall_area_high = %g and proteins_per_area_high = %g\n",wall_area_high,MinD_proteins_per_area_high);
   printf("Density factors: low_dens: %f, high_dens: %f, ratio: %f\n", density_factor_low_dens, density_factor_high_dens, density_factor_high_dens/density_factor_low_dens);
 
   printf("Gridpoints low_dens of the divider: %d\n",gridpoints_low_dens);
@@ -2211,17 +2207,17 @@ int set_density(double *nATP, double *nE, double *ND, double *mem_A){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           if ((rand_seed == 96 && k>vert_div && j<hor_div) || (rand_seed != 96 && k>density_divider_right)) {
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_high_dens;
+            nATP[i*Ny*Nz+j*Nz+k] = 0;//nATP_starting_density*density_factor_high_dens;
             nADP[i*Ny*Nz+j*Nz+k] =0;
-            ND[i*Ny*Nz+j*Nz+k] = 0;//proteins_per_area*mem_A[i*Ny*Nz+j*Nz+k]*density_factor_high_dens;
+            ND[i*Ny*Nz+j*Nz+k] = MinD_proteins_per_area_high*mem_A[i*Ny*Nz+j*Nz+k];
             NDE[i*Ny*Nz+j*Nz+k] = 0;
             nE[i*Ny*Nz+j*Nz+k] = 0;
             NflD[i*Ny*Nz+j*Nz+k] = ND[i*Ny*Nz+j*Nz+k] + NDE[i*Ny*Nz+j*Nz+k] + (nATP[i*Ny*Nz+j*Nz+k] + nADP[i*Ny*Nz+j*Nz+k])*dV;
           }
           else {
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_low_dens;
+            nATP[i*Ny*Nz+j*Nz+k] = 0;//nATP_starting_density*density_factor_low_dens;
             nADP[i*Ny*Nz+j*Nz+k] =0;
-            ND[i*Ny*Nz+j*Nz+k] = 0;//proteins_per_area*mem_A[i*Ny*Nz+j*Nz+k]*density_factor_low_dens;
+            ND[i*Ny*Nz+j*Nz+k] = MinD_proteins_per_area_low*mem_A[i*Ny*Nz+j*Nz+k];
             NDE[i*Ny*Nz+j*Nz+k] = 0;
             nE[i*Ny*Nz+j*Nz+k] = 0;
             NflD[i*Ny*Nz+j*Nz+k] = ND[i*Ny*Nz+j*Nz+k] + NDE[i*Ny*Nz+j*Nz+k] + (nATP[i*Ny*Nz+j*Nz+k] + nADP[i*Ny*Nz+j*Nz+k])*dV;
