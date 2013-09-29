@@ -155,25 +155,21 @@ def main():
 
     start_time_as_frac_of_ten = float(load.f_param6)
     end_time_as_frac_of_ten = float(load.f_param7)
-    # print load.f_shape
-    # print start_time_as_frac_of_ten
-    # print end_time_as_frac_of_ten
-    #(start, end) = (int(start_time_as_frac_of_ten*len(timeAxis)/10),int(end_time_as_frac_of_ten*len(timeAxis)/10))
     (start, end) = find_period(plotCurveList_D[3])
 
     #print set(plotCurveList_D[1]).union(set(plotCurveList_D[2]))
-    print start
 
-    arrow_start = start+10
+    arrow_start = start+int(0.05*(end-start))
     arrow_x = [arrow_start]*len(plotCurveList_D)
-    print len(plotCurveList_D)
+    for i in range(arrow_start,arrow_start + int((end-start)/5)):
+            if ((plotCurveList_D[0][arrow_x[0]]-0) < (plotCurveList_D[0][i]-0)):
+                arrow_x[0] = i
     for type in range(1,len(plotCurveList_D)):
         for i in range(arrow_start,arrow_start + int((end-start)/5)):
             if ((plotCurveList_D[type][arrow_x[type]]-plotCurveList_D[type-1][arrow_x[type]]) < (plotCurveList_D[type][i]-plotCurveList_D[type-1][i])):
                 arrow_x[type] = i
-                print type,i
-    print arrow_x
 
+    
     # arrow_x = [100]*len(plotCurveList_D)
     # print len(plotCurveList_D)
     # for type in range(len(plotCurveList_D)):
@@ -275,6 +271,7 @@ def main():
 
     j=0
     k=0
+    text_adjust = -.2*box_time_step*(end-start)
     for i in range(len(plotCurveList_D[:,0])):
         if i%(numProteinTypes_D)==0:
             j+=1
@@ -283,6 +280,10 @@ def main():
             bax.plot(timeAxis[start:end],
                        plotCurveList_D[i, start:end],
                        color=colorScale[j],alpha=alphaScale_D[k])
+            y_label = (plotCurveList_D[i, arrow_x[i]])/2.0
+            bax.annotate('%s'%plotNameList_D[i],xy=(arrow_x[i]*box_time_step,y_label),xytext=(start*box_time_step+text_adjust,y_label),
+                         fontsize=7,
+                         arrowprops=dict(facecolor='black',shrink=0.05, width=.3, headwidth=5.))
             bax.fill_between(timeAxis[start:end],
                              [0 for x in range(len(timeAxis))[start:end]],
                              plotCurveList_D[i, start:end],
@@ -294,8 +295,8 @@ def main():
             y_label = (plotCurveList_D[i, arrow_x[i]] + plotCurveList_D[i-1, arrow_x[i]])/2.0
             #print y_label
             #if i == 1:
-            text_adjust = -.3*box_time_step*(end-start)
             bax.annotate('%s'%plotNameList_D[i],xy=(arrow_x[i]*box_time_step,y_label),xytext=(start*box_time_step+text_adjust,y_label),
+                         fontsize=7,
                          arrowprops=dict(facecolor='black',shrink=0.05, width=.3, headwidth=5.))
             bax.fill_between(timeAxis[start:end],
                              plotCurveList_D[i-1, start:end],
@@ -304,6 +305,8 @@ def main():
             k+=1
     bax.set_xlim(box_time_step*start,box_time_step*end)
     bax.set_ylim(0, 1)
+    #bax.get_yaxis().set_visible(False)
+    bax.yaxis.set_ticklabels([0,"","","","",1.0])
     bax.set_title("Min D protein counts over time")
     bax.set_xlabel("Time (s)")
     #bax.set_ylabel("Fraction of proteins")
@@ -314,7 +317,7 @@ def main():
 #          arrowprops=dict(shrink=0.01, width=1,
 #                         headwidth=hw, path_effects=arroweff))
 
-    bax.legend(plotNameList_D,bbox_to_anchor=(0.3,-0.05,1.0,1.0),loc=4,prop={'size':8}).draw_frame(False)
+    #bax.legend(plotNameList_D,bbox_to_anchor=(0.3,-0.05,1.0,1.0),loc=4,prop={'size':8}).draw_frame(False)
 
 
     plt.savefig(load.print_string("box-plot_D",""))

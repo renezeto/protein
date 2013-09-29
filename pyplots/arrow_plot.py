@@ -9,9 +9,34 @@ import file_loader as load
 
 
 #membrane.dat or arrow.dat printed transposed, gotta align them:
-cell_membrane = np.transpose(np.loadtxt("./data/shape-%s/membrane_files/%s%s%ssections-%s-%s-%s-%s-%s-%s.dat"%
+cell_membrane_initial = np.loadtxt("./data/shape-%s/membrane_files/%s%s%ssections-%s-%s-%s-%s-%s-%s.dat"%
                                         (load.f_shape,load.debug_str,load.hires_str,load.slice_str,
-                                         load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5)))
+                                         load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
+
+#http://stackoverflow.com/questions/8486294/how-to-add-an-extra-column-to-an-numpy-array
+#this is algorithm want
+Ny = len(cell_membrane_initial[:,0])
+Nz = len(cell_membrane_initial[0,:])
+
+temp_array = np.zeros((Ny+1,Nz+1))
+temp_array[:-1,:-1] = cell_membrane_initial
+cell_membrane = temp_array
+
+
+row_of_zeros = np.zeros(len(cell_membrane[:,0]))
+np.vstack((cell_membrane[:,0],row_of_zeros))
+np.vstack((row_of_zeros,cell_membrane[:,0]))
+
+row_of_zeros = np.zeros(len(cell_membrane[0,:]))
+np.vstack((cell_membrane[0,:],row_of_zeros))
+np.vstack((row_of_zeros,cell_membrane[0,:]))
+
+
+cell_membrane
+if load.f_param4 != "94.00":
+    np.transpose(cell_membrane)
+
+
 
 for protein in load.proteinList:
     tails = np.loadtxt('./data/shape-%s/%s%s%sarrow-plot-%s-%s-%s-%s-%s-%s-%s.dat'%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,protein,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
@@ -48,18 +73,18 @@ for protein in load.proteinList:
     if len(tails)==0:
         print "The tails in this file has no tails!!"
         exit(0)
-    heads = [[load.dx*(tails[1][0]-tails[0][0]),load.dx*(tails[1][1]-tails[0][1])]]
-    heads += [[load.dx*(tails[i+1][0]-tails[i][0]), load.dx*(tails[i+1][1]-tails[i][1])] for i in range(1,len(tails)-1)]
-    tails = [[load.dx*tails[i][0],load.dx*tails[i][1]] for i in range(len(tails))]
+    heads = [[load.dx*(tails[1][1]-tails[0][1]),load.dx*(tails[1][0]-tails[0][0])]]
+    heads += [[load.dx*(tails[i+1][1]-tails[i][1]), load.dx*(tails[i+1][0]-tails[i][0])] for i in range(1,len(tails)-1)]
+    tails = [[load.dx*tails[i][1],load.dx*tails[i][0]] for i in range(len(tails))]
     displacements = [tail_element+head_element for (tail_element,head_element) in zip(tails,heads)] #in format: [point_x, point_y, vector_component_x, vector_component_y]
     X,Y,U,V = zip(*displacements)
     plt.figure()
     plt.axes().set_aspect('equal', 'datalim')
     plt.ax = plt.gca()
     cell_membrane[cell_membrane>0] = 1
-    cell_x = np.linspace(0,load.dx*len(cell_membrane[:,0]),len(cell_membrane[:,0]))
-    cell_y = np.linspace(0,load.dx*len(cell_membrane[0,:]),len(cell_membrane[0,:]))
-    plt.contour(cell_y,cell_x,cell_membrane, levels=[0.99])
+    cell_x = np.linspace(0,load.dx*len(cell_membrane[0,:]),len(cell_membrane[0,:]))
+    cell_y = np.linspace(0,load.dx*len(cell_membrane[:,0]),len(cell_membrane[:,0]))
+    plt.contour(cell_x,cell_y,cell_membrane, levels=[.5])
     plt.ax.quiver(X,Y,U,V,scale_units='xy',angles='xy',scale=1)
     plt.xlim((0,load.dx*cell_membrane.shape[1]))
     plt.ylim((0,load.dx*cell_membrane.shape[0]))
