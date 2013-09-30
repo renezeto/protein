@@ -10,10 +10,10 @@ f_param3 = sys.argv[4]
 f_param4 = sys.argv[5]
 f_param5 = sys.argv[6]
 
-dx=.15
+dx=.05
 
 #for the specific file reading, these are the protein strings
-proteinList = ["D_nATP","D_nADP","D_E_NDE","E_nE","D_ND"]
+proteinList = ["D_nATP","D_nADP","D_E_NDE","E_nE","D_ND","NflD","NflE"]
 
 #initialize as empty lists incase arguments not present in sys.argv
 hires_str=""
@@ -22,7 +22,7 @@ debug_str=""
 
 #change them to print the correct file names if arguments present
 if "-hires" in sys.argv:
-    dx=.05
+    dx=.025
     hires_str="hires-"
 if "-slice" in sys.argv:
     slice_str="slice-"
