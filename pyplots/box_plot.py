@@ -7,6 +7,8 @@ import sys
 import pylab
 import file_loader as load
 
+from mpl_toolkits.axes_grid.anchored_artists import AnchoredSizeBar
+
 ## WIP!!
 
 #reads a special kind of data file printed by protein_microscopy.cpp
@@ -22,11 +24,15 @@ import file_loader as load
 # --------
 #where n(t) is the number of proteins of one type at time t
 
-#opens the file and grabs a particular line matching proteinType and boxName. returns list of protein counts at each time.
+#opens the file and grabs a particular line matching proteinType and
+#boxName. returns list of protein counts at each time.
 def returnData(boxName,proteinType):
 
     #open the data file, grab the line with the correct protein type and box partition, load it as a [string] (so we can use list comprehensions)
-    with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
+    with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%
+              (load.f_shape,load.debug_str,load.hires_str,load.slice_str,
+               load.f_shape,load.f_param1,load.f_param2,load.f_param3,
+               load.f_param4,load.f_param5),"r") as boxData:
         proteinsOverTime = [line for line in boxData if (proteinType in line) and (boxName in line)]
 
 
@@ -36,8 +42,10 @@ def returnData(boxName,proteinType):
     proteinsOverTime = [float(i) for i in proteinsOverTime]
     return proteinsOverTime
 
-#takes input format: ["proteinType1-boxNum1","proteinType1-boxnum2",proteinType2-boxnum1"...]. will return a list of lists
-#in the stacking order specified by the input (first entry is at the bottom).
+#takes input format:
+#["proteinType1-boxNum1","proteinType1-boxnum2",proteinType2-boxnum1"...]. will
+#return a list of lists in the stacking order specified by the input
+#(first entry is at the bottom).
 def stackData(plotList):
     #parse the input
     tempList = []
@@ -53,6 +61,44 @@ def stackData(plotList):
 
     output = np.array(stackedPlotList)
     return output/output[len(output[:,0])-1, 0] # normalize output as a fraction of total
+
+def find_period(f):
+    """
+      Find the period of a function that is described by the input
+      array f, and return indices for a start and end range for one
+      period.  If we cannot find the period accurately, just return
+      the entire range.
+    """
+    # first we look at the fft to get a guess at the period (probably
+    # not *too* accurate or too bad).
+    fk = np.fft.fft(f)
+    fk[0] = 0
+    kmax = 1
+    fkmax = np.abs(fk[:int(len(fk)/2)]).max()
+    for i in xrange(1,int(len(fk)/2)):
+        if np.abs(fk[i]) == fkmax:
+            kmax = i
+            break
+    #print 'kmax is', kmax
+    period_estimate = len(f)/kmax
+    #plt.plot(np.abs(fk))
+    #plt.figure()
+    if kmax < 5:
+        return (0, len(f))
+    # now we locate the final minimum of the function.
+    lastmin = len(f)-2
+    while f[lastmin] > f[lastmin+1] or f[lastmin] > f[lastmin-1]:
+        lastmin -= 1
+    # and last (but not least), we locate the second-to-last
+    # (penultimate) minimum, which should have a very similar value to
+    # the final minimum.
+    penultimate_min = lastmin - int(period_estimate*.7)
+    while f[penultimate_min] > f[penultimate_min+1] or f[penultimate_min] > f[penultimate_min-1] or np.abs(f[penultimate_min]/f[lastmin]-1) > 0.01:
+        penultimate_min -= 1
+    #return (0, len(f) - 1)
+    if penultimate_min < 0:
+        return (0, len(f))
+    return (penultimate_min, lastmin)
 
 def main():
 
@@ -107,6 +153,7 @@ def main():
     # print start_time_as_frac_of_ten
     # print end_time_as_frac_of_ten
     (start, end) = (int(start_time_as_frac_of_ten*len(timeAxis)/10),int(end_time_as_frac_of_ten*len(timeAxis)/10))
+    (start, end) = find_period(plotCurveList_D[3])
 
     #get num on each plot
     for proteinType in proteinTypeList:
@@ -130,7 +177,7 @@ def main():
                              % (load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,
                                 load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
     def plot_sections(sectionax, sectiondata):
-        dx = 0.1 # FIXME
+        dx = load.dx
         x = np.arange(sectiondata.shape[1]*1.0)*dx
         y = np.arange(sectiondata.shape[0]*1.0)*dx
         X,Y = np.meshgrid(x,y)
@@ -162,25 +209,32 @@ def main():
             if boxList[i] == 'LowerRight':
                 mycolors[4] = colorScale[i]
         mycolors = colorScale[1:]
-        # here we rotate and flip so that the order of sections will
-        # match the box plot as well as we can manage.
-        if yweighted - ymean > abs(xweighted - xmean):
-            sectionax.contourf(X, Y, sectiondata, levels=levels, colors=mycolors)
-            sectionax.set_xlim(xmin, xmax)
-            sectionax.set_ylim(ymin, ymax)
-        elif ymean - yweighted > abs(xweighted - xmean):
-            sectionax.contourf(X, ymax - (Y - ymin), sectiondata, levels=levels, colors=mycolors)
-            sectionax.set_xlim(xmin, xmax)
-            sectionax.set_ylim(ymin, ymax)
-        elif xweighted > xmean:
-            sectionax.contourf(Y, X, sectiondata, levels=levels, colors=mycolors)
-            sectionax.set_xlim(ymin, ymax)
-            sectionax.set_ylim(xmin, xmax)
-        else:
-            sectionax.contourf(Y, xmax - (X - xmin), sectiondata, levels=levels, colors=mycolors)
-            sectionax.set_xlim(ymin, ymax)
-            sectionax.set_ylim(xmin, xmax)
+        # here we rotate so that the order of sections will match the
+        # box plot.
+        xdir, ydir = xweighted - xmean, yweighted - ymean
+        xdir, ydir = xdir/np.sqrt(xdir**2+ydir**2), ydir/np.sqrt(xdir**2+ydir**2)
+        extrayspace = 2
+        Yrotated = X*xdir + Y*ydir
+        Xrotated = X*ydir - Y*xdir
+        sectionax.contourf(Xrotated, Yrotated, sectiondata, levels=levels, colors=mycolors)
+        xmin = Xrotated[sectiondata>0].min()
+        xmax = Xrotated[sectiondata>0].max()
+        ymin = Yrotated[sectiondata>0].min()
+        ymax = Yrotated[sectiondata>0].max()
+        sectionax.set_xlim(xmin, xmax)
+        sectionax.set_ylim(ymin-extrayspace, ymax)
         sectionax.set_aspect('equal')
+        sectionax.set_frame_on(False)
+        sectionax.axes.get_xaxis().set_visible(False)
+        sectionax.axes.get_yaxis().set_visible(False)
+        sectionax.add_artist(AnchoredSizeBar(
+                sectionax.transData,
+                1., # length of the bar in the data reference
+                "1$\mu$", # label of the bar
+                loc=4, # 'best', # location (lower right)
+                pad=0.1, borderpad=0.25, sep=5,
+                frameon=False
+                ))
     plot_sections(sectionax, sectiondata)
 
     j=0
@@ -207,15 +261,16 @@ def main():
                              alpha=alphaScale_D[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
-    bax.set_xlim(start,end+.40*(end-start))
+    bax.set_xlim(start,end)
     bax.set_ylim(0, 1)
     bax.set_title("Min D protein counts over time")
     bax.set_xlabel("Time (s)")
     bax.set_ylabel("Fraction of proteins")
-    bax.legend(plotNameList_D,loc="lower right",prop={'size':8})
+    bax.legend(plotNameList_D,loc="lower right",prop={'size':8}).draw_frame(False)
 
 
     plt.savefig(load.print_string("box-plot_D",""))
+    plt.figure()
 
     #f, (bax,sectionax) = plt.subplots(1, 2)
     bax = plt.subplot2grid((2,5), (0,0), colspan=4, rowspan=2)
@@ -238,15 +293,15 @@ def main():
             bax.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
-    bax.set_xlim(start,end+.40*(end-start))
+    bax.set_xlim(start,end)
     bax.set_ylim(0, 1)
     bax.set_title("Min E protein counts over time")
     bax.set_xlabel("Time (s)")
     bax.set_ylabel("Fraction of proteins")
-    bax.legend(plotNameList_E,loc="lower right",prop={'size':8})
+    bax.legend(plotNameList_E,loc="lower right",prop={'size':8}).draw_frame(False)
     plt.savefig(load.print_string("box-plot_E",""))
 
-    plt.plot([1,2,3], [4,5,6])
+    plt.show()
     return 0
 
 if __name__ == '__main__':

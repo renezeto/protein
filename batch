@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from __future__ import division
 import numpy as np
-import glob
+import glob, string
 import sys
 import os
 import re
@@ -73,19 +73,15 @@ def getJobs(options):
 
 #starts simulations matching commands and options
 def runSim(commands,options):
-
-    #srun needs to come after ./batch, not before
-    if "srun" in commands:
-        sruncmd = ["srun"]
-    else:
-        sruncmd = []
-
     #create empty set for sims and fill it up with each job in joblist matching the command line args
     runningSims = set()
     jobList = getJobs(options)
     for job in jobList:
-        runningSims.add(subprocess.Popen(sruncmd + ["./protein_microscopy"] + [arg for arg in job]))
-
+        if "srun" in commands:
+            sruncmd = ["srun","-J",string.join(job)]
+        else:
+            sruncmd = []
+        runningSims.add(subprocess.Popen(sruncmd + ["./protein_microscopy"] + job))
 
     #runningSims is the set of currently running simulations (subprocess module object)
     while len(runningSims) > 0:
@@ -106,28 +102,36 @@ def runSim(commands,options):
 def runPlots(commands,options):
     if "srun" in commands:
         sruncmd = ["srun"]
+        simultaneous_jobs = 100
     else:
         sruncmd = []
+        simultaneous_jobs = 4
     jobList = getJobs(options)
-    runningPlots = set()
+    runningProcesses = set()
     for job in jobList:
         os.system('mkdir -p data/shape-%s/plots' % job[0])
-        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/box_plot.py"] + job))
-        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/time_map.py"] + job))
-        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/arrow_plot.py"] + job))
-        runningPlots.add(subprocess.Popen(sruncmd + ["python","pyplots/ave_plot.py"] + job))
-        while sruncmd == [] and len(runningPlots) > 2: # don't run *everything* at once without slurm!
-            for plot in runningPlots.copy():
-                if plot.poll() is not None:
-                    runningPlots.remove(plot)
-                else:
-                    time.sleep(1)
-    while len(runningPlots) > 0:
-        for plot in runningPlots.copy():
-            if plot.poll() is not None:
-                runningPlots.remove(plot)
-            else:
-                time.sleep(10)
+        def friendly_system(cmd):
+            print string.join(cmd)
+            runningProcesses.add(subprocess.Popen(cmd))
+            while len(runningProcesses) >= simultaneous_jobs:
+                for p in runningProcesses.copy():
+                    if p.poll() is not None:
+                        if p.poll() != 0:
+                            print 'Error running plot, exit code', p.poll()
+                            exit(1)
+                        runningProcesses.remove(p)
+                time.sleep(0.5)
+        friendly_system(sruncmd + ["python","pyplots/box_plot.py"] + job)
+        friendly_system(sruncmd + ["python","pyplots/time_map.py"] + job)
+        friendly_system(sruncmd + ["python","pyplots/arrow_plot.py"] + job)
+        friendly_system(sruncmd + ["python","pyplots/ave_plot.py"] + job)
+    while len(runningProcesses) > 0:
+        for p in runningProcesses.copy():
+            if p.poll() is not None:
+                if p.poll() != 0:
+                    print 'Error running plot, exit code', p.poll()
+                    exit(1)
+                runningProcesses.remove(p)
     return 0
 
 #starts the movie .gif generation for jobs matching commands and options (with -dump present in jobs file). works the same as runSim and runPlots

@@ -1,4 +1,4 @@
-CXXFLAGS = -g -Wall -Werror
+CXXFLAGS = -g -O2 -Wall -Werror
 
 .SUFFIXES: .tex .dvi .ps .bib .bbl .pdf .fig .eps .aux .jpg .png .svg \
 		.gp .mf .2602gf .pl .xgr
