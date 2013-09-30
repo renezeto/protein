@@ -63,24 +63,23 @@ attachement of minD on the cell membrane), and is stationary once
 attached.  A number of studies have used an approach similar in that
 they do not rely on the ability of MinD to move along the walls and
 cluster ~\cite{kruse2007experimentalist} \cite{meinhardt2001pattern}
-\cite{drew2005polymerization} \cite{fange2006noise}, while studies
-have been made as well of models which rely on MinD mobility and
-attraction on the cell
+\cite{drew2005polymerization} \cite{fange2006noise}
+\cite{kerr2006division}, while studies have been made as well of
+models which rely on MinD mobility and attraction on the cell
 membrane\cite{kruse2002dynamic}\cite{howard2005cellular}.  Variations
-of the Huang 2003 model that attempt to stochasticly account for
-variations of molecular interaction confirm the major results obtained
-by Huang's model and more successfully predict experimentally observed
-oscillations in round cell phenotypes.\cite{drew2005polymerization}
+of the Huang 2003 model that stochasticly account for variations of
+molecular interaction \cite{fange2006noise} and as well monte-carlo
+simulations that implement stochastic version of Huang's mean filed
+reaction rates confirm the major results obtained by Huang's model and
+more successfully predict experimentally observed oscillations in
+round cell phenotypes.\cite{drew2005polymerization}
 \cite{fange2006noise} \cite{huang2004min} Biochemical models of
 broader scope have also been used to study the MinD system and show
-consistent results.\cite{arjunan2010new}
-
-\fixme{should read following citation more carefully, worried -
-  abstract says that simple models don't explain certain experimental
-  findings.} \cite{ivanov2010multiple} \fixme{should read following
-  more carefully this is Huang doing much the same as what were doing}
-\cite{varma2008min}
-
+consistent results.\cite{arjunan2010new}.  However, in general the
+results of the stochastic and monte-carlo simulations are similar to
+those given by Huang's mean field results.  They both show the
+characteristic oscillations in the pill shaped cells.  We do not see
+any compelling reason to avoid using this simple and successful model.
 
 Previous studies have been made of the Min system's associtation with
 the cell membrane
@@ -88,24 +87,26 @@ the cell membrane
 shown as well that MinD binds preferentially to regions enriched with
 cadiolipin, an anionic phospholipid that collects on regions of high
 negative curvature. This mechanism has been incorporated into other
-models.\cite{drew2005polymerization}
-\cite{cytrynbaum2007multistranded} \cite{renner2012mind}
-\cite{renner2012mind} However, this mechanism of combined clustering,
-phospholipids and MinD has not been observed in real
-cells. \cite{halatek2012highly}
+models.\cite{drew2005polymerization,cytrynbaum2007multistranded,renner2012mind,renner2012mind}
+However, this mechanism of combined clustering, phospholipids and MinD
+has not been observed in real cells. \cite{halatek2012highly}
 
 It is vital for the mechanism by which the cell accurately divides to
 be robust and indeed it has been shown to
 be\cite{touhami2006temperature}.  Studies have shown that the
 oscillations can effectively find poles in abberent cell
-shapes\cite{varma2008min}\cite{juarez2010changes}.  However, Mannik et
-al. have shown that there are limits to this robustness. Forcing cells
-into flattened, irregular cell shapes adversly effects the Min
-system's ability to maintain their regular oscillatory
-behavior\cite{mannik2012robustness} \cite{mannik2010bacteria} \cite{mannik2009bacterial}.  We
-follow the experimental work of Mannik et and use Huang's mean field
-differential equation reaction model to explore the model's ability to
-find regular oscillatory behavoir in a series of abberent shapes.
+shapes~\cite{corbin2002exploring} \cite{juarez2010changes}.  Varma et
+al. have studied three pronged connected tube shapes, both
+experimentally and in simulation\cite{varma2008min} and have shown
+that even in these oscillations develop in regular patterns. However,
+Mannik et al. have shown that there are limits to this
+robustness. Forcing cells into flattened, irregular cell shapes
+adversly effects the Min system's ability to maintain their regular
+oscillatory behavior \fixme{this link doesn't work = cite{mannik2012robustness}}
+\cite{mannik2010bacteria} \cite{mannik2009bacterial}.  We follow the
+experimental work of Mannik et and use Huang's mean field differential
+equation reaction model to explore the model's ability to find regular
+oscillatory behavoir in a series of abberent shapes.
 
 
 
@@ -162,7 +163,7 @@ Kubitschek\cite{kubitschek1990cell} \cite{kubitschek1968linear} has
 shown in multiple experiments that at the time of cell division cells
 have a volume that is within a range of roughly $1\mu m^3$ to $2\mu
 m^3$.  We follow Huang's simulations\cite{huang2003dynamic} and
-Mannik's experiments \cite{mannik2012robustness} and model cells that
+Mannik's experiments \fixme{this link doesn't work = cite{mannik2012robustness}} and model cells that
 are slightly larger than this range.  Amoung our flattened cells the
 two dimensional length scales are tuned so that every total cell
 volume is very close to $3\mu^3$.  \fixme{should we just leave it to
@@ -361,6 +362,25 @@ along, in a way.
   \label{total-oscillation-randst-96-plot}
 \end{figure}
 
+Looking at at few periods in detail.  We find that there is a small
+increase in cytoplasmic MinE always directly before the the beggining
+of climb in the membrane bound MinE peak.  Also, there is at any one
+time a very large amount more of minE that is membrane bound then
+cytoplasmic in any ones section.  A difference of a factor of roughly
+20 when membrane MinE is at its peak, and roughly 12 when membrane
+MinE is at it's minimum.  There seem to be two modes of oscillation,
+each exhibiting a density peak maxima that moves back and forth
+diagonaly from one corner to the opposite, as if there were two
+overlapping, criss-crossed cells oscillating.  In the box plot this is
+seen as roughly coinciding membrane minD peaks in the lower left and
+right corners, followed one pi later in peaks in the upper right and
+upper left corners.  Interesting that this did not exhibit
+counterclockwise motion that Huangs 2008 paper might suggest.  Should
+run sims that start in the wacky way that just started running with
+triangles.
+\newline
+
+
 We haven't simulated long enough yet, so no real pattern has shown
 itself.  There's certainly oscillations, and it's almost as if there's
 competing modes - top to bottom, left to right, corner to corner, etc.
@@ -496,7 +516,52 @@ the left corner, then back to the top, then to the left, then to the
 top again, then back to the right side.  It's fascinating that there
 must be two back and forth motions before proceeding to the other side
 \fixme{would this happen over and over or would there be a chaos,
-  breakdown sort of thing at some point.  Need longer sim}.  The total
+  breakdown sort of thing at some point.  Need longer sim}.  The
+animations show that when there is a maxima in the center, if it is a
+maxima that is on the right side of the center upper cup then this
+maxima will be followed by a maxima in the lower left corner.  This
+maxima in the lower left corner (immediately following the one on the
+right side of the upper cup) will reside for a bit longer than the
+left corner maxima preceding it.  These longer residing maxima will
+then be followed by a switch, to the right corner, with a short less
+intensive maxima traveling through the center.  The MinE shows the
+same pattern. So what does this say, keeping in mind our model of MinD
+diffusing and MinE comming in to eat it away?  MinD starts in the
+lower left, diffuses up and maximizes on the right side of upper cup.
+Why right side of upper cup?  Because there is more MinE on the left
+side then on the right side of that upper cup, because MinE has just
+spent time coagulating on left corner wall because there was more MinD
+there.  The MinE attaches to the MinD on the membrane and begins to
+release it.  Why at that point does the MinD go back to the left
+corner?  When the MinE eats away at the wall bound MinD it starts at
+te edges and moves in.  There's one frame where the MinE has maxima on
+either side of the MinD maxima on the right side cup.  The center of
+the cup is a little further away so it attaches to these out ridges
+first and then moves in.  After it eats at the corners and starts
+moving in why does the MinD go back to the left corner?  Watching the
+cytoplasmic MinE, something very interesting: It as well maximizes
+twice in one corner, but in between the two maximizations it has a
+smaller maxima in the other corner.  So when the MinD is getting eaten
+away from the top cup, the minE is moving over to maximize in the
+opposite corner.  Why does it maximize there? there are more minD on
+the membrane to attach to on the left, so it can diffuse further down
+into the corner.  Want to be able to construct a full frame by frame
+picture, with all the proteins layed out top to bottom, each frame
+ontop of its likewise frame.  Actually, you can see this effect very
+slightly watching the 98 shape, between the center cap and the right
+corner.
+
+
+Also - as to why the proteins like poles and corners.  It's a
+diffusion model, so there's no momentum.  When they are at an end or
+corner, they will go in all directions, and if there's a small hole
+way out, only a small percentage will go down it.  As the others
+attach to the wall, there is a higher chance that diffusing particles
+will attach to that wall instead.
+
+
+
+The total
 fluctuation plot shows this double maxima corner pattern, with two
 spikes on the right, then two spikes on the left, then two back on the
 right.
@@ -594,7 +659,7 @@ fluctuations. \cite{touhami2006temperature}
 
 We wish to subject Huang's seminal model to more harsh geometrical
 tests of robustness and compare results to the new experimental
-results of Mannik.\cite{mannik2012robustness}
+results of Mannik.\fixme{this link doesn't work = cite{mannik2012robustness}}
 
 Models also introduce the affect of cardiolipin, an anionic
 phospholipid that collects on regions of high negative curvature (the

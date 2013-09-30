@@ -46,7 +46,7 @@ int Nx, Ny, Nz; //number of gridpoints in each direction
 string mem_f_shape; //cell shape argument
 double A, B, C, D; //specific shape parameters, set by command line args
 
-//N denotes protein number, n denotes protein number density 
+//N denotes protein number, n denotes protein number density
 double *nATP; //min D bound to an ATP
 double *nADP; //min D bound to an ADP
 double *nE; //loose min E in cytoplasm
@@ -506,13 +506,13 @@ int main (int argc, char *argv[]) {
   }
 
   //fixed simulation parameters
-  tot_time = 1000; //sec
+  tot_time = 2000; //sec
   if (debug_flag==1) {
     tot_time = 11;
   }
   time_step = .1*dx*dx/difD;//sec
   iter = int(tot_time/time_step);//this will give us triangle data in about two days and randst in four days?
-  printout_iterations = int(5.0/time_step);
+  printout_iterations = int(1.0/time_step);
   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
   double dV = dx*dx*dx;
 
@@ -531,19 +531,24 @@ int main (int argc, char *argv[]) {
   //In the following, for every set of three numbers, the 1st is y and he 2nd is z and the 3rd is quassian width
   double guass99[] = {2.0,2.2,.50,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.50};
   double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
+  double guass94[] = {2.6,3.2,.3,2.28,2.75,.25,3.0,3.9,.6,3.1,3.6,.4,3.3,3.9,.4,3.5,4.7,.5,2.9,5.6,.5,3.1,5.2,.4,2.4,5.8,.2,3.6,5.1,.3};
+  //double guass94[] = {2.3,2.3,.2,2.4,2.3,.3,3.1,3.4,.6,3.6,3.4,.4,3.5,4.3,.6,3.4,4.4,.5,3.1,5.1,.6,3.3,5.2,.6,3.3,5.3,.3};
   double guass97[] = {1.4,3,.4,1.8,3,.4,2.2,3,.4,2.6,3,.4,3,3,.4,3.4,3,.4,
                       3.8,3,.4,4.2,3,.4,4.6,3,.4,5,3,.4,5.4,3,.4,3.4,2.4,.6};
-  double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,
-                      4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  //double guass96[] = {1.3,1.3,.7,2.1,2,.7,3,2,.7,3.9,2,.7,4.7,1.3,.7,4,2.1,.7,4,3,.7,4,3.9,.7,4.7,4.7,.7,3.9,4,.7,3,4,.7,2.3,4,.7,1.3,4.7,.7,2.1,3.9,.7,3,3.9,.7,2.1,3.9,.7};
+  double guass96[] = {3,3,.5};
+  double guass95[] = {2.2,2.4,.3,2.5,3.2,.6,2.7,3.5,.4,2.9,3.5,.4,3.4,4.4,.5,3.6,4.1,.8,3.3,4.6,.6,3.25,4.3,.5};
+  // for (int i=0;i<100;i++){
+  //   guass96[i] = guass96[i]/1.4;
+  // }
   for (int i=0;i<100;i++){
-    //printf("guass96[%d] = %g\n",i,guass96[i]);
-    guass96[i] = guass96[i]/1.4;
-    //printf("guass96[%d] = %g\n",i,guass96[i]);
+    guass97[i] = 1.3*guass97[i];
   }
   for (int i=0;i<100;i++){
-    //printf("guass97[%d] = %g\n",i,guass97[i]);
-    guass97[i] = 1.3*guass97[i];
-    //printf("guass97[%d] = %g\n",i,guass97[i]);
+    guass95[i] = 1.8*guass95[i];
+  }
+  for (int i=0;i<100;i++){
+    guass94[i] = 1.6*guass94[i];
   }
   printf("Those are all the guassians!\n");
   if (rand_seed == 99){
@@ -551,6 +556,10 @@ int main (int argc, char *argv[]) {
       guass[i]=guass99[i];
       fprintf(out_file,"rand_seed is 99!");
       fflush(stdout);
+    }
+  } else if (rand_seed == 94){
+    for (int i=0;i<3*10;i++){
+      guass[i]=guass94[i];
     }
   } else if (rand_seed == 98){
     for (int i=0;i<3*5;i++){
@@ -561,8 +570,12 @@ int main (int argc, char *argv[]) {
       guass[i]=guass97[i];
     }
   } else if (rand_seed == 96){
-    for (int i=0;i<3*16;i++){
+    for (int i=0;i<3*1;i++){
       guass[i]=guass96[i];
+    }
+  } else if (rand_seed == 95){
+    for (int i=0;i<3*8;i++){
+      guass[i]=guass95[i];
     }
   } else {
     if (mem_f_shape == "randst"){
@@ -811,6 +824,21 @@ int main (int argc, char *argv[]) {
   fclose(out);
   printf("\nMembrane file printed.\n");
 
+  set_density(nATP, nE, mem_A);
+  fflush(out_file);
+  printf("density set.\n");
+
+
+  //Starting the Sections file set up
+
+  double left_area_total = 0;
+  double middle_area_total = 0;
+  double right_area_total = 0;
+  double right_up_area_total = 0;
+  double right_down_area_total = 0;
+  double left_up_area_total = 0;
+  double left_down_area_total = 0;
+
   if (mem_f_shape=="triangle") {
     char* outfilename_sections = new char[1024];
     sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
@@ -820,12 +848,21 @@ int main (int argc, char *argv[]) {
       for (int i=0;i<Nz;i++) {
         if (triangle_section(j*dx,i*dx)=="Right"){
           marker = 1;
+          for (int a=0;a<Nx;a++){
+            right_area_total += mem_A[a*Ny*Nz+j*Nz+i];
+          }
         }
         if (triangle_section(j*dx,i*dx)=="Mid"){
           marker = 2;
+          for (int a=0;a<Nx;a++){
+            middle_area_total += mem_A[a*Ny*Nz+j*Nz+i];
+          }
         }
         if (triangle_section(j*dx,i*dx)=="Left"){
           marker = 3;
+          for (int a=0;a<Nx;a++){
+            left_area_total += mem_A[a*Ny*Nz+j*Nz+i];
+          }
         }
         if (inside(int(Nx/2),j,i)==false) {
           marker = 0;
@@ -840,32 +877,8 @@ int main (int argc, char *argv[]) {
     delete[] outfilename_sections;
   }
 
-  //end membrane printing
-
-  set_density(nATP, nE, mem_A);
-  fflush(out_file);
-  printf("density set.\n");
-
-  double left_area_total = 0;
-  double middle_area_total = 0;
-  double right_area_total = 0;
 
   if (mem_f_shape=="p"){
-    for (int a=0;a<Ny; a++) {
-      for (int b=0; b<Nz; b++) {
-        for (int c=0; c<Nx; c++) {
-          if (b < box_divider_left) {
-            left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-          }
-          else if (b > box_divider_right) {
-            right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-          }
-          else {
-            middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
-          }
-        }
-      }
-    }
     char* outfilename_sections = new char[1024];
     sprintf(outfilename_sections, "data/shape-%s/membrane_files/%s%s%ssections-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),
             debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
@@ -874,12 +887,21 @@ int main (int argc, char *argv[]) {
       for (int b=0; b<Nz; b++) {
         if (b < box_divider_left) {
           marker = 3;
+          for (int c=0;c<Nx;c++){
+            left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
         }
         if (b > box_divider_right) {
           marker = 1;
+          for (int c=0;c<Nx;c++){
+            right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
         }
         if ((b <= box_divider_right) && (b >= box_divider_left)) {
           marker = 2;
+          for (int c=0;c<Nx;c++){
+            middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+          }
         }
         if (inside(int(Nx/2),a,b)==false) {
           marker = 0;
@@ -918,6 +940,14 @@ int main (int argc, char *argv[]) {
       vert_div = 3.0/dx;
       vert_div_two = 4.8/dx;
     }
+    if (rand_seed == 95) {
+      vert_div = 6.0/dx;
+      vert_div_two = 7.9/dx;
+    }
+    if (rand_seed == 94) {
+      vert_div = 10.7/dx;
+      vert_div_two = 14.7/dx;
+    }
     if (rand_seed == 97) {
       vert_div = 3.0/dx;
       hor_div = 3.2/dx;
@@ -935,43 +965,76 @@ int main (int argc, char *argv[]) {
     FILE *outfile_sections = fopen((const char*)outfilename_sections,"w");
     for (int a=0; a<Ny; a++) {
       for (int b=0; b<Nz; b++) {
-        if (rand_seed == 99 || rand_seed == 98) {
+        if (rand_seed == 99 || rand_seed == 98 || rand_seed == 95 || rand_seed == 94) {
             if (b < vert_div) {
               marker = 3;
+              for (int c=0;c<Nx;c++){
+                left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (b > vert_div_two) {
               marker = 1;
+              for (int c=0;c<Nx;c++){
+                right_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else {
               marker = 2;
+              for (int c=0;c<Nx;c++){
+                middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
           }
-          if (rand_seed == 97) {
+        if (rand_seed == 97) {
             if (b < vert_div) {
               marker = 4;
+              for (int c=0;c<Nx;c++){
+                left_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (a > hor_div_two) {
               marker = 1;
+              for (int c=0;c<Nx;c++){
+                right_up_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (a < hor_div) {
               marker = 3;
+              for (int c=0;c<Nx;c++){
+                right_down_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else {
               marker = 2;
+              for (int c=0;c<Nx;c++){
+                middle_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
           }
           if (rand_seed == 96) {
             if (b < vert_div && a < hor_div) {
               marker = 3;
+              for (int c=0;c<Nx;c++){
+                left_down_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (b < vert_div && a >= hor_div) {
               marker = 4;
+              for (int c=0;c<Nx;c++){
+                left_up_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else if (b >= vert_div && a < hor_div) {
               marker = 1;
+              for (int c=0;c<Nx;c++){
+                right_down_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
             else {
               marker = 2;
+              for (int c=0;c<Nx;c++){
+                right_up_area_total += mem_A[c*Ny*Nz+a*Nz+b];
+              }
             }
           }
           if (inside(int(Nx/2),a,b)==false) {
@@ -1036,7 +1099,7 @@ int main (int argc, char *argv[]) {
                 }
               }
               if (mem_f_shape == "randst") {
-                if (rand_seed == 99 || rand_seed == 98) {
+                if (rand_seed == 99 || rand_seed == 98 || rand_seed == 95 || rand_seed == 94) {
                   if (b < vert_div) {
                     proteinList[pNum]->numLeft[i_dat] += accessGlobals[pNum][c*Ny*Nz+a*Nz+b]*dV;
                   }
@@ -1370,7 +1433,7 @@ int main (int argc, char *argv[]) {
       delete[] boxname;
       for (int pNum=0; pNum<numProteins; pNum++) {
 
-        if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98 || mem_f_shape == "triangle") {
+        if (mem_f_shape == "p" || rand_seed == 99 || rand_seed == 98 || rand_seed == 95 || rand_seed == 94 || mem_f_shape == "triangle") {
           fprintf(box_plot,"%s\tleft\t",proteinList[pNum]->name);
           for (int i_plot_dat=0; i_plot_dat<i_dat+1; i_plot_dat++) {
             fprintf(box_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_plot_dat]));
@@ -1444,7 +1507,7 @@ int main (int argc, char *argv[]) {
 
         printf("left area = %g middle area = %g right area = %g\n",left_area_total,middle_area_total,right_area_total);
         fflush(stdout);
-        if (mem_f_shape == "p"){
+        if (mem_f_shape == "p" || mem_f_shape == "triangle" || rand_seed == 98 || rand_seed == 95 || rand_seed == 94 || rand_seed == 99){
           for (int pNum=3; pNum<numProteins; pNum++) {
             fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
             for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
@@ -1459,6 +1522,56 @@ int main (int argc, char *argv[]) {
             fprintf(ave_plot,"%s\tright\t",proteinList[pNum]->name);
             for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
               fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRight[i_plot_dat]/right_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"\n");
+          }
+        }
+        if (rand_seed == 97){
+          for (int pNum=3; pNum<numProteins; pNum++) {
+            fprintf(ave_plot,"%s\tleft\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeft[i_plot_dat]/left_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\trightup\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_plot_dat]/right_up_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\tmid\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numMid[i_plot_dat]/middle_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\trightdown\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_plot_dat]/right_down_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"\n");
+          }
+        }
+        if (rand_seed == 96){
+          for (int pNum=3; pNum<numProteins; pNum++) {
+            fprintf(ave_plot,"%s\trightup\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRightUp[i_plot_dat]/right_up_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\tleftup\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeftUp[i_plot_dat]/left_up_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\tleftdown\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numLeftDown[i_plot_dat]/left_down_area_total));
+            }
+            fprintf(ave_plot,"\n");
+            fprintf(ave_plot,"%s\trightdown\t",proteinList[pNum]->name);
+            for (int i_plot_dat=0; i_plot_dat<i_dat; i_plot_dat++) {
+              fprintf(ave_plot,"%1.2f\t",(proteinList[pNum]->numRightDown[i_plot_dat]/right_down_area_total));
             }
             fprintf(ave_plot,"\n");
             fprintf(ave_plot,"\n");
@@ -1505,7 +1618,7 @@ int main (int argc, char *argv[]) {
         delete[] arrowname;
         for (int p=1; p<(i-1); p++) {
           if ((time_maxima_y[p] != 0) && (time_maxima_z[p] != 0)) {
-            fprintf(arrowfile,"%d\t%d\n",time_maxima_y[p],time_maxima_z[p]);
+            fprintf(arrowfile,"%g\t%d\t%d\n",p*time_step,time_maxima_y[p],time_maxima_z[p]);
           }
         }
         fclose(arrowfile);
@@ -1956,37 +2069,43 @@ int set_density(double *nATP, double *nE, double *mem_A){
       }
     }
   }
-
-  int density_divider_z = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
-
   //get total gridpoints, gridpoints left of divide, gridpoints right of divide for protein count
-  int gridpoints_left = 0;
-  int gridpoints_right = 0;
+  double vert_div = (2.7)/dx;
+  double hor_div = 3.0/dx;
+  int density_divider_right = int(right_most_point_z - (right_most_point_z - left_most_point_z)/3);
+  int density_divider_left = int(right_most_point_z - 2*(right_most_point_z - left_most_point_z)/3);
+  int gridpoints_low_dens = 0;
+  int gridpoints_high_dens = 0;
   int gridpoints_total = 0;
+  double wall_area = 0;
   for (int i=0;i<Nx;i++){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
           gridpoints_total++;
-          if (k<=density_divider_z) {
-            gridpoints_left++;
+          if ((rand_seed == 96 && k>vert_div && j<hor_div) || (rand_seed != 96 && k>density_divider_right)) {
+            gridpoints_high_dens++;
           }
           else {
-            gridpoints_right++;
+            gridpoints_low_dens++;
           }
+        }
+        if ((rand_seed == 96 && k>vert_div && j<hor_div) || (rand_seed != 96 && k>density_divider_right)) {
+          wall_area += mem_A[i*Ny*Nz+j*Nz+k];
         }
       }
     }
   }
+  //compute density scale factors low_dens and high_dens of divide (to ensure correct protein #)
+  double density_factor_low_dens = gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
+  double density_factor_high_dens = density_factor*gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
 
-  //compute density scale factors left and right of divide (to ensure correct protein #)
-  double density_factor_left = gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
-  double density_factor_right = density_factor*gridpoints_total/(gridpoints_left + density_factor*gridpoints_right);
+  double proteins_per_area = dx*dx*dx*nATP_starting_density*gridpoints_high_dens*density_factor_high_dens/wall_area;
 
-  printf("Density factors: left: %f, right: %f, ratio: %f\n", density_factor_left, density_factor_right, density_factor_right/density_factor_left);
+  printf("Density factors: low_dens: %f, high_dens: %f, ratio: %f\n", density_factor_low_dens, density_factor_high_dens, density_factor_high_dens/density_factor_low_dens);
 
-  printf("Gridpoints left of the divider: %d\n",gridpoints_left);
-  printf("Gridpoints right of the divider:%d\n",gridpoints_right);
+  printf("Gridpoints low_dens of the divider: %d\n",gridpoints_low_dens);
+  printf("Gridpoints high_dens of the divider:%d\n",gridpoints_high_dens);
   printf("Gridpoints total: %d\n",gridpoints_total);
 
   //begin setting density at each gridpoint:
@@ -1994,19 +2113,19 @@ int set_density(double *nATP, double *nE, double *mem_A){
     for (int j=0;j<Ny;j++){
       for (int k=0;k<Nz;k++){
         if (inside(i,j,k)){
-          if(k>density_divider_z){
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_right;
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_right;
+          if ((rand_seed == 96 && k>vert_div && j<hor_div) || (rand_seed != 96 && k>density_divider_right)) {
+            nATP[i*Ny*Nz+j*Nz+k] = 0;
             nADP[i*Ny*Nz+j*Nz+k] =0;
-            ND[i*Ny*Nz+j*Nz+k] =0;
+            ND[i*Ny*Nz+j*Nz+k] = proteins_per_area*mem_A[i*Ny*Nz+j*Nz+k]*density_factor_high_dens;
             NDE[i*Ny*Nz+j*Nz+k] = 0;
+            nE[i*Ny*Nz+j*Nz+k] = 0;
           }
           else {
-            nATP[i*Ny*Nz+j*Nz+k] = nATP_starting_density*density_factor_left;
-            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_left;
+            nATP[i*Ny*Nz+j*Nz+k] = 0;
             nADP[i*Ny*Nz+j*Nz+k] =0;
-            ND[i*Ny*Nz+j*Nz+k] =0;
+            ND[i*Ny*Nz+j*Nz+k] = proteins_per_area*mem_A[i*Ny*Nz+j*Nz+k]*density_factor_low_dens;
             NDE[i*Ny*Nz+j*Nz+k] = 0;
+            nE[i*Ny*Nz+j*Nz+k] = 0;
           }
         }
         else {
@@ -2015,6 +2134,51 @@ int set_density(double *nATP, double *nE, double *mem_A){
           nADP[i*Ny*Nz+j*Nz+k] =0;
           ND[i*Ny*Nz+j*Nz+k] =0;
           NDE[i*Ny*Nz+j*Nz+k] = 0;
+        }
+      }
+    }
+  }
+  //now set nDE
+  gridpoints_low_dens = 0;
+  gridpoints_high_dens = 0;
+  gridpoints_total = 0;
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          gridpoints_total++;
+          if ((rand_seed == 96 && k<vert_div && j<hor_div) || (rand_seed != 96 && k<density_divider_left)) {
+            gridpoints_high_dens++;
+          }
+          else {
+            gridpoints_low_dens++;
+          }
+        }
+      }
+    }
+  }
+
+  //compute density scale factors low_dens and high_dens of divide (to ensure correct protein #)
+  density_factor_low_dens = gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
+  density_factor_high_dens = density_factor*gridpoints_total/(gridpoints_low_dens + density_factor*gridpoints_high_dens);
+
+  printf("Density factors: low_dens: %f, high_dens: %f, ratio: %f\n", density_factor_low_dens, density_factor_high_dens, density_factor_high_dens/density_factor_low_dens);
+
+  printf("Gridpoints low_dens of the divider: %d\n",gridpoints_low_dens);
+  printf("Gridpoints high_dens of the divider:%d\n",gridpoints_high_dens);
+  printf("Gridpoints total: %d\n",gridpoints_total);
+
+  //begin setting density at each gridpoint:
+  for (int i=0;i<Nx;i++){
+    for (int j=0;j<Ny;j++){
+      for (int k=0;k<Nz;k++){
+        if (inside(i,j,k)){
+          if ((rand_seed == 96 && k<vert_div && j<hor_div) || (rand_seed != 96 && k<density_divider_left)) {
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_high_dens;
+          }
+          else {
+            nE[i*Ny*Nz+j*Nz+k] = nE_starting_density*density_factor_low_dens;
+          }
         }
       }
     }
