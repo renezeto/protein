@@ -36,9 +36,46 @@ def returnData(boxName,proteinType):
     output = np.array(proteinsOverTime)
     return (output)
 
+def find_period(f):
+    """
+      Find the period of a function that is described by the input
+      array f, and return indices for a start and end range for one
+      period.  If we cannot find the period accurately, just return
+      the entire range.
+    """
+    # first we look at the fft to get a guess at the period (probably
+    # not *too* accurate or too bad).
+    fk = np.fft.fft(f)
+    fk[0] = 0
+    kmax = 1
+    fkmax = np.abs(fk[:int(len(fk)/2)]).max()
+    for i in xrange(1,int(len(fk)/2)):
+        if np.abs(fk[i]) == fkmax:
+            kmax = i
+            break
+    #print 'kmax is', kmax
+    period_estimate = len(f)/kmax
+    #plt.plot(np.abs(fk))
+    #plt.figure()
+    if kmax < 5:
+        return (0, len(f))
+    # now we locate the final minimum of the function.
+    lastmin = len(f)-2
+    while f[lastmin] > f[lastmin+1] or f[lastmin] > f[lastmin-1]:
+        lastmin -= 1
+    # and last (but not least), we locate the second-to-last
+    # (penultimate) minimum, which should have a very similar value to
+    # the final minimum.
+    penultimate_min = lastmin - int(period_estimate*.7)
+    while f[penultimate_min] > f[penultimate_min+1] or f[penultimate_min] > f[penultimate_min-1] or np.abs(f[penultimate_min]/f[lastmin]-1) > 0.01:
+        penultimate_min -= 1
+    #return (0, len(f) - 1)
+    if penultimate_min < 0:
+        return (0, len(f))
+    return (penultimate_min, lastmin)
+
 
 def main():
-
     with open("./data/shape-%s/%s%s%sbox-plot--%s-%s-%s-%s-%s-%s.dat"%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5),"r") as boxData:
         fileLines = boxData.readlines()
 
@@ -87,11 +124,17 @@ def main():
         plotCurveList_D += [returnData(boxName,protein)]
 
     #get a time axis for the plot from the length of one of the data sets we have
-    timeAxis = range(len(plotCurveList_D[0]))
+    #timeAxis = range(len(plotCurveList_D[0]))
+    difD = 2.5 # (um)^2 s^- 1
+    time_step = .1*load.dx*load.dx/difD #sec
+    print_denominator = 1000 #This is from the c++ I wanted to format things the same here.
+    box_time_step = time_step*print_denominator
+    timeAxis = np.linspace(0,box_time_step*len(plotCurveList_D[0]),len(plotCurveList_D[0]))
+
 
     #begin messy code (to deal with matplotlib) - don't judge me
-    (start, end) = (int(5.3*int(len(timeAxis)/10)),int(5.7*int(len(timeAxis)/10)))
-
+    #(start, end) = (int(5.3*int(len(timeAxis)/10)),int(5.7*int(len(timeAxis)/10)))
+    (start, end) = find_period(plotCurveList_D[3])
 
     #integral of proteins over time
     for i in range(numPlots_D):
@@ -117,7 +160,7 @@ def main():
                  plotCurveList_D[i][start:end],
                  color=colorScale[j],alpha=alphaScale_D[k])
         k+=1
-    plt.xlim(start,end+.40*(end-start))
+    plt.xlim(timeAxis[start],timeAxis[end-1])
     #plt.ylim(0,10000)
     plt.title("Min D protein counts over time")
     plt.xlabel("Time (s)")
@@ -131,7 +174,3 @@ if __name__ == '__main__':
     main()
 
 
-#     return 0
-
-# if __name__ == '__main__':
-#     main()
