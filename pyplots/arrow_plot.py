@@ -6,7 +6,7 @@ if "show" not in sys.argv:
 import matplotlib.pyplot as plt
 import numpy as np
 import file_loader as load
-
+from matplotlib.font_manager import FontProperties
 
 #membrane.dat or arrow.dat printed transposed, gotta align them:
 cell_membrane_initial = np.loadtxt("./data/shape-%s/membrane_files/%s%s%ssections-%s-%s-%s-%s-%s-%s.dat"%
@@ -17,24 +17,6 @@ cell_membrane_initial = np.loadtxt("./data/shape-%s/membrane_files/%s%s%ssection
 #this is algorithm want
 Ny = len(cell_membrane_initial[:,0])
 Nz = len(cell_membrane_initial[0,:])
-
-max_x_pos = 0
-max_y_pos = 0
-min_x_pos = 1000
-for y_pos in range(len(cell_membrane_initial[0,:])):
-    for x_pos in range(len(cell_membrane_initial[:,0])):
-        if cell_membrane_initial[x_pos,y_pos] != 0.0:
-            if x_pos > max_x_pos:
-                max_x_pos = x_pos
-            if y_pos > max_y_pos:
-                max_y_pos = y_pos
-            if x_pos < min_x_pos:
-                min_x_pos = x_pos
-print load.dx*Ny
-print "Max:"
-print load.dx*max_x_pos
-print "Min:"
-print load.dx*min_x_pos
 
 temp_array = np.zeros((Ny+1,Nz+1))
 temp_array[:-1,:-1] = cell_membrane_initial
@@ -59,8 +41,8 @@ if load.f_param4 != "94.00":
 for protein in load.proteinList:
     tails = np.loadtxt('./data/shape-%s/%s%s%sarrow-plot-%s-%s-%s-%s-%s-%s-%s.dat'%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,protein,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
     tails = [list(element) for element in tails]
-    cut = 10
-    tails = [tail for tail in tails[0:cut][:]]
+    cut = len(tails)-10
+    tails = [tail for tail in tails[cut:][:]]
     # z_max = max(tails[:][2])
     # z_min = min(tails[:][2])
     # print "z_max = ",z_max
@@ -95,28 +77,26 @@ for protein in load.proteinList:
     heads = [[load.dx*(tails[1][1]-tails[0][1]),load.dx*(tails[1][0]-tails[0][0])]]
     heads += [[load.dx*(tails[i+1][1]-tails[i][1]), load.dx*(tails[i+1][0]-tails[i][0])] for i in range(1,len(tails)-1)]
     tails = [[load.dx*tails[i][1],load.dx*tails[i][0]] for i in range(len(tails))]
-    displacements = [tail_element+head_element for (tail_element,head_element) in zip(tails,heads)] #in format: [point_x, point_y, vector_component_x, vector_component_y]
-    X,Y,U,V = zip(*displacements)
     plt.figure()
     plt.axes().set_aspect('equal', 'datalim')
     plt.ax = plt.gca()
-    #place numbers
+    font=FontProperties()
+    font.set_family('serif')
     for i in range(len(tails)-1):
         radial_length = np.sqrt((tails[i][0]-load.dx*Ny/2.0)**2+(tails[i][1]-load.dx*Nz/2.0)**2)
         dir_z = (tails[i][0]-load.dx*Nz/2.0)/radial_length
         dir_y = (tails[i][1]-load.dx*Ny/2.0)/radial_length
-        number_zpos = tails[i][0]+.15*dir_z
-        number_ypos = tails[i][1]+.15*dir_y
-        plt.ax.annotate('',xy=(tails[i+1][0],tails[i+1][1]),xytext=(tails[i][0],tails[i][1]),#xytext=(tails[i][0],tails[i][1]),
+        number_zpos = tails[i][0]+.18*dir_z
+        number_ypos = tails[i][1]+.18*dir_y
+        plt.ax.annotate('',xy=(tails[i+1][0],tails[i+1][1]),xytext=(tails[i][0],tails[i][1]),
                         fontsize=7,
-                        #fontproperties=font,
-                        arrowprops=dict(facecolor='black',shrink=0.01, width=.3, headwidth=5.))
-        plt.ax.text(number_zpos,number_ypos,"%d"%i,fontsize=9)
+                        arrowprops=dict(facecolor='red',shrink=0.01, width=.3, headwidth=5.))
+        plt.ax.text(number_zpos,number_ypos,"%d"%(i+1),fontsize=30,fontproperties=font,color='red')
     cell_membrane[cell_membrane>0] = 1
     cell_x = np.linspace(0,load.dx*len(cell_membrane[0,:]),len(cell_membrane[0,:]))
     cell_y = np.linspace(0,load.dx*len(cell_membrane[:,0]),len(cell_membrane[:,0]))
-    plt.contour(cell_x,cell_y,cell_membrane, levels=[.5])
-     #plt.ax.quiver(X,Y,U,V,scale_units='xy',angles='xy',scale=1)
+    plt.contour(cell_x,cell_y,cell_membrane, linewidths=2,levels=[.99])
+    #plt.ax.quiver(X,Y,U,V,scale_units='xy',angles='xy',scale=1)
     plt.ax.get_yaxis().set_visible(False)
     plt.ax.get_xaxis().set_visible(False)
     plt.xlim((0,load.dx*cell_membrane.shape[1]))
@@ -127,8 +107,3 @@ for protein in load.proteinList:
     plt.savefig(load.print_string("arrow-plot",protein))
 
 plt.show()
-# contour-only keyword arguments:
-
-# linewidths: [ None | number | tuple of numbers ]
-# If linewidths is None, the default width in lines.linewidth in matplotlibrc is used.
-
