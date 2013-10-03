@@ -93,9 +93,10 @@ def build(proteins,proteinList):
                 spread.paste(cropped, (0,box[3]*i))
             else:
                 spread.paste(cropped, (cut+(init_box[2]-2*cut)*(k-int(start_time/dump_time_step)),box[3]*i))
-    spread.save("data/shape-"+f_shape +"/plots/"+load.debug_str+load.hires_str+load.slice_str+"image-" \
-                            +f_shape+"-"+f_param1+"-"+f_param2 \
-                            +"-"+f_param3+"-"+f_param4+"-"+f_param5+".pdf")
+    spread.save(load.print_string("image-plot_E",""))
+    #spread.save("data/shape-"+f_shape +"/plots/"+load.debug_str+load.hires_str+load.slice_str+"image-" \
+    #                        +f_shape+"-"+f_param1+"-"+f_param2 \
+    #                        +"-"+f_param3+"-"+f_param4+"-"+f_param5+".pdf")
 
 proteinList = ["nADP","nATP","ND","nE","NDE"]#["nE","nATP","nADP","ND"]#,"NDE"]
 proteins = [0]*len(proteinList)
