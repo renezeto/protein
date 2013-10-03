@@ -140,6 +140,20 @@ def main():
             if "E_" in proteinType:
                 plotNameList_E += ["%s-%s"%(box,proteinType)]
 
+    print plotNameList_D
+    new_plotNameList_D = [0]*len(plotNameList_D)
+    P_Ord = [3,0,2,1,7,4,6,5,11,8,10,9]
+    if load.f_param4 == '97.00' or load.f_param4 == '96.00':
+        P_Ord = [3,0,2,1,7,4,6,5,11,8,10,9,15,12,14,13]
+    for i in range(len(P_Ord)):
+        new_plotNameList_D[i] = plotNameList_D[P_Ord[i]]
+    for i in range(len(plotNameList_D)):
+        plotNameList_D[i] = new_plotNameList_D[i]
+    print plotNameList_D
+    plotProteinLabels = ['MinD:ATP (cyto)','MinD:ATP (mem)','MinE:MinD:ATP','MinD:ADP (cyto)']
+    print plotProteinLabels
+
+
     #pass plotNameList through stackData to generate the list of line data to be plotted
     plotCurveList_D = stackData(plotNameList_D)
     plotCurveList_E = stackData(plotNameList_E)
@@ -155,6 +169,9 @@ def main():
 
     start_time_as_frac_of_ten = float(load.f_param6)
     end_time_as_frac_of_ten = float(load.f_param7)
+    tot_time = len(plotCurveList_D[0])*box_time_step
+    start = int(tot_time*start_time_as_frac_of_ten/10.0/box_time_step)
+    end = int(tot_time*end_time_as_frac_of_ten/10.0/box_time_step)
     (start, end) = find_period(plotCurveList_D[3])
 
     #print set(plotCurveList_D[1]).union(set(plotCurveList_D[2]))
@@ -264,14 +281,10 @@ def main():
                 "1$\mu$", # label of the bar
                 #bbox_to_anchor=(0.,0.,1.,1.),
                 loc=8, # 'best', # location (lower right)
-                pad=-(ymax-ymin)/2.0 +.5, borderpad=0.25, sep=3,
+                pad=-(ymax-ymin)/2.0 + 0.4, borderpad=0.25, sep=3,
                 frameon=False
                 ))
     plot_sections(sectionax, sectiondata)
-    print load.f_shape
-    print load.f_param4
-    print numProteinTypes_D
-    print len(plotCurveList_D[:,0])
     section_names = ['Left Section','Center Section','Right Section']
     if load.f_param4 == '97.00' or load.f_param4 == '96.00':
         section_names = ['Left Lower Section','Left Center Section','Left Upper Section','Right Center Section']
@@ -279,7 +292,6 @@ def main():
     font=FontProperties()
     font.set_family('serif')
     text_adjust = -.2*box_time_step*(end-start)
-    plotProteinLabels = ['MinD:ATP (cyto)','MinE (mem)','MinD:ADP (cyto)','MinD:ATP (mem)']
     j=0
     k=0
     for i in range(len(plotCurveList_D[:,0])):
