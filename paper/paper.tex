@@ -84,9 +84,7 @@ round cell phenotypes.\cite{drew2005polymerization}
 broader scope have also been used to study the MinD system and show
 consistent results.\cite{arjunan2010new}.  However, in general the
 results of the stochastic and monte-carlo simulations are similar to
-those given by Huang's mean field results.  They both show the
-characteristic oscillations in the pill shaped cells.  We do not see
-any compelling reason to avoid using this simple and successful model.
+those given by Huang's mean field results.
 
 Previous studies have been made of the Min system's associtation with
 the cell membrane
@@ -200,6 +198,92 @@ protein concentrations in the cell over time.
 %%   \label{frequency-plot-40-20-0-0-150}
 %% \end{figure}
 
+
+Our simplest shape is the naturally occuring pill shape.  We peice this shape
+together as two hemispherical endcaps attached on either end of a
+cylinder.  This shape follows the early simulations of Huang et al but
+differs in that we have added the end caps for a more natural shape,
+expecting similar results.  We test cells of radius $.5\mu$ and of
+lengths $2\mu$, $3\mu$, and $5\mu$ between both tips of the end
+caps. In all these models we observe quick establishement (within a
+few periods) of extremely regular oscillatory behavoir that lasts for
+any length of time, with periods that closely agree with the results
+of Huang et al.  The following table shows the periods of oscillations
+at different cell lengths.
+
+\begin{table}
+  \begin{tabular}{|r|c|c|c|l|}
+    \hline
+    Length($\mu$) & 2.50 & 3.00 & 4.00 & 5.00\\
+    \hline
+    Period(sec) & sim & 33 & 38 & 48 \\ \cline{2-2}
+    \hline
+  \end{tabular}
+  \caption{Period According to Pill Length}
+\end{table}
+
+%% \begin{figure*}
+%%   \includegraphics[width=\textwidth]{../data/shape-p/plots/image-plot_E--p-200-50-0-0-1500}
+%%   \caption{Frames from an animation showing a series of contour plots
+%%     of the concentration of proteins in different stages over time.
+%%     The density of proteins are integrated along the axis
+%%     normal to the page. The frames occur 2.5 seconds apart.}
+%%   \label{total-oscillation-plot}
+%% \end{figure*}
+
+This simple model is a good starting point for observing in
+detail the dynamic interaction between the different stages of protein
+that lead to their qualitatively distinct behavoir. Figure (Figure
+image) shows the process in a series of frames taken from simulation
+animations.  The causal chain is cyclical so we can begin our
+observations at any stage in the cycle.  We look first at MinD:ATP
+floating freely in the cytoplasm.  The protein will not react with any
+other floating protein, and it will not spontenously shift back into
+the MinD:ADP stage of the cycle.  It will diffuse until it attaches to
+a cell membrane.  When compared to a protein that is in the middle
+cylindrical section of the cell, a protein that is in an end cap
+section is more likely to bump into a wall in a given number of
+diffusive steps, since there is a greater cross section of possible
+movement that is covered by a nearby wall.  All else being equal,
+proteins will collect with a higher rate on the caps.  This effect is
+made more pronounced by the MinD:ATP tendency to attract and cluster.
+When adjacent to the membrane, the rate of binding to the membrane is
+porportional to the amount of MinD already bound there.  Initially,
+then, there is a strong tendency of MinD to cluster in the polar
+regions of the cell.
+
+The next observed mechanism is the formation of MinE 'rings' on the
+membranes of the polar caps.  As the freely
+diffusing MinE enters the cap portion it begins to encounter
+concentrated membrane bound MinD.  As it bumps into the walls here it
+binds to this MinD and remians for a time on the walls in compound
+form.  When it is released, it can diffuse naturally outward or inward
+towards the cell.  If it diffuses inward, there is less cross
+sectional wall for it to bump into and also less concentrated MinD:ATP
+to react with.  If it diffuses outward, the curvature of the cell wall
+cuases there to be a greater chance that it will bump into the cell
+membrane (for the same reason outlined for the MinD:ATP above) and if
+there is MinD:ATP bound there, there is a chance that it will bind to
+that protein and react again.  If it does diffuse in this directin, it
+will likely react with MinD:ATP before getting very far into the
+encap.  Thus after dettaching from the membrane at the edge of the
+MinD:ATP encap cluster, the MinE is most likely to travel a small
+distance further into the polar region and then attach and react again
+with MinD:ATP protein there.  This process results in the observed
+qualitative 'encroaching MinE ring' behavoir that released MinD:ADP
+back into the cytoplasm.  This MinD:ADP will diffuse for a time before
+spontanosly uindergowing hydrolysis \fixme{is this right?} and
+reaching the MinD:ATP state that can bind to the membrane again.
+There is a strong chance that it has by this time diffused out of the
+polar region and is on its way to the opposite polar region of the
+cell.  If it hasn't then it will reattach to the MinD:ATP on the cell
+wall deeper into the endcap and will eventually be converged upon by
+the MinE ring, only to be released again in MinD:ADP form.
+
+Overall this process results in an extremely robust oscillatory
+behavoir of polar selection and oscillation in a wide variety of cell
+shapes.
+
 \begin{figure}
   %%\includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-400-50-0-0-1500}
   \includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-200-50-0-0-1500}
@@ -216,20 +300,34 @@ protein concentrations in the cell over time.
   \label{total-oscillation-plot}
 \end{figure}
 
-Figure \ref{total-oscillation-plot} shows total protein
-results for pill shaped cell of length $5\mu$ and radius $.5\mu$.  The
-plot shows both the transerence between different stages of protein
-compound and movement within the cell.  Starting at the beginning of a
-period, we can see that first there is a spike on the left of MinD-ATP
-attached to the wall that is accompanied by a growing number of
-cytoplasmic MinD-ATP and MinD-ADP that are entering the left section,
-followed by a high peak in MinD-MinE-ATP.  This peak gives way through
-the middle to peaks on the right side of the cell, the first being a
-small bump in cytoplasmic MinD-ATP that dissapears into a much larger
-spike in wall attached MinD-ATP, which is followed by a peak in wall
-attached MinD-MinE-ATP.  The pattern during each period clearly shows
-the cycle of proteins rections, as well as the very regular nature of
-the pole to pole protein oscillations.
+Figure \ref{total-oscillation-plot} is a plot of the total fraction of
+MinD found in each stage of the cycle in each of three sections of the
+cell (we have split the pill into two polar sections and one center
+section) over time.  One complete oscillation period is shown, in
+which one of the poles begins and ends at a maximum density
+concentration and the other a minimum denisty concentration.  Looking
+at the evolution of the latter, we see an initial high concentration
+of cytoplasmic MinD:ATP, as the this protein diffuses into the polar
+region, followed by a dip in this and large spike in membrane bound
+MinD:ATP, as the protein clusters onto the polar cell wall, followed
+by a spike in the memebrane bound MinE:MinD:ATP stage of protein,
+together with a slight rise in cytoplasmic MinD:ADP as the MinD
+dettaches from the wall.
+
+results for pill shaped cell of length
+$5\mu$ and radius $.5\mu$.  The plot shows both the transerence
+between different stages of protein compound and movement within the
+cell.  Starting at the beginning of a period, we can see that first
+there is a spike on the left of MinD-ATP attached to the wall that is
+accompanied by a growing number of cytoplasmic MinD-ATP and MinD-ADP
+that are entering the left section, followed by a high peak in
+MinD-MinE-ATP.  This peak gives way through the middle to peaks on the
+right side of the cell, the first being a small bump in cytoplasmic
+MinD-ATP that dissapears into a much larger spike in wall attached
+MinD-ATP, which is followed by a peak in wall attached MinD-MinE-ATP.
+The pattern during each period clearly shows the cycle of proteins
+rections, as well as the very regular nature of the pole to pole
+protein oscillations.
 
 \fixme{our 5 length cells are labeled as 4 cells in the file labels,
   since 4 is the length of the cylinder. In the text I'll refer to the
@@ -601,6 +699,14 @@ other base corner, skipping any maxima steps in the middle (the top of
 the A), while the MinD-ADP, the stage that has just left the wall,
 shows no such behavoir.  Every base corner maxima is followed by a top
 corner maxima, with very obvious symmetry.
+
+%% \begin{center}
+%%   \begin{figure}
+%%     {\includegraphics[width=\paperwidth]{../data/shape-randst/plots/image-plot_E--randst-25-602-602-9900-1500}}
+%%     \caption{Attempt at adding image plot to paper.}
+%%     \label{image-plot}
+%%   \end{figure}
+%% \end{center}
 
 \section{Interpretation of Data}
 \section{Conclusion}
