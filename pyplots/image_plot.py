@@ -68,11 +68,6 @@ def build(proteins,proteinList):
         Z, Y = np.meshgrid(np.arange(0,proteins[i].datashape[1],1), np.arange(0,proteins[i].datashape[0],1))
     #generate a sequence of .png's for each file (printed time step). these will be used to create a gif.
         for k in range(int(end_time/dump_time_step)-int(start_time/dump_time_step)):
-            print "1st prints"
-            print k
-            print maxval
-            print minval
-            sys.stdout.flush()
             page = proteins[i].dataset[k]
             plt.clf()
             plt.axes().set_aspect('equal', 'datalim')
@@ -90,20 +85,15 @@ def build(proteins,proteinList):
                                +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
             init_box = orig.getbbox()
             cut = 60
-            print "2nd prints"
-            print cut
-            print init_box[2]
-            print init_box[3]
-            sys.stdout.flush()
             box = (cut,0,init_box[2]-cut,init_box[3])
-            if (k == int(start_time/dump_time_step)):
+            if (k == 0):
                 box = (0,0,init_box[2]-cut,init_box[3])
             cropped = orig.crop(box)
             del orig
-            if (k == int(start_time/dump_time_step)):
+            if (k == 0):
                 spread.paste(cropped, (0,box[3]*i))
             else:
-                spread.paste(cropped, (cut+(init_box[2]-2*cut)*(k-int(start_time/dump_time_step)),box[3]*i))
+                spread.paste(cropped, (cut+(init_box[2]-2*cut)*k,box[3]*i))
     spread.save(load.print_string("image-plot",""))
     #spread.save("data/shape-"+f_shape +"/plots/"+load.debug_str+load.hires_str+load.slice_str+"image-" \
     #                        +f_shape+"-"+f_param1+"-"+f_param2 \
