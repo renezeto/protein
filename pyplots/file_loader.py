@@ -44,7 +44,14 @@ filename_tuple = (f_shape,hires_str,slice_str,f_shape,f_param1,f_param2,f_param3
 class data(object):
     def __init__(self,protein):
         self.protein = protein
-        self.filenames = self.get_filenames(protein)
+        self.filenames = self.get_filenames(protein,0,0)
+        self.tsteps = len(self.filenames)
+        self.dataset = np.array([np.loadtxt(file) for file in self.filenames])
+        self.datashape = self.dataset[0].shape
+        self.axes = [[i*dx for i in range(self.datashape[1])],[j*dx for j in range(self.datashape[0])]]
+    def __init__(self,protein,start_time,end_time):
+        self.protein = protein
+        self.filenames = self.get_filenames(protein,start_time,end_time)
         self.tsteps = len(self.filenames)
         self.dataset = np.array([np.loadtxt(file) for file in self.filenames])
         self.datashape = self.dataset[0].shape
@@ -52,10 +59,16 @@ class data(object):
 
 #loads the files for creating the data object.
     @staticmethod
-    def get_filenames(protein):
+    def get_filenames(protein,start_time,end_time):
         dat_filenames = []
-        for fn in glob.iglob("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)):
-            dat_filenames.append(fn)
+        if end_time == 0:
+            for fn in glob.iglob("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)):
+                dat_filenames.append(fn)
+        if end_time != 0:
+            for i in np.arange(start_time,end_time,2.5):
+                file_num = round(i/2.5)
+                dat_filenames.append("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-%d.dat"%
+                                     (f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5,file_num))
         dat_filenames = sorted(dat_filenames)
         i=0 #pop the first 10% of file names to let things equillibriate a bit
         while i<round(len(dat_filenames)/10):
