@@ -56,13 +56,15 @@ def timemin(protein):
     return minval
 
 def build(proteins,proteinList):
-    total_length = int((end_time/dump_time_step)+1)- int(start_time/dump_time_step)
-    spread = Image.new("RGB", (120+300*total_length, 300*len(proteins)), "white")
+    total_length = int(end_time/dump_time_step)- int(start_time/dump_time_step)
+    cut = 40
+    spread = Image.new("RGB", (120+(400-2*cut)*total_length, 300*len(proteins)), "white")
     for i in range(len(proteins)):
         if (proteinList[i]=="ND" or proteinList[i]=="NDE"):
             maxval = timemax(proteins[i])
         else:
             maxval = timemax(proteins[i])
+        sys.stdout.flush()
         minval = timemin(proteins[i])
         plt.figure()
         Z, Y = np.meshgrid(np.arange(0,proteins[i].datashape[1],1), np.arange(0,proteins[i].datashape[0],1))
@@ -71,7 +73,8 @@ def build(proteins,proteinList):
             page = proteins[i].dataset[k]
             plt.clf()
             plt.axes().set_aspect('equal', 'datalim')
-            CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval,.1))
+            color_plot_steps = (maxval-minval)/100
+            CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,1.1*maxval,color_plot_steps))
         #plt.axis('off')
             plt.axes().get_xaxis().set_ticks([])
             plt.axes().get_yaxis().set_ticks([])
@@ -84,7 +87,6 @@ def build(proteins,proteinList):
                                +"-"+str(proteins[i].protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
                                +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
             init_box = orig.getbbox()
-            cut = 60
             box = (cut,0,init_box[2]-cut,init_box[3])
             if (k == 0):
                 box = (0,0,init_box[2]-cut,init_box[3])
@@ -94,6 +96,7 @@ def build(proteins,proteinList):
                 spread.paste(cropped, (0,box[3]*i))
             else:
                 spread.paste(cropped, (cut+(init_box[2]-2*cut)*k,box[3]*i))
+        plt.close()
     spread.save(load.print_string("image-plot",""))
     #spread.save("data/shape-"+f_shape +"/plots/"+load.debug_str+load.hires_str+load.slice_str+"image-" \
     #                        +f_shape+"-"+f_param1+"-"+f_param2 \
