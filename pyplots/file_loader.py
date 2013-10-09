@@ -49,13 +49,13 @@ class data(object):
         self.dataset = np.array([np.loadtxt(file) for file in self.filenames])
         self.datashape = self.dataset[0].shape
         self.axes = [[i*dx for i in range(self.datashape[1])],[j*dx for j in range(self.datashape[0])]]
-    def __init__(self,protein,start_time,end_time):
-        self.protein = protein
-        self.filenames = self.get_filenames(protein,start_time,end_time)
-        self.tsteps = len(self.filenames)
-        self.dataset = np.array([np.loadtxt(file) for file in self.filenames])
-        self.datashape = self.dataset[0].shape
-        self.axes = [[i*dx for i in range(self.datashape[1])],[j*dx for j in range(self.datashape[0])]]
+    # def __init__(self,protein,start_time,end_time):
+    #     self.protein = protein
+    #     self.filenames = self.get_filenames(protein,start_time,end_time)
+    #     self.tsteps = len(self.filenames)
+    #     self.dataset = np.array([np.loadtxt(file) for file in self.filenames])
+    #     self.datashape = self.dataset[0].shape
+    #     self.axes = [[i*dx for i in range(self.datashape[1])],[j*dx for j in range(self.datashape[0])]]
 
 #loads the files for creating the data object.
     @staticmethod
