@@ -32,45 +32,49 @@ def maxnum(page):
 def minnum(page):
     Z = [0. for i in range(page.shape[0])]
     for i in range(page.shape[0]):
+        for j in range(len(page[i])):
+            if page[i][j] == 0:
+             page[i][j] = 50000000 #eh
         Z[i] = min(page[i])
-        if Z[i] == 0:
-            Z[i] = 50000000 #eh
     minval = min(Z)
     return minval
 
 #computes the global maximum over a set of two dimensional arrays (stored as files)
 def timemax(protein):
     Z = [0. for i in range(protein.tsteps)]
-    for i in (range(int(start_time/dump_time_step),int(end_time/dump_time_step)+1)):
-        Z[i+1] = maxnum(protein.dataset[i+1])
+    for i in (range(int(end_time/dump_time_step)-int(start_time/dump_time_step))):
+        Z[i] = maxnum(protein.dataset[i])
     maxval = max(Z)
     return maxval
 
 #computes the global minimum over a set of two dimensional arrays (stored as files)
 def timemin(protein):
     Z = [0. for i in range(protein.tsteps)]
-    for i in (range(int(start_time/dump_time_step),int(end_time/dump_time_step)+1)):
-        Z[i+1] = minnum(protein.dataset[i+1])
+    for i in (range(int(end_time/dump_time_step)-int(start_time/dump_time_step))):
+        Z[i] = minnum(protein.dataset[i])
     minval = min(Z)
     return minval
 
 def build(proteins,proteinList):
-    total_length = int((end_time/dump_time_step)+1)- int(start_time/dump_time_step)
-    spread = Image.new("RGB", (120+400*total_length, 300*len(proteins)), "white")
+    total_length = int(end_time/dump_time_step)- int(start_time/dump_time_step)
+    cut = 40
+    spread = Image.new("RGB", (120+(400-2*cut)*total_length, 300*len(proteins)), "white")
     for i in range(len(proteins)):
         if (proteinList[i]=="ND" or proteinList[i]=="NDE"):
             maxval = timemax(proteins[i])
         else:
             maxval = timemax(proteins[i])
+        sys.stdout.flush()
         minval = timemin(proteins[i])
         plt.figure()
         Z, Y = np.meshgrid(np.arange(0,proteins[i].datashape[1],1), np.arange(0,proteins[i].datashape[0],1))
     #generate a sequence of .png's for each file (printed time step). these will be used to create a gif.
-        for k in range(int(start_time/dump_time_step),int(end_time/dump_time_step)+1): #fig.dpi method
+        for k in range(int(end_time/dump_time_step)-int(start_time/dump_time_step)):
             page = proteins[i].dataset[k]
             plt.clf()
             plt.axes().set_aspect('equal', 'datalim')
-            CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval,.1))
+            color_plot_steps = (maxval-minval)/100
+            CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,1.1*maxval,color_plot_steps))
         #plt.axis('off')
             plt.axes().get_xaxis().set_ticks([])
             plt.axes().get_yaxis().set_ticks([])
@@ -83,17 +87,17 @@ def build(proteins,proteinList):
                                +"-"+str(proteins[i].protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
                                +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png")
             init_box = orig.getbbox()
-            cut = 60
             box = (cut,0,init_box[2]-cut,init_box[3])
-            if (k == int(start_time/dump_time_step)):
+            if (k == 0):
                 box = (0,0,init_box[2]-cut,init_box[3])
             cropped = orig.crop(box)
             del orig
-            if (k == int(start_time/dump_time_step)):
+            if (k == 0):
                 spread.paste(cropped, (0,box[3]*i))
             else:
-                spread.paste(cropped, (cut+(init_box[2]-2*cut)*(k-int(start_time/dump_time_step)),box[3]*i))
-    spread.save(load.print_string("image-plot_E",""))
+                spread.paste(cropped, (cut+(init_box[2]-2*cut)*k,box[3]*i))
+        plt.close()
+    spread.save(load.print_string("image-plot",""))
     #spread.save("data/shape-"+f_shape +"/plots/"+load.debug_str+load.hires_str+load.slice_str+"image-" \
     #                        +f_shape+"-"+f_param1+"-"+f_param2 \
     #                        +"-"+f_param3+"-"+f_param4+"-"+f_param5+".pdf")
@@ -101,9 +105,8 @@ def build(proteins,proteinList):
 proteinList = ["nADP","nATP","ND","nE","NDE"]#["nE","nATP","nADP","ND"]#,"NDE"]
 proteins = [0]*len(proteinList)
 
-plt.figure()
 for i in range(len(proteinList)):
-    proteins[i] = load.data(proteinList[i])
+    proteins[i] = load.data(proteinList[i],start_time,end_time)
 
 build(proteins,proteinList)
 #may need to use --mem-per-cpu=4000 after the srun for this
