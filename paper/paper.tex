@@ -188,17 +188,6 @@ protein concentrations in the cell over time.
 
 
 
-%% \begin{figure}
-%%   \includegraphics[width=\columnwidth]{../data/shape-p/plots/frequency-plot-all-NflD-p-40-20-0-0-150.pdf}
-%%   \caption{Protein density fluctuation with time against the polar
-%%     wall in a 4$\mu m$ by 2$\mu m$ pill shaped cell.  The wall-bound
-%%     proteins are shown at a point that is on the wall and the
-%%     cytoplasm densities are shown at a point immediately adjecent.
-%%     This plot is normalized so that every protein density peaks at 1}
-%%   \label{frequency-plot-40-20-0-0-150}
-%% \end{figure}
-
-
 Our simplest shape is the naturally occuring pill shape.  We peice this shape
 together as two hemispherical endcaps attached on either end of a
 cylinder.  This shape follows the early simulations of Huang et al but
@@ -220,37 +209,29 @@ at different cell lengths.
     \hline
   \end{tabular}
   \caption{Period According to Pill Length}
+  \label{table-p}
 \end{table}
 
-%% \begin{figure*}
-%%   \includegraphics[width=\textwidth]{../data/shape-p/plots/image-plot_E--p-200-50-0-0-1500}
-%%   \caption{Frames from an animation showing a series of contour plots
-%%     of the concentration of proteins in different stages over time.
-%%     The density of proteins are integrated along the axis
-%%     normal to the page. The frames occur 2.5 seconds apart.}
-%%   \label{total-oscillation-plot}
-%% \end{figure*}
-
-This simple model is a good starting point for observing in
-detail the dynamic interaction between the different stages of protein
-that lead to their qualitatively distinct behavoir. Figure (Figure
-image) shows the process in a series of frames taken from simulation
-animations.  The causal chain is cyclical so we can begin our
-observations at any stage in the cycle.  We look first at MinD:ATP
-floating freely in the cytoplasm.  The protein will not react with any
-other floating protein, and it will not spontenously shift back into
-the MinD:ADP stage of the cycle.  It will diffuse until it attaches to
-a cell membrane.  When compared to a protein that is in the middle
-cylindrical section of the cell, a protein that is in an end cap
-section is more likely to bump into a wall in a given number of
-diffusive steps, since there is a greater cross section of possible
-movement that is covered by a nearby wall.  All else being equal,
-proteins will collect with a higher rate on the caps.  This effect is
-made more pronounced by the MinD:ATP tendency to attract and cluster.
-When adjacent to the membrane, the rate of binding to the membrane is
-porportional to the amount of MinD already bound there.  Initially,
-then, there is a strong tendency of MinD to cluster in the polar
-regions of the cell.
+This simple model is a good starting point for observing in detail the
+dynamic interaction between the different stages of protein that lead
+to their qualitatively distinct behavoir. Figure \ref{image-p} shows
+the process in a series of frames taken from simulation animations.
+Each frame is 2.5 seconds ahead of the last.  The causal chain is
+cyclical so we can begin our observations at any stage in the cycle.
+We consider first MinD:ATP floating freely in the cytoplasm.  The
+protein will not react with any other floating protein, and it will
+not spontenously shift back into the MinD:ADP stage of the cycle.  It
+will diffuse until it attaches to a cell membrane.  When compared to a
+protein that is in the middle cylindrical section of the cell, a
+protein that is in an end cap section is more likely to bump into a
+wall in a given number of diffusive steps, since there is a greater
+cross section of possible movement that is covered by a nearby wall.
+All else being equal, proteins will collect with a higher rate on the
+caps.  This effect is made more pronounced by the MinD:ATP tendency to
+attract and cluster.  When adjacent to the membrane, the rate of
+binding to the membrane is porportional to the amount of MinD already
+bound there.  Initially, then, there is a strong tendency of MinD to
+cluster in the polar regions of the cell.
 
 The next observed mechanism is the formation of MinE 'rings' on the
 membranes of the polar caps.  As the freely
@@ -270,7 +251,7 @@ encap.  Thus after dettaching from the membrane at the edge of the
 MinD:ATP encap cluster, the MinE is most likely to travel a small
 distance further into the polar region and then attach and react again
 with MinD:ATP protein there.  This process results in the observed
-qualitative 'encroaching MinE ring' behavoir that released MinD:ADP
+qualitative 'encroaching MinE ring' behavoir that releases MinD:ADP
 back into the cytoplasm.  This MinD:ADP will diffuse for a time before
 spontanosly uindergowing hydrolysis \fixme{is this right?} and
 reaching the MinD:ATP state that can bind to the membrane again.
@@ -283,6 +264,37 @@ the MinE ring, only to be released again in MinD:ADP form.
 Overall this process results in an extremely robust oscillatory
 behavoir of polar selection and oscillation in a wide variety of cell
 shapes.
+
+\begin{figure*}
+  \includegraphics[width=\textwidth]{../data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf}
+  \caption{Frames from an animation showing a series of contour plots
+    of the concentration of proteins in different stages over time.
+    The density of proteins are integrated along the axis
+    normal to the page. The frames occur 2.5 seconds apart.}
+  \label{image-p}
+\end{figure*}
+
+Consider Figure \ref{image-p}.  At 0 seconds we can see cytoplasmic
+nATP roughly evenly distributed throughout the cell.  There is nADP
+concentrated in the left pole and it will transform into nATP.  At 2.5
+seconds we see membrane bound MinD:ATP form on the right side of the
+cell.  It avoids the left side because there is a concentration of
+cytoplasmic MinE on the left side and compared to the right side,
+which is empty of MinE, MinD:ATP attaching to the wall on the left has
+no time to collect and cluster before reacting.  One can see how as
+the MinE spreads out rightward, the the clustered membrane bound
+MinD:ATP stays just at the edge of it, always to the right.  Where the
+two meet there is at every time step a spike in membrane bound
+MinD-MinE:ATP, resulting from the MinE reaction with the MinD on the
+wall.  One can see from roughly 5 seconds to 17.5 seconds the
+cytoplasmic MinE chases in a way the MinD towards the right, reacting
+with it as it clusters on the wall.  Upon reaching the right side, the
+MinD is in a way trapped, and the MinE now concentrated in that pole
+will react until the MinD has diffused back towards the other side and
+there is no more membrane bound MinD:ATP to react with.  The cycle
+then begins again.
+
+
 
 \begin{figure}
   %%\includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-400-50-0-0-1500}
@@ -297,15 +309,15 @@ shapes.
     protein changes while the total number of MinD protein in the cell
     remains constant, shown by the fact that the very top line is
     horizontal.}
-  \label{total-oscillation-plot}
+  \label{box-p}
 \end{figure}
 
-Figure \ref{total-oscillation-plot} is a plot of the total fraction of
+Figure \ref{box-p} is a plot of the total fraction of
 MinD found in each stage of the cycle in each of three sections of the
 cell (we have split the pill into two polar sections and one center
 section) over time.  One complete oscillation period is shown, in
 which one of the poles begins and ends at a maximum density
-concentration and the other a minimum denisty concentration.  Looking
+concentration and the other a minimum density concentration.  Looking
 at the evolution of the latter, we see an initial high concentration
 of cytoplasmic MinD:ATP, as the this protein diffuses into the polar
 region, followed by a dip in this and large spike in membrane bound
@@ -1027,7 +1039,7 @@ It would be good here to add the time map plots and discuss the idea
 about the proteins spending most of their time in the center of the
 cell.
 
-Figure \ref{frequency-plot-40-20-0-0-150} also shows that the middle
+Figure also shows that the middle
 density oscillates at a frequency that is twice that of the polar
 regions, which is to be expected considering the symmetry of the
 center compared to the that of the polar regions.  Also, the
