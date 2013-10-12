@@ -368,7 +368,6 @@ they accumulate on the opposite wall.
 \end{table}
 
 \begin{figure}
-  \includegraphics[width=\columnwidth]{../data/shape-p/plots/ave-plot_D--p-400-50-0-0-1500}
   \includegraphics[width=\columnwidth]{../data/shape-p/plots/ave-plot_D--p-200-50-0-0-1500}
   \caption{Average protein density per unit area of wall for the wall
     attached stages of the protein cycle.  Shown in the right, middle,
@@ -385,12 +384,9 @@ place Min proteins on the walls in heavier concentrations in the caps
 of the cell and lower concentrations in the middle section, so that
 the FtZ polymer may build up along the center walls.  We can see from
 the plot of the 3$\mu m$ by 1$\mu m$ cell that the MinD proteins reach
-concentration peaks in the caps that are roughly three times higher
-(for the MinD-ATP proteins) and roughly 1.5 times higher (for the
-MinD-MinE-ATP) than peaks in the center.  Integrals of these plotted
-values show that the time averaged concentrations are likewise higher
-in the caps than in the center.  \fixme{am computing these integrals
-  now in ave\_plot.py but need to print out into maybe a bar chart}
+concentration peaks in the caps that are higher than peaks in the
+center.  \fixme{is the next part true?} Integrals of these plotted values show that the time averaged
+concentrations are likewise higher in the caps than in the center.
 
 \subsection{Triangular Shapes}
 \begin{figure}
@@ -402,8 +398,29 @@ in the caps than in the center.  \fixme{am computing these integrals
     (bottom) triangle.  The vertical axis shows stacked the total
     number of proteins that are of four different compound stages and
     in the different sections of the cell.}
-  \label{total-oscillation-triangle-plot}
+  \label{box-triangle}
 \end{figure}
+
+The double pole oscillation pattern, where one pole is located in a
+single corner of the triangle and the other pole is spread out between
+the opposite two, can be seen in Figure \ref{box-triangle}.  The
+equilateral triangle shows a spike in both the Center and Left
+sections at the same time, both showing the familiar sequence of peaks
+amoungst the different states of the protein seen in the poles of the
+pill shaped bacteria.  A spike in the other corner, showing the common
+sequence, occurs during the minima of the former two, wth a higher
+concentration at the peak.  A similar pattern is seen in the
+iscosolese triangular shape, where interestingly the onset of the
+maxima in the single maxima corner (the Left section) builds more
+quickly than it fades.  This is presumably becuase as the cytoplasmic
+minD:ATP diffuses down a more accute corner, it is sourrounded by
+closer cell walls than it would be in a less acute corner, so that the
+it is more apt at any diffusive step to make contact and cluster on
+the walls.  That particular part of the process is therefore
+accelerated, driving the build up of the maxima forward.  The right
+triangle shows a similar pattern.
+
+
 
 Figure \ref{total-oscillation-triangle-plot} shows the equivalent
 motion and transference between compound states for the triangular
@@ -425,6 +442,7 @@ this oscillation pattern seems reasonable.  However, it's interesting
 to note that the oscillations, started with assymmetric density, do
 not naturally rotate around the corners of the triangle in a circular
 pattern.
+
 
 It seems as well that there is a desired oscillation maxima for the
 particular shape and size of the cell, as can be seen by the
@@ -462,25 +480,125 @@ equilateral triangles.
   from the sections output: 96=star shape, 97=sideways sideways
   flying saucer pancake, 98=manniks squished cell, 99=an A}
 
-With arrow plots - have noticed that the wall attached proteins seem
-to climb along the walls with little arrows, so the maxima crawl
-along, in a way.
-
+\subsubsection{Randst-mannik shape}
 \begin{figure}
-
-\end{figure}
-\subsubsection{Randst-94-mannik shape}
-\begin{figure}
-  \includegraphics[width=3cm]{../data/shape-randst/plots/arrow-plot-NflD-randst-25-1100-1100-9500-1500.pdf}
+  \includegraphics[width=2.8cm]{../mannik-2.png}
   \includegraphics[width=2.8cm]{../mannik-1.png}
   \includegraphics[width=3cm]{../data/shape-randst/plots/arrow-plot-NflD-randst-25-1300-2000-9400-1500.pdf}
-  \includegraphics[width=2.8cm]{../mannik-2.png}
+  \includegraphics[width=3cm]{../data/shape-randst/plots/arrow-plot-NflD-randst-25-1101-1101-9500-1500.pdf}
+  \includegraphics[width=3cm]{../data/shape-randst/plots/arrow-plot-NflD-randst-25-600-800-9800-1500}
+  \includegraphics[width=3cm]{../data/shape-randst/plots/arrow-plot-NflD-randst-25-1102-1102-9500-1500}
   \caption{Arrow plots for our simulation and mannik's experimental}
-  \label{arrow-randst-94}
+  \label{arrow-compare-mannik}
+\end{figure}
+
+Figure \ref{arrow-compare-mannik} shows a comparison of time maxima
+plots with similar plots published by mannik et al.  The sequence of
+arrows show a series of global maxima in space and local maxima in
+time at their heads, numbered by the sequence in which they occur.
+They function as a trace of the path that the traveling maxima take.
+We have created for each of the two shapes published by Mannik a
+closely resembling shape (shown directly below Mannik's) and a
+variation on this shape (shown below that) in order to test the effect
+of variations on basic shapes.  The plots of the left shape show that
+much of the preffered locations for the proteins to maximize are
+similar between this experimental and simulated shape.  The maxima in
+the top center of the cell does not seem to appear in the experimental
+version.  Also in both of the simulations on the left there don't seem
+to be maxima at membrane regions with negative radii of curvature
+while the experimental shows a maxima in the bottom center region
+right at one of these regions.  The shape on the right compares less
+successfully.  Here the simulation shows a limited number of maxima
+locations that appear to be quite regular, where mannik's experimental
+results show a much more chaotic system.  In particular, the maxima
+location on the right wall seems to be very robust.  It acts as one of
+the poles do in the pill shapes.  \fixme{I'm now running a sim with a
+  slightly different shape to see result} The simulated version has
+found a robust two pole pattern, similar to that seen in other shapes.
+
+
+
+
+
+\subsubsection{Randst-99 our lambda shape}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/box-plot_D--randst-25-600-600-9900-1500}
+  %%\includegraphics[width=\columnwidth]{../data/shape-randst/plots/box-plot_D--randst-25-600-600-9600-1500}arrow-plot-NflD-randst-25-600-800-9800-1500.pdf
+
+  \caption{Total protein fluctuation in the A shaped shape.  The vertical axis shows stacked the total number
+    of proteins that are of four different compound stages and in the
+    different sections of the cell.}
+  \label{total-oscillation-randst-96-plot}
 \end{figure}
 
 
 
+Our animations for this cell shape show a very interesting pattern.
+The maxima oscillates from the right corner to the top corner, then
+\emph{back to the right corner} then to the top corner again, then to
+the left corner, then back to the top, then to the left, then to the
+top again, then back to the right side.
+
+\fixme{running larger and smaller.  Guessing the larger will do pole
+  and pole, so talk about in terms of you have huge, pole and pole,
+  then once get small enough double oscillations develop.  Why do they
+  do that?  And hen you can do image plot for the one with consistent
+  double oscillations.  Can right now explain reason for double
+  oscillations.  Look at todo.txt.  The slightly varied guassian shape,
+  so a little assymetric, doesn't change double oscillation pattern.}
+
+Contour plot frames from the animations show the second maxima in the
+lower left corner (immediately following the one in the upper middle
+corner) will reside for a bit longer than the left corner maxima
+preceding it.  These longer residing maxima will then be followed by a
+switch, to the right corner, with a short, less intensive maxima
+traveling through the center.  The MinE shows the same pattern. The
+MinE that was just concentrated on the left corner during the first
+maxima, after releasing the MinD from the membrane there, diffuses up
+and attaches to the MinD on the upper corner membrane and begins to
+release it.  During this process the MinE starts at the edges and
+moves in towards the center of the maxima.  The center of the cup is a
+little further away so it attaches to these outer ridges first and
+then moves in.  After it eats at the corners and starts moving in the
+MinD eventually travels back to set up a maxima in the left corner.
+Watching the cytoplasmic MinE, something very interesting: It as well
+maximizes twice in the left corner, but during the MinD's first maxima
+in the left corner, the MinD has a maxima in the upper corner, and
+during the MinD's second left maxima, the MinE travels to the right
+corner and has a maxima there.  At the same time (during the second
+MinD left corner maxima), there is a large amount of cytoplasmic
+MinD:ATP on the right side.  The MinE does this becuase during the
+first MinD left corner maxima, the MinE has just come off a maxima in
+the right corner.  So it diffuses up to the upper corner and sets up
+there.  During the second MinD left corner maxima, the MinE has just
+come off the upper corner maxima.  It will diffuse into the right
+corner and left corner.  In the left corner it interacts with the MinD
+bound to the membrane there.  In the right corner it sits and
+eventually diffuses away, but at a somewhat slow pace.  \fixme{An idea
+  is that once the MinD travels back from the left corner after its
+  second maxima there, it is not able tot set up a maxima in the upper
+  corner as easily, since there is left over MinE there, which has
+  just traveled from the right corner.  The problem with this is that
+  the MinE doesn't seem to be maximized in the upper corner when the
+  MinD is traveling back up from the left.}  The other idea is simply
+that because the minE is traveling all the way from the right corner,
+the longer time it takes to get there simply means that it all
+concentrates on the left, leaving the upp and right side completely
+open for the build up of MinD.  \fixme{Still dont quite get it but
+  take a look at the other simulations and come back.} Actually, you
+can see this effect very slightly watching the 98 shape, between the
+center cap and the right corner.
+
+
+
+
+%% \begin{center}
+%%   \begin{figure}
+%%     {\includegraphics[width=\paperwidth]{../data/shape-randst/plots/image-plot_E--randst-25-602-602-9900-1500}}
+%%     \caption{Attempt at adding image plot to paper.}
+%%     \label{image-plot}
+%%   \end{figure}
+%% \end{center}
 \subsubsection{Randst-96-Star}
 \begin{figure}
   \includegraphics[width=\columnwidth]{../data/shape-randst/plots/box-plot_D--randst-25-600-600-9600-1500}
@@ -629,96 +747,8 @@ end to the other end, and back again.  The effect of this movement can
 be seen in the time averaged plot directly below the arrow plot.  The
 proteins spend a majority of time at the very ends of the cell.
 
-\subsubsection{Randst-99 our A shape}
-\begin{figure}
-  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/box-plot_D--randst-25-600-600-9900-1500}
-  %%\includegraphics[width=\columnwidth]{../data/shape-randst/plots/box-plot_D--randst-25-600-600-9600-1500}
-  \caption{Total protein fluctuation in the A shaped shape.  The vertical axis shows stacked the total number
-    of proteins that are of four different compound stages and in the
-    different sections of the cell.}
-  \label{total-oscillation-randst-96-plot}
-\end{figure}
-Our animations for this plot show a very interesting pattern.  The
-maxima oscillates from the right corner to the top corner, then
-\emph{back to the right corner} then to the top corner again, then to
-the left corner, then back to the top, then to the left, then to the
-top again, then back to the right side.  It's fascinating that there
-must be two back and forth motions before proceeding to the other side
-\fixme{would this happen over and over or would there be a chaos,
-  breakdown sort of thing at some point.  Need longer sim}.  The
-animations show that when there is a maxima in the center, if it is a
-maxima that is on the right side of the center upper cup then this
-maxima will be followed by a maxima in the lower left corner.  This
-maxima in the lower left corner (immediately following the one on the
-right side of the upper cup) will reside for a bit longer than the
-left corner maxima preceding it.  These longer residing maxima will
-then be followed by a switch, to the right corner, with a short less
-intensive maxima traveling through the center.  The MinE shows the
-same pattern. So what does this say, keeping in mind our model of MinD
-diffusing and MinE comming in to eat it away?  MinD starts in the
-lower left, diffuses up and maximizes on the right side of upper cup.
-Why right side of upper cup?  Because there is more MinE on the left
-side then on the right side of that upper cup, because MinE has just
-spent time coagulating on left corner wall because there was more MinD
-there.  The MinE attaches to the MinD on the membrane and begins to
-release it.  Why at that point does the MinD go back to the left
-corner?  When the MinE eats away at the wall bound MinD it starts at
-te edges and moves in.  There's one frame where the MinE has maxima on
-either side of the MinD maxima on the right side cup.  The center of
-the cup is a little further away so it attaches to these out ridges
-first and then moves in.  After it eats at the corners and starts
-moving in why does the MinD go back to the left corner?  Watching the
-cytoplasmic MinE, something very interesting: It as well maximizes
-twice in one corner, but in between the two maximizations it has a
-smaller maxima in the other corner.  So when the MinD is getting eaten
-away from the top cup, the minE is moving over to maximize in the
-opposite corner.  Why does it maximize there? there are more minD on
-the membrane to attach to on the left, so it can diffuse further down
-into the corner.  Want to be able to construct a full frame by frame
-picture, with all the proteins layed out top to bottom, each frame
-ontop of its likewise frame.  Actually, you can see this effect very
-slightly watching the 98 shape, between the center cap and the right
-corner.
-
-Also - as to why the proteins like poles and corners.  It's a
-diffusion model, so there's no momentum.  When they are at an end or
-corner, they will go in all directions, and if there's a small hole
-way out, only a small percentage will go down it.  As the others
-attach to the wall, there is a higher chance that diffusing particles
-will attach to that wall instead.
 
 
-
-The total
-fluctuation plot shows this double maxima corner pattern, with two
-spikes on the right, then two spikes on the left, then two back on the
-right.
-
-\begin{figure}
-  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/arrow-plot-D_nATP-randst-25-600-600-9900-1500}
-  \includegraphics[width=\columnwidth]{../data/shape-randst/plots/arrow-plot-D_nADP-randst-25-600-600-9900-1500}
-  \caption{Arrows that connect maxima that are global in space and
-    local in time. The arrow heads touch spatial, time maxima and are
-    adjecent to the tails of arrows that show the very next spatial,
-    time maxima. The proteins shown are cytopasmic MinD-ATP (above) and MinD-ADP (below).}
-  \label{arrow-plot-randst-99-plot}
-\end{figure}
-Figure \ref{arrow-plot-randst-99-plot} shows maxima that are global in
-space and local in time.  It is interesting that the MinD-ATP, the
-stage that immediately proceeds attachement to the wall, show maxima
-in one base corner of the A shape and then immediate maxima in the
-other base corner, skipping any maxima steps in the middle (the top of
-the A), while the MinD-ADP, the stage that has just left the wall,
-shows no such behavoir.  Every base corner maxima is followed by a top
-corner maxima, with very obvious symmetry.
-
-%% \begin{center}
-%%   \begin{figure}
-%%     {\includegraphics[width=\paperwidth]{../data/shape-randst/plots/image-plot_E--randst-25-602-602-9900-1500}}
-%%     \caption{Attempt at adding image plot to paper.}
-%%     \label{image-plot}
-%%   \end{figure}
-%% \end{center}
 
 \section{Interpretation of Data}
 \section{Conclusion}
