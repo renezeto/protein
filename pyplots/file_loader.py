@@ -71,9 +71,9 @@ class data(object):
                                      (f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5,file_num))
         dat_filenames = sorted(dat_filenames)
         i=0 #pop the first 10% of file names to let things equillibriate a bit
-        while i<round(len(dat_filenames)/10):
-            dat_filenames.pop(0)
-            i+=1
+        # while i<round(len(dat_filenames)/10):
+        #     dat_filenames.pop(0)
+        #     i+=1
         if (dat_filenames == []):
             print "File loading error: filename list is empty."
             print "./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)

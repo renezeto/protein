@@ -79,14 +79,14 @@ def contourplt(protein):
         CS = plt.contourf(Z, Y, page, cmap=plt.cm.jet,origin='lower',levels=np.arange(minval,maxval+10,1))
         cbar = plt.colorbar(CS)
         plt.clim(minval,maxval)
-        plt.title(str(protein.protein)+" volume density at time: "+str(k*5)+" sec")
+        plt.title(str(protein.protein)+" volume density at time: "+str(k*2.5)+" sec")
         plt.xlabel("Z position")
         plt.ylabel("Y position")
         plt.savefig('./data/shape-'+f_shape+'/plots/'+load.debug_str+load.hires_str+load.slice_str+'-tmp_%03d'%k+'-'+str(protein.protein)+ \
                         '-'+f_shape+'-'+f_param1+'-'+f_param2+'-'+f_param3+'-'+f_param4+'-'+f_param5+'.png',dpi=50)
 
     #shell command to convert all of the recently generated .png's to a single .gif using convert utility
-    os.system("convert -delay 20 ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+"-tmp_*" \
+    os.system("convert -delay 10 ./data/shape-"+f_shape+"/plots/"+load.debug_str+load.hires_str+load.slice_str+"-tmp_*" \
     +"-"+str(protein.protein)+"-"+f_shape+"-"+f_param1+"-"+f_param2 \
     +"-"+f_param3+"-"+f_param4+"-"+f_param5+".png ./data/shape-"+f_shape \
     +"/plots/"+load.debug_str+load.hires_str+load.slice_str+"density_movie-"+str(protein.protein)+"-"+f_shape \

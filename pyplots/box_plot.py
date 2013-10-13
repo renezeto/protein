@@ -140,18 +140,21 @@ def main():
             if "E_" in proteinType:
                 plotNameList_E += ["%s-%s"%(box,proteinType)]
 
-    print plotNameList_D
+    print ""
+    print "plotNameList before ", plotNameList_D, "\n"
     new_plotNameList_D = [0]*len(plotNameList_D)
     P_Ord = [3,0,2,1,7,4,6,5,11,8,10,9]
-    if load.f_param4 == '97.00' or load.f_param4 == '96.00':
-        P_Ord = [3,0,2,1,7,4,6,5,11,8,10,9,15,12,14,13]
+    if load.f_param4 == '97.00':
+        P_Ord = [3,0,2,1,11,8,10,9,15,12,14,13,7,4,6,5]
+    if load.f_param4 == '96.00':
+        P_Ord = [15,12,14,13,3,0,2,1,7,4,6,5,11,8,10,9]
     for i in range(len(P_Ord)):
         new_plotNameList_D[i] = plotNameList_D[P_Ord[i]]
     for i in range(len(plotNameList_D)):
         plotNameList_D[i] = new_plotNameList_D[i]
-    print plotNameList_D
+    print "plotNameList after ",plotNameList_D,"\n"
     plotProteinLabels = ['MinD:ATP (cyto)','MinD:ATP (mem)','MinE:MinD:ATP','MinD:ADP (cyto)']
-    print plotProteinLabels
+
 
 
     #pass plotNameList through stackData to generate the list of line data to be plotted
@@ -173,6 +176,12 @@ def main():
     start = int(tot_time*start_time_as_frac_of_ten/10.0/box_time_step)
     end = int(tot_time*end_time_as_frac_of_ten/10.0/box_time_step)
     (start, end) = find_period(plotCurveList_D[3])
+    if load.f_param4 == '97.00':
+        start_time_as_frac_of_ten = 0
+        end_time_as_frac_of_ten = 2.3
+        start = int(tot_time*start_time_as_frac_of_ten/10.0/box_time_step)
+        end = int(tot_time*end_time_as_frac_of_ten/10.0/box_time_step)
+
 
     #print set(plotCurveList_D[1]).union(set(plotCurveList_D[2]))
 
@@ -239,7 +248,7 @@ def main():
         yweighted = (Y*sectiondata).sum()/sectiondata.sum()
         xweighted = (X*sectiondata).sum()/sectiondata.sum()
         levels = [0.5, 1.5, 2.5, 3.5, 4.5]
-        mycolors = ["w","g","r","c","m","y"]
+        mycolors = ["w","g","r","m","c","y"]
         for i in xrange(min(4, len(boxList))):
             if boxList[i] == 'Right':
                 mycolors[1] = colorScale[i]
@@ -247,15 +256,13 @@ def main():
                 mycolors[2] = colorScale[i]
             if boxList[i] == 'Left':
                 mycolors[3] = colorScale[i]
-            if boxList[i] == 'UpperLeft':
-                mycolors[1] = colorScale[i]
-            if boxList[i] == 'UpperRight':
-                mycolors[2] = colorScale[i]
-            if boxList[i] == 'LowerLeft':
-                mycolors[3] = colorScale[i]
-            if boxList[i] == 'LowerRight':
-                mycolors[4] = colorScale[i]
         mycolors = colorScale[1:]
+        if load.f_param4 == '97.00':
+            mycolors = ['g','r','m','c']
+        if load.f_param4 == '96.00':
+            #rightup = 2, rightdown = 1, leftup = 4, leftdown = 3
+            mycolors = ['g','r','c','m']
+        print mycolors
         # here we rotate so that the order of sections will match the
         # box plot.
         xdir, ydir = xweighted - xmean, yweighted - ymean
@@ -286,9 +293,12 @@ def main():
                 ))
     plot_sections(sectionax, sectiondata)
     section_names = ['Left Section','Center Section','Right Section']
-    if load.f_param4 == '97.00' or load.f_param4 == '96.00':
-        section_names = ['Left Lower Section','Left Center Section','Left Upper Section','Right Center Section']
-
+    if load.f_param4 == '97.00':
+        section_names = ['Lower Section','Middle Left Section','Middle Right Section','Upper Section']
+#        section_names = ['rightup','mid','left','rightdown']
+    if load.f_param4 == '96.00':
+        section_names = ['Lower Left Section','Lower Right Section','Upper Left Section','Upper Right Section']
+#        section_names = ['rightdown','rightup','leftdown','leftup']
     font=FontProperties()
     font.set_family('serif')
     text_adjust = -.2*box_time_step*(end-start)

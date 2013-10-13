@@ -61,7 +61,7 @@ def build(proteins,proteinList):
     spread = Image.new("RGB", (120+(400-2*cut)*total_length, 300*len(proteins)), "white")
     for i in range(len(proteins)):
         if (proteinList[i]=="ND" or proteinList[i]=="NDE"):
-            maxval = timemax(proteins[i])
+            maxval = timemax(proteins[i])/4
         else:
             maxval = timemax(proteins[i])
         sys.stdout.flush()
@@ -78,7 +78,7 @@ def build(proteins,proteinList):
         #plt.axis('off')
             plt.axes().get_xaxis().set_ticks([])
             plt.axes().get_yaxis().set_ticks([])
-            plt.xlabel('%s  %gs' %  (proteinList[i], float(k*dump_time_step)) )
+            plt.xlabel('%s  %gs' %  (proteinList[i], float(k*dump_time_step)),fontsize=40)
             if (k == int(start_time/dump_time_step)):
                 plt.ylabel('%s' % proteinList[i])
             plt.savefig('./data/shape-'+f_shape+'/pngs/'+load.debug_str+load.hires_str+load.slice_str+'tmp_%03d'%k+'-'+str(proteins[i].protein)+ \
@@ -98,9 +98,6 @@ def build(proteins,proteinList):
                 spread.paste(cropped, (cut+(init_box[2]-2*cut)*k,box[3]*i))
         plt.close()
     spread.save(load.print_string("image-plot",""))
-    #spread.save("data/shape-"+f_shape +"/plots/"+load.debug_str+load.hires_str+load.slice_str+"image-" \
-    #                        +f_shape+"-"+f_param1+"-"+f_param2 \
-    #                        +"-"+f_param3+"-"+f_param4+"-"+f_param5+".pdf")
 
 proteinList = ["nADP","nATP","ND","nE","NDE"]#["nE","nATP","nADP","ND"]#,"NDE"]
 proteins = [0]*len(proteinList)

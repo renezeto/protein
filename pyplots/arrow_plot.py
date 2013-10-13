@@ -41,7 +41,7 @@ if load.f_param4 != "94.00":
 for protein in load.proteinList:
     tails = np.loadtxt('./data/shape-%s/%s%s%sarrow-plot-%s-%s-%s-%s-%s-%s-%s.dat'%(load.f_shape,load.debug_str,load.hires_str,load.slice_str,protein,load.f_shape,load.f_param1,load.f_param2,load.f_param3,load.f_param4,load.f_param5))
     tails = [list(element) for element in tails]
-    cut = len(tails)-10
+    cut = len(tails)-15
     tails = [tail for tail in tails[cut:][:]]
     # z_max = max(tails[:][2])
     # z_min = min(tails[:][2])
@@ -90,7 +90,7 @@ for protein in load.proteinList:
         number_ypos = tails[i][1]+.18*dir_y
         plt.ax.annotate('',xy=(tails[i+1][0],tails[i+1][1]),xytext=(tails[i][0],tails[i][1]),
                         fontsize=7,
-                        arrowprops=dict(facecolor='red',shrink=0.01, width=.3, headwidth=5.))
+                        arrowprops=dict(color='red',shrink=0.01, width=.3, headwidth=5.))
         plt.ax.text(number_zpos,number_ypos,"%d"%(i+1),fontsize=30,fontproperties=font,color='red')
     cell_membrane[cell_membrane>0] = 1
     cell_x = np.linspace(0,load.dx*len(cell_membrane[0,:]),len(cell_membrane[0,:]))
@@ -103,7 +103,7 @@ for protein in load.proteinList:
     plt.ylim((0,load.dx*cell_membrane.shape[0]))
     plt.xlabel("Z grid position")
     plt.ylabel("Y grid position")
-    plt.title("Local temporal maxima, global spatial maxima view of %s"%(protein))
+    #plt.title("Local temporal maxima, global spatial maxima view of %s"%(protein))
     plt.savefig(load.print_string("arrow-plot",protein))
 
 plt.show()
