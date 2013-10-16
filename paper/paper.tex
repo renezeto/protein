@@ -383,14 +383,14 @@ concentrations are likewise higher in the caps than in the center.
   \includegraphics[width=\columnwidth]{../data/shape-triangle/plots/box-plot_D--triangle-25-500-300-500-1500}
   \includegraphics[width=\columnwidth]{../data/shape-triangle/plots/box-plot_D--triangle-25-600-480-360-1500}
   \caption{Total protein fluctuation in the right, middle, and left
-    parts of a equilateral (top), iscoscolese (middle), and 3-4-5
+    parts of an equilateral (top), iscoscolese (middle), and 3-4-5
     (bottom) triangle.  The vertical axis shows stacked the total
     number of proteins that are of four different compound stages and
     in the different sections of the cell.}
   \label{box-triangle}
 \end{figure}
 
-The double pole oscillation pattern, where one pole is located in a
+The double pole oscillation pattern, in which one pole is located in a
 single corner of the triangle and the other pole is spread out between
 the opposite two, can be seen in Figure \ref{box-triangle}.  The
 equilateral triangle shows a spike in both the Center and Left
@@ -406,63 +406,48 @@ minD:ATP diffuses down a more accute corner, it is sourrounded by
 closer cell walls than it would be in a less acute corner, so that the
 it is more apt at any diffusive step to make contact and cluster on
 the walls.  That particular part of the process is therefore
-accelerated, driving the build up of the maxima forward.  The right
-triangle shows a similar pattern.
+accelerated, driving the build up of the maxima forward.
+
+The right triangle shows a similar pattern except that here there is
+an assymetry between the two corners that maximize at roughly the same
+time.  One corner is further from the single maximizing corner and it
+consisitently peaks later.  The MinD simply have further to travel
+before they maximize there.
+
+For these three sizess and shapes there is not sign that the
+oscillation patterns once they are set will break down.
+
+\begin{figure}
+  \includegraphics[width=\columnwidth]{../data/shape-triangle/plots/box-plot_D--triangle-25-601-601-601-1500}
+  \caption{Total protein fluctuation of an equilateral triangle with
+    larger dimensions (each side is roughly $6\mu m$.  The vertical
+    axis shows stacked the total number of proteins that are of four
+    different compound stages and in the different sections of the
+    cell. The time limits have been set to show the broken down
+    section of the simulation.}
+  \label{box-triangle}
+
+The larger equilateral shape shows the same pattern as the smaller
+version does only until fifteen periods, at which point there is a
+breakdown of the oscillation pattern.  During the last three stable
+periods, the single maximizing corner, the lower left section in the
+figure, has a lower peak each period as the membrane bound MinD:ATP in
+the other corners lag more and more before being eaten away by the
+MinE.  Finally these maxima lag so much that they break down the
+regular pattern.  There then occurs about five periods of semi chaotic
+behavoir, until it settles back into another stable oscillation that
+is similar to the original one, except that a different corner has
+been chosen to be the singlular maxima (the right section in the
+figure), while the other two corners maximize at the same time.  This
+interesting breakdown and recovery shows both the robustness of the
+double pole oscilatory tendency and the importance of required
+distance of travel for the different proteins.
+
+\end{figure}
 
 
+Fifteen
 
-Figure \ref{total-oscillation-triangle-plot} shows the equivalent
-motion and transference between compound states for the triangular
-states as Figure \ref{total-oscillation-plot} does for the pill shaped
-cells.  The equilateral triangular shows that in all three sections
-there is a spike in wall attached MinD-ATP directly followed by a
-spike in wall attached MinD-MinE-ATP.  The pill had shown a similar
-pattern except that the mid section exhibited no such pronounced
-spike.  Interestingly, the right and mid sections show spikes at
-similar times when compared to the left section spikes, which seem to
-oscillate in a manner shifted pi off from the other two.  This
-behavoir shows itself in the animations, which show a relaxation into
-a stable oscillation from a maxima in one corner to a double maxima in
-the other two corners, and back again.  The left section heights are
-roughly twice that of the right section heights.  The simulations are
-started with higher concentrations of proteins in primarily the right
-section, with some overlap into the middle section, so that perhpas
-this oscillation pattern seems reasonable.  However, it's interesting
-to note that the oscillations, started with assymmetric density, do
-not naturally rotate around the corners of the triangle in a circular
-pattern.
-
-
-It seems as well that there is a desired oscillation maxima for the
-particular shape and size of the cell, as can be seen by the
-relaxation, over the first four periods, to a regular maximal height
-of the right and left sections' total protein at the height of each spike.
-
-\fixme{Note to make sure I'm interpreting the iscosolese triangle data
-  correctly: the triangle sides are 5,5,3, and the higher density
-  starts in the corner that is opposite the short side.  This corner
-  is covered by the right section.  I've verified this by looking at
-  the protein\_microscopy and drawing a little picture, which is on my
-  desk...if you dare look for something on my desk!!!}  The iscosolese
-triangle starts its simulation with a higher concentration of protein
-in the section that is opposite the shorter side.  It quickly relaxes
-into a stable oscillation pattern.  This pattern shows that right
-corner section regularly has higher spikes in total protein than the
-other sections, and that its spikes appear one pi removed from the
-spikes for the other two sections.  This a similar behavoir to that
-which is seen in the equilateral triangle, differening in that it
-converges more quickly towards this behavoir and that it shows a
-greater exageration in the height of protein buildup in the right most
-section.
-
-\fixme{Note on interpretation of 3-4-5 triangle: the higher density
-  starts to the right of a vertical line that is parrallel to the
-  second longest side in the triangle (the longer of the two
-  non-hypotonuse sides).  This means the higher concentration covers
-  the right angle and also the smaller angle in the triangle} The
-3-4-5 triangle exhibits behavoir that I need more data to properly
-observe.  I does not converge as quickly as that for the iscosolese or
-equilateral triangles.
 
 \subsection{Randst shape}
 \fixme{Cheat sheet for the shapes, need to put these into a big figure
@@ -578,6 +563,37 @@ open for the build up of MinD.  \fixme{Still dont quite get it but
 can see this effect very slightly watching the 98 shape, between the
 center cap and the right corner.
 
+Simulations of this shape that has the same height and dimensions .6
+times the size do not exhibit the same pattern.  In these the MinD
+maxima oscillate quickly back and forth between the two lower corner
+poles.
+
+Simulations in which the two planar dimensions are 2 and then 3 times
+the size (cells roughly $6\mu m$ and $9\mu m$, respectively, from top
+to bottom) show no stable regular periodic pattern \fixme{although
+  they haven't really run long enough to exhibit much.  They certainly
+  won't show the double oscillation pattern, however.}  The animations
+of $6\mu m$ cells show that the MinD acts as a sort of traveling
+cluster that is constantly being eaten away be MinE behind it.  When
+this cluster enters a region of high curvature that ends in a dead end
+corner it performs the polar maxima behavoir seen in the other
+simulations, regrouping out away from the corner where it travels in
+the opposite direction while being ``chased'' away by the MinE that
+has itself maximized in the corner.  If it has just maximized in the
+top corner, it regroups traveling downward and then naturally splits
+into two groups that travel out and form maxima in the two opposite
+bottom corners.  After maximizing in these two corners the two groups
+recombine again in the center and travel in some direction together as
+one cluster.  Simulations of the $9\mu m$ cells show a similar roaming
+cluster.  Although here, the maxima occur on non-polar walls often,
+and will often split into two roaming clusters that interact less
+quickly and are less correlated than those seen in the $6\mu m$ cell.
+
+It seems that there is an approximate critical cell size for which the
+MinD will act in these ``wandering cluster'' formations.  The cell is
+large enough so that there is a loss of MinD correlation between the
+opposite sides (the protein in the right corner at any time is too far
+away from the left to immediately affect the protein there).
 
 
 
@@ -689,6 +705,60 @@ the smallest corner?  \fixme{There isn't enough data to see properly
 
 
 \section{Below are NOTES for the Writing}
+
+Figure \ref{total-oscillation-triangle-plot} shows the equivalent
+motion and transference between compound states for the triangular
+states as Figure \ref{total-oscillation-plot} does for the pill shaped
+cells.  The equilateral triangular shows that in all three sections
+there is a spike in wall attached MinD-ATP directly followed by a
+spike in wall attached MinD-MinE-ATP.  The pill had shown a similar
+pattern except that the mid section exhibited no such pronounced
+spike.  Interestingly, the right and mid sections show spikes at
+similar times when compared to the left section spikes, which seem to
+oscillate in a manner shifted pi off from the other two.  This
+behavoir shows itself in the animations, which show a relaxation into
+a stable oscillation from a maxima in one corner to a double maxima in
+the other two corners, and back again.  The left section heights are
+roughly twice that of the right section heights.  The simulations are
+started with higher concentrations of proteins in primarily the right
+section, with some overlap into the middle section, so that perhpas
+this oscillation pattern seems reasonable.  However, it's interesting
+to note that the oscillations, started with assymmetric density, do
+not naturally rotate around the corners of the triangle in a circular
+pattern.
+
+
+It seems as well that there is a desired oscillation maxima for the
+particular shape and size of the cell, as can be seen by the
+relaxation, over the first four periods, to a regular maximal height
+of the right and left sections' total protein at the height of each spike.
+
+\fixme{Note to make sure I'm interpreting the iscosolese triangle data
+  correctly: the triangle sides are 5,5,3, and the higher density
+  starts in the corner that is opposite the short side.  This corner
+  is covered by the right section.  I've verified this by looking at
+  the protein\_microscopy and drawing a little picture, which is on my
+  desk...if you dare look for something on my desk!!!}  The iscosolese
+triangle starts its simulation with a higher concentration of protein
+in the section that is opposite the shorter side.  It quickly relaxes
+into a stable oscillation pattern.  This pattern shows that right
+corner section regularly has higher spikes in total protein than the
+other sections, and that its spikes appear one pi removed from the
+spikes for the other two sections.  This a similar behavoir to that
+which is seen in the equilateral triangle, differening in that it
+converges more quickly towards this behavoir and that it shows a
+greater exageration in the height of protein buildup in the right most
+section.
+
+\fixme{Note on interpretation of 3-4-5 triangle: the higher density
+  starts to the right of a vertical line that is parrallel to the
+  second longest side in the triangle (the longer of the two
+  non-hypotonuse sides).  This means the higher concentration covers
+  the right angle and also the smaller angle in the triangle} The
+3-4-5 triangle exhibits behavoir that I need more data to properly
+observe.  I does not converge as quickly as that for the iscosolese or
+equilateral triangles.
+
 
 
 \end{document}
