@@ -176,9 +176,13 @@ def main():
     start = int(tot_time*start_time_as_frac_of_ten/10.0/box_time_step)
     end = int(tot_time*end_time_as_frac_of_ten/10.0/box_time_step)
     (start, end) = find_period(plotCurveList_D[3])
-    if load.f_param4 == '97.00':
-        start_time_as_frac_of_ten = 0
-        end_time_as_frac_of_ten = 2.3
+    if load.f_param4 == '97.00' or (load.f_shape == 'triangle' and load.f_param3 == '6.01'):
+        if load.f_param4 == '97.00':
+            start_time_as_frac_of_ten = 0
+            end_time_as_frac_of_ten = 2.3
+        if load.f_shape == 'triangle' and load.f_param3 == '6.01':
+            start_time_as_frac_of_ten = 5.00
+            end_time_as_frac_of_ten = 9.00
         start = int(tot_time*start_time_as_frac_of_ten/10.0/box_time_step)
         end = int(tot_time*end_time_as_frac_of_ten/10.0/box_time_step)
 
