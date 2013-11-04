@@ -22,5 +22,5 @@ void set_curvature(double mem_A[], double curvature[]);
 void set_insideArr(bool *insideArr);
 bool inside(int xi, int yi, int zi);
 double find_intersection(const double fXYZ, const double fXYz, const double fXyZ, const double fxYZ,
-		       const double fxyZ, const double fxYz, const double fXyz, const double fxyz,
-		       const double f_minus_C);
+                         const double fxyZ, const double fxYz, const double fXyz, const double fxyz,
+                         const double f_minus_C, bool debugme = false);
