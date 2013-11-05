@@ -287,9 +287,9 @@ double mem_f(double x, double y, double z) {
      double X = Nx*dx;
      double Y = Ny*dx;
      double Z = Nz*dx;
-     double x1 = X/2;
-     double y1 = Y/2;
-     double z1 = Z/2;
+     double x1 = X/2.0;
+     double y1 = Y/2.0;
+     double z1 = Z/2.0;
      double f;
      f = sqrt((x-x1)*(x-x1) + (y-y1)*(y-y1) + (z-z1)*(z-z1)) - A;
      return f;
@@ -683,10 +683,53 @@ int main (int argc, char *argv[]) {
 
    double *mem_A = new double[Nx*Ny*Nz];
    set_membrane(out_file, mem_f, mem_A);
+
+   bool *insideArr = new bool[Nx*Ny*Nz];
+   set_insideArr(insideArr);
+
+   double total_cell_volume = 0;
+   double total_cell_area = 0;
+   for (int i=0;i<Nx*Ny*Nz;i++){
+    total_cell_area += mem_A[i];
+    if (insideArr[i]==true) {
+      total_cell_volume += dx*dx*dx;
+    }
+   }
+   double True_Volume = 0;
+   double True_Area = 0;
+   if (mem_f_shape == "sp"){
+     True_Volume = 4.0/3.0*M_PI*A*A*A;
+     True_Area = 4.0*M_PI*A*A;
+   }
+   if (mem_f_shape == "p") {
+     True_Volume = M_PI*B*B*A+4.0/3.0*M_PI*B*B*B;
+     True_Area = 2*M_PI*B*A+4.0*M_PI*B*B;
+   }
+   printf("\nVolume of thing = %g, True Volume = %g, Volume difference = %g\n",
+          total_cell_volume,True_Volume,total_cell_volume-True_Volume);
+   printf("Volume percent difference = %g\n\n",100.0*(total_cell_volume-True_Volume)/True_Volume);
+   printf("Area of thing = %g, True Area = %g, Area difference = %g\n",
+          total_cell_area,True_Area,total_cell_area-True_Area);
+   printf("Area percent difference = %g\n\n",100.0*(total_cell_area-True_Area)/True_Area);
+
+   char *testing_filename = new char[1024];
+   sprintf(testing_filename,"testing_file.txt");
+   FILE *testing_file = fopen((const char *)testing_filename,"w");
+   delete[] testing_filename;
+   for(int xi=0;xi<Nx;xi++){
+     for(int yi=0;yi<Ny;yi++){
+       for(int zi=0;zi<Nz;zi++){
+         fprintf(testing_file,"%d\t",insideArr[xi*Ny*Nz+yi*Nz+zi]);
+       }
+       fprintf(testing_file,"\n");
+     }
+   }
+   fclose(testing_file);
+   fflush(stdout);
    sym_check (mem_A);
    fflush(stdout);
 
-// double *first_mem_A = new double[Nx*Ny*Nz];
+  // double *first_mem_A = new double[Nx*Ny*Nz];
   // set_membrane(out_file, mem_f, first_mem_A);
 
   // //Trimming the grid code:
@@ -816,11 +859,7 @@ int main (int argc, char *argv[]) {
   double *JyE = new double[Nx*Ny*Nz];
   double *JzE = new double[Nx*Ny*Nz];
   //double *curvature = new double[Nx*Ny*Nz];
-  bool *insideArr = new bool[Nx*Ny*Nz];
-  //for (int i=0;i<Nx*Ny*Nz;i++){mem_A[i] = 0;}  ?? What on earth was this for???
-
-  set_insideArr(insideArr);
-
+  
   const int numProteins = 7;
 
   protein* nATP_plot = new protein;
@@ -939,18 +978,6 @@ int main (int argc, char *argv[]) {
 
   // fprintf(out_file,"Finished opening area_rating file.\n");
   // fprintf(out_file,"Finished with insideArr function.\n");
-
-  double total_cell_volume = 0;
-  double total_cell_area = 0;
-
-  for (int i=0;i<Nx*Ny*Nz;i++){
-    total_cell_area += mem_A[i];
-    if (insideArr[i]==true) {
-      total_cell_volume += dx*dx*dx;
-    }
-  }
-  printf("total_cell_volume = %g and dx = %g\n",total_cell_volume,dx);
-  fprintf(out_file, "total_cell_volume = %g\n",total_cell_volume);
 
   //add cell params file
 
@@ -2113,6 +2140,7 @@ double find_intersection(const double fXYZ, const double fXYz, const double fXyZ
       } else {
         // We now know that the plane must be going through the +x, +y, +z corner!
         assert(np == 3);
+        return 0.0;
         const double dist01 = sqrt((ptsx[1]-ptsx[0])*(ptsx[1]-ptsx[0])
                                    + (ptsy[1]-ptsy[0])*(ptsy[1]-ptsy[0])
                                    + (ptsz[1]-ptsz[0])*(ptsz[1]-ptsz[0]));
