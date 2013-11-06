@@ -1,0 +1,117 @@
+This is detailed information about the simulated volumes and the ideal
+volumes of sphere and pill (and maybe other) shapes.
+
+sphere radius 4:
+Volume of thing = 275.655, True Volume = 268.083, Volume difference = 7.57205
+Volume percent difference = 2.82452
+With Bug:
+Volume of thing = 275.655, True Volume = 268.083, Volume difference = 7.57205
+Volume percent difference = 2.82452
+
+Area of thing = 201.064, True Area = 201.062, Area difference = 0.00159021
+Area percent difference = 0.000790905
+With Bug:
+Area of thing = 199.602, True Area = 201.062, Area difference = -1.45972
+Area percent difference = -0.726007
+
+Sphere radius 2:
+Volume of thing = 35.4261, True Volume = 33.5103, Volume difference = 1.9158
+Volume percent difference = 5.71705
+With Bug:
+Volume of thing = 35.4261, True Volume = 33.5103, Volume difference = 1.9158
+Volume percent difference = 5.71705
+
+Area of thing = 50.2627, True Area = 50.2655, Area difference = -0.00279006
+Area percent difference = -0.00555065
+With Bug:
+Area of thing = 49.9024, True Area = 50.2655, Area difference = -0.363091
+Area percent difference = -0.722348
+
+Sphere radius .5:
+Volume of thing = 0.654125, True Volume = 0.523599, Volume difference = 0.130526
+Volume percent difference = 24.9287
+With Bug:
+Volume of thing = 0.654125, True Volume = 0.523599, Volume difference = 0.130526
+Volume percent difference = 24.9287
+
+Area of thing = 3.14139, True Area = 3.14159, Area difference = -0.000201535
+Area percent difference = -0.00641507
+With Bug:
+Area of thing = 3.11865, True Area = 3.14159, Area difference = -0.0229406
+Area percent difference = -0.730221
+
+Sphere radius .2:
+Volume of thing = 0.057625, True Volume = 0.0335103, Volume difference = 0.0241147
+Volume percent difference = 71.9619
+With Bug:
+Volume of thing = 0.057625, True Volume = 0.0335103, Volume difference = 0.0241147
+Volume percent difference = 71.9619
+
+Area of thing = 0.496969, True Area = 0.502655, Area difference = -0.00568603
+Area percent difference = -1.1312
+With Bug:
+Area of thing = 0.492728, True Area = 0.502655, Area difference = -0.00992678
+Area percent difference = -1.97487
+
+
+Pill cylind length 4, radius .5:
+Volume of pill = 4.22413, True Volume = 3.66519, Volume difference = 0.558934
+Percent difference Volume = 15.2
+With High Res:
+Volume of thing = 3.94789, True Volume = 3.66519, Volume difference = 0.282699
+Volume percent difference = 7.71308
+With Bug:
+Volume of thing = 4.22413, True Volume = 3.66519, Volume difference = 0.558934
+Volume percent difference = 15.2498
+
+Area of Pill = 15.7225, True Area = 15.708, Area difference = 0.014555
+Percent difference Area = .0926
+With high Res:
+Area of thing = 15.6649, True Area = 15.708, Area difference = -0.0430408
+Area percent difference = -0.274006
+With Bug:
+Area of thing = 15.6998, True Area = 15.708, Area difference = -0.008184
+Area percent difference = -0.052101
+
+Pill cylind length 2, radius .5:
+Volume of pill = 2.43913, True Volume = 2.0944, Volume difference = 0.34473
+Percent difference Volume = 16.5
+With High Res:
+Volume of thing = 2.26664, True Volume = 2.0944, Volume difference = 0.172246
+Volume percent difference = 8.22412
+With Bug:
+Volume of thing = 2.43913, True Volume = 2.0944, Volume difference = 0.34473
+Volume percent difference = 16.4596
+
+Area of Pill = 9.43197, True Area = 9.42478, Area difference = 0.00718905
+Percent difference Area = .0762
+With High Res:
+Area of thing = 9.39089, True Area = 9.42478, Area difference = -0.0338908
+Area percent difference = -0.359592
+With Bug:
+Area of thing = 9.40923, True Area = 9.42478, Area difference = -0.01555
+Area percent difference = -0.16499
+
+
+Pill cylind length 1, radius .5:
+Volume of pill = 1.54662, True Volume = 1.309, Volume difference = 0.237628
+Percent difference Volume = 18.2
+With High Res:
+Volume of thing = 1.42602, True Volume = 1.309, Volume difference = 0.117019
+Volume percent difference = 8.93957
+With Bug:
+Volume of thing = 1.54662, True Volume = 1.309, Volume difference = 0.237628
+Volume percent difference = 18.1534
+
+Area of Pill = 6.28669, True Area = 6.28319, Area difference = 0.00350606
+Percent difference Area = .0558
+With High Res:
+Area of thing = 6.25387, True Area = 6.28319, Area difference = -0.0293158
+Area percent difference = -0.466575
+With Bug:
+Area of thing = 6.26395, True Area = 6.28319, Area difference = -0.019233
+Area percent difference = -0.306102
+
+
+
+
