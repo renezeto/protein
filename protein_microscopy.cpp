@@ -174,6 +174,8 @@ double f_2D_randst(double y, double z){
 double mem_f(double x, double y, double z) {
   if(mem_f_shape=="randst" || mem_f_shape=="TIE_fighter" || mem_f_shape=="triangle"){
     double X = Nx*dx;
+    //x = .4;
+    //printf("X/2.0 = %g A = %g\n",(X/2.0),A);
     double f_2d = 0;
     if(mem_f_shape=="randst") f_2d = f_2D_randst(y,z);
     else if(mem_f_shape=="TIE_fighter") f_2d = f_2D_TIE_fighter(y,z);
@@ -183,7 +185,7 @@ double mem_f(double x, double y, double z) {
       exit(1);
     }
     if (f_2d<=0) {
-      return abs(2*(x-(X/2))/A) - 1;
+      return abs(2*(x-(X/2.0))/A) - 0.99999;//1.00001;
     }
     double closest_y0 = -100.0;
     double closest_z0 = -100.0;
@@ -203,10 +205,10 @@ double mem_f(double x, double y, double z) {
       }
     }
     double dis = sqrt((y-closest_y0)*(y-closest_y0) + (z-closest_z0)*(z-closest_z0) + (x-X/2.0)*(x-X/2.0));
-    if (dis <= A) {
-      return 2*(dis/A-.5);
+    if (dis < A) {
+      return 2.0*(dis/A-.49999);
     } else {
-      return 1;
+      return 1.0;
     }
   }
 
@@ -423,7 +425,7 @@ void sym_check (double * mem_A){
   //       if (abs(mem_f(xa,y,z) - mem_f(xb,y,z)) > .00000001) {
   //         fprintf(out_file,"Nx*dx = %g\n",Nx*dx);
   //         fprintf(out_file,"xa = %g yi = %g z = %g mem_A = %g\n",xa,y,z,mem_f(xa,y,z));//[xi*Ny*Nz+ya*Nz+zi]);
-  //         fprintf(out_file,"xb = %g yi = %g z = %g mem_A = %g\n",xb,y,z,mem_f(xb,y,z));//[xi*Ny*Nz+ya*Nz+zi]);
+  //         fprintf(out_file,"xb = %g yi = %g z = %g mem_A = %g\n",xb,y,z,em_f(xb,y,z));//[xi*Ny*Nz+ya*Nz+zi]);
   //       }
   //       //fprintf(out_file,"No! ");
   //     }
@@ -555,9 +557,9 @@ int main (int argc, char *argv[]) {
      Nz = ceil(A/dx) + 4;
    }
    if (mem_f_shape=="randst") {
-     Nx = ceil(A/dx) + 4;
-     Ny = ceil(B/dx) + 4;
-     Nz = ceil(C/dx) + 4;
+     Nx = round(A/dx) + 5;
+     Ny = round(B/dx) + 5;
+     Nz = round(C/dx) + 5;
      rand_seed = int(D);
      if (D != round(D)) {
        printf("WARNING!!! When using randst the last argument, the rand_seed, should be an integer!  For now I've truncated it!!!\n");
@@ -569,8 +571,8 @@ int main (int argc, char *argv[]) {
      Nz = ceil(C/dx) + 4;
    }
    if (mem_f_shape=="triangle") {
-     Nx = ceil(A/dx) + 4;
-     Nz = ceil((A+B)/dx) + 4;
+     Nx = ceil(A/dx) + 5;
+     Nz = ceil((A+B)/dx) + 5;
      //Using law of cosines we get height of triangle:
      double theta = acos((B*B+D*D-C*C)/(2*B*D));
      Ny = ceil((A+D*sin(theta))/dx) + 4;
@@ -681,6 +683,21 @@ int main (int argc, char *argv[]) {
    }
    //end random stuff
 
+   //   double x = .32999;//dx*Nx/2.0;
+   double x = dx*8;//0.10;
+   double y = dx*34;//dx*Ny/2.0;
+   double z = dx*Nz/2.0;
+   printf("mem_f(%g,%g,%g) = %g\nA = %g  B = %g\n",x,y,z,mem_f(x,y,z),A,B);
+   double xi = x/dx;
+   double yi = y/dx;
+   double zi = z/dx;
+   double fXYZ = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
+   double fxYZ = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
+   double f = mem_f(xi*dx, yi*dx, zi*dx);
+   printf("f = %g fX = %g fx = %g\n",f,fXYZ,fxYZ);
+
+   fflush(stdout);
+
    double *mem_A = new double[Nx*Ny*Nz];
    set_membrane(out_file, mem_f, mem_A);
 
@@ -712,20 +729,42 @@ int main (int argc, char *argv[]) {
           total_cell_area,True_Area,total_cell_area-True_Area);
    printf("Area percent difference = %g\n\n",100.0*(total_cell_area-True_Area)/True_Area);
 
-   char *testing_filename = new char[1024];
-   sprintf(testing_filename,"testing_file.txt");
-   FILE *testing_file = fopen((const char *)testing_filename,"w");
-   delete[] testing_filename;
+   // char *testing_filename = new char[1024];
+   // sprintf(testing_filename,"testing_file.txt");
+   // FILE *testing_file = fopen((const char *)testing_filename,"w");
+   // delete[] testing_filename;
+   // //for(int xi=0;xi<Nx;xi++){
+   // for(int yi=0;yi<Ny;yi++){
+   //   for(int zi=0;zi<Nz;zi++){
+   //     int xi = Nx/2;
+   //     fprintf(testing_file,"%d\t",insideArr[xi*Ny*Nz+yi*Nz+zi]);
+   //   }
+   //   fprintf(testing_file,"\n");
+   // }
+   // //}
+   // fclose(testing_file);
+   // fflush(stdout);
+
+   char *testing_filename_area = new char[1024];
+   sprintf(testing_filename_area,"testing_file_area.txt");
+   FILE *testing_file_area = fopen((const char *)testing_filename_area,"w");
+   delete[] testing_filename_area;
+   //for(int xi=0;xi<Nx;xi++){
    for(int xi=0;xi<Nx;xi++){
      for(int yi=0;yi<Ny;yi++){
-       for(int zi=0;zi<Nz;zi++){
-         fprintf(testing_file,"%d\t",insideArr[xi*Ny*Nz+yi*Nz+zi]);
+       int zi = Nz/2;
+       fprintf(testing_file_area,"%g\t",mem_A[xi*Ny*Nz+yi*Nz+zi]);
+       if (mem_A[xi*Ny*Nz+yi*Nz+zi] != 0.0) {
+         printf("xi = %d  yi = %d mem_A = %g\n",xi,yi,mem_A[xi*Ny*Nz+yi*Nz+zi]);
        }
-       fprintf(testing_file,"\n");
      }
+     fprintf(testing_file_area,"\n");
    }
-   fclose(testing_file);
+   fclose(testing_file_area);
+
+   printf("Got Here!\n");
    fflush(stdout);
+
    sym_check (mem_A);
    fflush(stdout);
 
@@ -1984,6 +2023,9 @@ double find_intersection(const double fXYZ, const double fXYz, const double fXyZ
                          const double fxYZ, const double fxYz, const double fxyZ, const double fxyz,
                          const double f, bool debugme) {
   double dA = 0;
+  if (fXYZ>0.0 && fXYz>0.0 && fXyZ>0.0 && fXyz>0.0 && fxYZ>0.0 && fxYz>0.0 && fxyZ>0.0 && fxyz>0.0 && f>0.0){
+    return 0.0;
+  }
   if (debugme) printf("I am debugging\n");
   // "pts" is a set of points in 3D space (in units of distance) where
   // the plane of f=0 intersects with the *edges* of the cube.
