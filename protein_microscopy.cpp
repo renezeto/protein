@@ -646,7 +646,7 @@ int main (int argc, char *argv[]) {
    }
    if (rand_seed == 99) {
      for (int i=0;i<100;i++){
-       guass99[i] = 1.3*guass99[i];
+       guass99[i] = 3.0*guass99[i];
      }
    }
    printf("Those are all the guassians!\n");
@@ -684,50 +684,42 @@ int main (int argc, char *argv[]) {
    //end random stuff
 
    //   double x = .32999;//dx*Nx/2.0;
-   double x = dx*8;//0.10;
-   double y = dx*34;//dx*Ny/2.0;
-   double z = dx*Nz/2.0;
-   printf("mem_f(%g,%g,%g) = %g\nA = %g  B = %g\n",x,y,z,mem_f(x,y,z),A,B);
-   double xi = x/dx;
-   double yi = y/dx;
-   double zi = z/dx;
-   double fXYZ = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
-   double fxYZ = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
-   double f = mem_f(xi*dx, yi*dx, zi*dx);
-   printf("f = %g fX = %g fx = %g\n",f,fXYZ,fxYZ);
+   // double x = dx*8;//0.10;
+   // double y = dx*34;//dx*Ny/2.0;
+   // double z = dx*Nz/2.0;
+   // double xi = x/dx;
+   // double yi = y/dx;
+   // double zi = z/dx;
+   // double fXYZ = mem_f((xi+0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
+   // double fxYZ = mem_f((xi-0.5)*dx, (yi+0.5)*dx, (zi+0.5)*dx);
+   // double f = mem_f(xi*dx, yi*dx, zi*dx);
+   // printf("f = %g fX = %g fx = %g\n",f,fXYZ,fxYZ);
 
-   fflush(stdout);
 
-   double *mem_A = new double[Nx*Ny*Nz];
-   set_membrane(out_file, mem_f, mem_A);
-
-   bool *insideArr = new bool[Nx*Ny*Nz];
-   set_insideArr(insideArr);
-
-   double total_cell_volume = 0;
-   double total_cell_area = 0;
-   for (int i=0;i<Nx*Ny*Nz;i++){
-    total_cell_area += mem_A[i];
-    if (insideArr[i]==true) {
-      total_cell_volume += dx*dx*dx;
-    }
-   }
-   double True_Volume = 0;
-   double True_Area = 0;
-   if (mem_f_shape == "sp"){
-     True_Volume = 4.0/3.0*M_PI*A*A*A;
-     True_Area = 4.0*M_PI*A*A;
-   }
-   if (mem_f_shape == "p") {
-     True_Volume = M_PI*B*B*A+4.0/3.0*M_PI*B*B*B;
-     True_Area = 2*M_PI*B*A+4.0*M_PI*B*B;
-   }
-   printf("\nVolume of thing = %g, True Volume = %g, Volume difference = %g\n",
-          total_cell_volume,True_Volume,total_cell_volume-True_Volume);
-   printf("Volume percent difference = %g\n\n",100.0*(total_cell_volume-True_Volume)/True_Volume);
-   printf("Area of thing = %g, True Area = %g, Area difference = %g\n",
-          total_cell_area,True_Area,total_cell_area-True_Area);
-   printf("Area percent difference = %g\n\n",100.0*(total_cell_area-True_Area)/True_Area);
+   // double total_cell_volume = 0;
+   // double total_cell_area = 0;
+   // for (int i=0;i<Nx*Ny*Nz;i++){
+   //  total_cell_area += mem_A[i];
+   //  if (insideArr[i]==true) {
+   //    total_cell_volume += dx*dx*dx;
+   //  }
+   // }
+   // double True_Volume = 0;
+   // double True_Area = 0;
+   // if (mem_f_shape == "sp"){
+   //   True_Volume = 4.0/3.0*M_PI*A*A*A;
+   //   True_Area = 4.0*M_PI*A*A;
+   // }
+   // if (mem_f_shape == "p") {
+   //   True_Volume = M_PI*B*B*A+4.0/3.0*M_PI*B*B*B;
+   //   True_Area = 2*M_PI*B*A+4.0*M_PI*B*B;
+   // }
+   // printf("\nVolume of thing = %g, True Volume = %g, Volume difference = %g\n",
+   //        total_cell_volume,True_Volume,total_cell_volume-True_Volume);
+   // printf("Volume percent difference = %g\n\n",100.0*(total_cell_volume-True_Volume)/True_Volume);
+   // printf("Area of thing = %g, True Area = %g, Area difference = %g\n",
+   //        total_cell_area,True_Area,total_cell_area-True_Area);
+   // printf("Area percent difference = %g\n\n",100.0*(total_cell_area-True_Area)/True_Area);
 
    // char *testing_filename = new char[1024];
    // sprintf(testing_filename,"testing_file.txt");
@@ -745,108 +737,109 @@ int main (int argc, char *argv[]) {
    // fclose(testing_file);
    // fflush(stdout);
 
-   char *testing_filename_area = new char[1024];
-   sprintf(testing_filename_area,"testing_file_area.txt");
-   FILE *testing_file_area = fopen((const char *)testing_filename_area,"w");
-   delete[] testing_filename_area;
-   //for(int xi=0;xi<Nx;xi++){
+   // char *testing_filename_area = new char[1024];
+   // sprintf(testing_filename_area,"testing_file_area.txt");
+   // FILE *testing_file_area = fopen((const char *)testing_filename_area,"w");
+   // delete[] testing_filename_area;
+   // //for(int xi=0;xi<Nx;xi++){
+   // for(int xi=0;xi<Nx;xi++){
+   //   for(int yi=0;yi<Ny;yi++){
+   //     int zi = Nz/2;
+   //     fprintf(testing_file_area,"%g\t",mem_A[xi*Ny*Nz+yi*Nz+zi]);
+   //     if (mem_A[xi*Ny*Nz+yi*Nz+zi] != 0.0) {
+   //       printf("xi = %d  yi = %d mem_A = %g\n",xi,yi,mem_A[xi*Ny*Nz+yi*Nz+zi]);
+   //     }
+   //   }
+   //   fprintf(testing_file_area,"\n");
+   // }
+   // fclose(testing_file_area);
+
+
+   //sym_check (mem_A);
+   //fflush(stdout);
+
+
+   double *first_mem_A = new double[Nx*Ny*Nz];
+   set_membrane(out_file, mem_f, first_mem_A);
+
+   //Trimming the grid code:
+   printf("initial Nx = %d Ny = %d Nz = %d\n",Nx,Ny,Nz);
+   int max_xi = 0;
+   min_xi = Nx;
+   int max_yi = 0;
+   min_yi = Ny;
+   int max_zi = 0;
+   min_zi = Nz;
    for(int xi=0;xi<Nx;xi++){
      for(int yi=0;yi<Ny;yi++){
-       int zi = Nz/2;
-       fprintf(testing_file_area,"%g\t",mem_A[xi*Ny*Nz+yi*Nz+zi]);
-       if (mem_A[xi*Ny*Nz+yi*Nz+zi] != 0.0) {
-         printf("xi = %d  yi = %d mem_A = %g\n",xi,yi,mem_A[xi*Ny*Nz+yi*Nz+zi]);
+       for(int zi=0;zi<Nz;zi++){
+         if (first_mem_A[xi*Ny*Nz+yi*Nz+zi] != 0) {
+           if (xi > max_xi){
+             //printf("xi=%d max_xi=%d\n",xi,max_xi);
+             max_xi = xi;
+           }
+           if (yi > max_yi){
+             max_yi = yi;
+           }
+           if (zi > max_zi){
+             //printf("zi=%d max_zi=%d mem_A = %g\n",zi,max_zi,mem_A[xi*Ny*Nz+yi*Nz+zi]);
+             max_zi = zi;
+           }
+           if (xi < min_xi){
+             min_xi = xi;
+           }
+           if (yi < min_yi){
+             min_yi = yi;
+           }
+           if (zi < min_zi){
+             min_zi = zi;
+             printf("min_zi = %d, xi = %d,yi = %d,zi = %d\n",min_zi, xi,yi,zi);
+           }
+         }
        }
      }
-     fprintf(testing_file_area,"\n");
    }
-   fclose(testing_file_area);
+   printf("max xi=%d\tyi=%d\tzi=%d\t min xi=%d\tyi=%d\tzi=%d\t\n",max_xi,max_yi,max_zi,min_xi,min_yi,min_zi);
+   int new_Nx = max_xi-min_xi+2;
+   int new_Ny = max_yi-min_yi+2;
+   int new_Nz = max_zi-min_zi+2;
+   double *mem_A = new double[new_Ny*new_Nz*new_Nz];
+   for(int xi=min_xi;xi<Nx;xi++){
+     for(int yi=min_yi;yi<Ny;yi++){
+       for(int zi=min_zi;zi<Nz;zi++){
+         mem_A[(xi-min_xi+1)*new_Ny*new_Nz+(yi-min_yi+1)*new_Nz+(zi-min_zi+1)] = first_mem_A[xi*Ny*Nz+yi*Nz+zi];
+       }
+     }
+   }
+   printf("2nd Nx = %d Ny = %d Nz = %d\n",Nx,Ny,Nz);
+   printf("new_Nx = %d new_Ny = %d new_Nz = %d\n",new_Nx,new_Ny,new_Nz);
+   //these three lines are needed for the 'inside' function later:
+   // grid_trimming_Nx = min_xi-1;
+   // grid_trimming_Ny = min_yi-1;
+   // grid_trimming_Nz = min_zi-1;
+   // printf("grid_trimming_Nx = %d grid_trimming_Ny = %d grid_trimming_Nz = %d\n",
+   //        grid_trimming_Nx,grid_trimming_Ny,grid_trimming_Nz);
 
-   printf("Got Here!\n");
+   printf("Nx = %d new_Nx = %d\nNy = %d new_Ny = %d\nNz = %d new_Nz = %d\n",Nx,new_Nx,Ny,new_Ny,Nz,new_Nz);
    fflush(stdout);
 
-   sym_check (mem_A);
-   fflush(stdout);
-
-  // double *first_mem_A = new double[Nx*Ny*Nz];
-  // set_membrane(out_file, mem_f, first_mem_A);
-
-  // //Trimming the grid code:
-  // printf("initial Nx = %d Ny = %d Nz = %d\n",Nx,Ny,Nz);
-  // int max_xi = 0;
-  // min_xi = Nx;
-  // int max_yi = 0;
-  // min_yi = Ny;
-  // int max_zi = 0;
-  // min_zi = Nz;
-  // for(int xi=0;xi<Nx;xi++){
-  //   for(int yi=0;yi<Ny;yi++){
-  //     for(int zi=0;zi<Nz;zi++){
-  //       if (first_mem_A[xi*Ny*Nz+yi*Nz+zi] != 0) {
-  //         if (xi > max_xi){
-  //           //printf("xi=%d max_xi=%d\n",xi,max_xi);
-  //           max_xi = xi;
-  //         }
-  //         if (yi > max_yi){
-  //           max_yi = yi;
-  //         }
-  //         if (zi > max_zi){
-  //           //printf("zi=%d max_zi=%d mem_A = %g\n",zi,max_zi,mem_A[xi*Ny*Nz+yi*Nz+zi]);
-  //           max_zi = zi;
-  //         }
-  //         if (xi < min_xi){
-  //           min_xi = xi;
-  //         }
-  //         if (yi < min_yi){
-  //           min_yi = yi;
-  //         }
-  //         if (zi < min_zi){
-  //           min_zi = zi;
-  //           printf("min_zi = %d, xi = %d,yi = %d,zi = %d\n",min_zi, xi,yi,zi);
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-  // printf("max xi=%d\tyi=%d\tzi=%d\t min xi=%d\tyi=%d\tzi=%d\t\n",max_xi,max_yi,max_zi,min_xi,min_yi,min_zi);
-  // int new_Nx = max_xi-min_xi+2;
-  // int new_Ny = max_yi-min_yi+2;
-  // int new_Nz = max_zi-min_zi+2;
-  // double *mem_A = new double[new_Ny*new_Nz*new_Nz];
-  // for(int xi=min_xi;xi<Nx;xi++){
-  //   for(int yi=min_yi;yi<Ny;yi++){
-  //     for(int zi=min_zi;zi<Nz;zi++){
-  //       mem_A[(xi-min_xi+1)*new_Ny*new_Nz+(yi-min_yi+1)*new_Nz+(zi-min_zi+1)] = first_mem_A[xi*Ny*Nz+yi*Nz+zi];
-  //     }
-  //   }
-  // }
-  // printf("2nd Nx = %d Ny = %d Nz = %d\n",Nx,Ny,Nz);
-  // printf("new_Nx = %d new_Ny = %d new_Nz = %d\n",new_Nx,new_Ny,new_Nz);
-  // //these three lines are needed for the 'inside' function later:
-  // // grid_trimming_Nx = min_xi-1;
-  // // grid_trimming_Ny = min_yi-1;
-  // // grid_trimming_Nz = min_zi-1;
-  // // printf("grid_trimming_Nx = %d grid_trimming_Ny = %d grid_trimming_Nz = %d\n",
-  // //        grid_trimming_Nx,grid_trimming_Ny,grid_trimming_Nz);
-
-  // printf("Nx = %d new_Nx = %d\nNy = %d new_Ny = %d\nNz = %d new_Nz = %d\n",Nx,new_Nx,Ny,new_Ny,Nz,new_Nz);
-  // fflush(stdout);
-
-  // Nx = new_Nx;
-  // Ny = new_Ny;
-  // Nz = new_Nz;
-  // for(int yi=0;yi<Ny;yi++){
-  //   for(int zi=0;zi<Nz;zi++){
-  //     if (mem_A[int(Nx/2)*Ny*Nz+yi*Nz+zi]!=0) {
-  //       //printf("%d %d %g H\t",yi,zi,mem_A[int(Nx/2)*Ny*Nz+yi*Nz+zi]);
-  //     }
-  //   }
-  //   //printf("\n");
-  // }
-  // printf("3rd Nx = %d Ny = %d Nz = %d\n",Nx,Ny,Nz);
+   Nx = new_Nx;
+   Ny = new_Ny;
+   Nz = new_Nz;
+   for(int yi=0;yi<Ny;yi++){
+     for(int zi=0;zi<Nz;zi++){
+       if (mem_A[int(Nx/2)*Ny*Nz+yi*Nz+zi]!=0) {
+         //printf("%d %d %g H\t",yi,zi,mem_A[int(Nx/2)*Ny*Nz+yi*Nz+zi]);
+       }
+     }
+     //printf("\n");
+   }
+   printf("3rd Nx = %d Ny = %d Nz = %d\n",Nx,Ny,Nz);
   //End of trimming the grid code
   //attempt at making the p shape an exception to trimming
 
+   bool *insideArr = new bool[Nx*Ny*Nz];
+   set_insideArr(insideArr);
 
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
@@ -859,7 +852,7 @@ int main (int argc, char *argv[]) {
   }
   //  double inmarker; unused
   //  double zt = A/2; double yt = B/2; double xt = C/2; unused
-  //  double ft = mem_f(zt,yt,xt); unused
+  //  double ft = mem_fz(mem_f(t,yt,xt); unused
   for (int j=0;j<Ny;j++){
     //for (int i=0;i<Nz;i++){
     for (int i=0;i<Nx;i++){
@@ -875,6 +868,9 @@ int main (int argc, char *argv[]) {
   //fflush(stdout);
   fclose(out);
   printf("\nMembrane file printed.\n");
+
+  printf("Got Here!\n");
+  fflush(stdout);
 
 
   //global arrays for storing simulation data
@@ -898,7 +894,7 @@ int main (int argc, char *argv[]) {
   double *JyE = new double[Nx*Ny*Nz];
   double *JzE = new double[Nx*Ny*Nz];
   //double *curvature = new double[Nx*Ny*Nz];
-  
+
   const int numProteins = 7;
 
   protein* nATP_plot = new protein;
@@ -1079,7 +1075,6 @@ int main (int argc, char *argv[]) {
   //fflush(out_file);
   printf("density set.\n");
 
-  
 
   //Starting the Sections file set up
 
@@ -1187,8 +1182,8 @@ int main (int argc, char *argv[]) {
 
   if (mem_f_shape=="randst") {
     if (rand_seed == 99) {
-      vert_div = 1.3*(2.6/dx)-min_zi+1;
-      vert_div_two = 1.3*(4.6/dx)-min_zi+1;
+      vert_div = 3.0*(2.6/dx)-min_zi+1;
+      vert_div_two = 3.0*(4.6/dx)-min_zi+1;
     }
     if (rand_seed == 98) {
       vert_div = 3.0/dx-min_zi+1;
