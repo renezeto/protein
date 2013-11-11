@@ -14,7 +14,9 @@ sim: protein_microscopy
 ALL_FIGURES = \
 	data/shape-p/plots/box-plot_D--p-200-50-0-0-1500.pdf
 
-paper/paper.pdf: paper/paper.tex paper/reactions.pdf ${ALL_FIGURES}
+paper/paper.pdf: paper/paper.tex \
+		paper/reactions.pdf data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf \
+		${ALL_FIGURES}
 	echo ${ALL_FIGURES}
 	cd paper && pdflatex paper.tex && bibtex paper && pdflatex paper.tex && pdflatex paper.tex
 
@@ -41,6 +43,10 @@ data/shape-p/plots/time-map-compare-p-40-20-0-0-150.pdf: pyplots/time_map.py
 	python pyplots/time_map.py p 4.00 2.00 0.00 0.00 15.00
 data/shape-p/plots/time-map-compare-p-40-30-0-0-150.pdf: pyplots/time_map.py
 	python pyplots/time_map.py p 4.00 3.00 0.00 0.00 15.00
+
+data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf: pyplots/image_plot.py
+	mkdir -p data/shape-p/plots
+	python $< p 4.00 0.50 0.00 0.00 15.00 60.00 290.00
 
 #arrow plots
 #box plots

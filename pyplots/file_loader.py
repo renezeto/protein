@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import glob
+import os
 
 #get the shape an physical parameters of the cell (last argument is density lopsidedness)
 f_shape = sys.argv[1]
@@ -9,6 +10,9 @@ f_param2 = sys.argv[3]
 f_param3 = sys.argv[4]
 f_param4 = sys.argv[5]
 f_param5 = sys.argv[6]
+
+git_add_files = False # set this to True to automagically git add dat
+                      # files that we need to do the plots
 
 dx=.05
 
@@ -68,6 +72,9 @@ def get_filenames(protein,start_time,end_time):
     # while i<round(len(dat_filenames)/10):
     #     dat_filenames.pop(0)
     #     i+=1
+    if git_add_files:
+        for filename in dat_filenames:
+            os.system('git add -f %s' % filename)
     if (dat_filenames == []):
         print "File loading error: filename list is empty."
         print "./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)

@@ -12,7 +12,7 @@
 *.png
 *.pdf
 *.gif
-
+*.dat
 
 # for latex:
 *.aux
