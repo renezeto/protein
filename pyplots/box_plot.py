@@ -350,7 +350,7 @@ def main():
     bax.set_xlim(box_time_step*start,box_time_step*end)
     bax.get_yaxis().set_visible(False)
     bax.set_ylim(0, 1)
-    bax.set_title("Min D protein counts over time")
+    bax.set_title("MinD protein counts over time")
     bax.set_xlabel("Time (s)")
     rax = bax.twinx()
     rax.set_ylabel('Fraction of proteins in each stage and section',labelpad=-15)
@@ -392,7 +392,7 @@ def main():
         k+=1
     bax.set_xlim(box_time_step*start,box_time_step*end)
     bax.set_ylim(0, 1)
-    bax.set_title("Min E protein counts over time")
+    bax.set_title("MinE protein counts over time")
     bax.set_xlabel("Time (s)")
     bax.set_ylabel("Fraction of proteins")
     bax.legend(plotNameList_E,bbox_to_anchor=(0.3,-0.05,1.0,1.0),loc="lower right",prop={'size':8}).draw_frame(False)
