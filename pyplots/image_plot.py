@@ -61,7 +61,7 @@ def build(proteins,proteinList):
     spread = Image.new("RGB", (120+(400-2*cut)*total_length, 300*len(proteins)), "white")
     for i in range(len(proteins)):
         if (proteinList[i]=="ND" or proteinList[i]=="NDE"):
-            maxval = timemax(proteins[i])/4
+            maxval = timemax(proteins[i])/1
         else:
             maxval = timemax(proteins[i])
         sys.stdout.flush()

@@ -40,46 +40,40 @@ if len(sys.argv)>expected_arg_number:
 
 filename_tuple = (f_shape,hires_str,slice_str,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)
 
+
+
 #data object, to create in another plot: proteinname=data(protein="proteinname")
 class data(object):
-    def __init__(self,protein):
+    def __init__(self,protein,start_time=0,end_time=0):
         self.protein = protein
-        self.filenames = self.get_filenames(protein,0,0)
+        self.filenames = get_filenames(protein,start_time,end_time)
         self.tsteps = len(self.filenames)
         self.dataset = np.array([np.loadtxt(file) for file in self.filenames])
         self.datashape = self.dataset[0].shape
         self.axes = [[i*dx for i in range(self.datashape[1])],[j*dx for j in range(self.datashape[0])]]
-    # def __init__(self,protein,start_time,end_time):
-    #     self.protein = protein
-    #     self.filenames = self.get_filenames(protein,start_time,end_time)
-    #     self.tsteps = len(self.filenames)
-    #     self.dataset = np.array([np.loadtxt(file) for file in self.filenames])
-    #     self.datashape = self.dataset[0].shape
-    #     self.axes = [[i*dx for i in range(self.datashape[1])],[j*dx for j in range(self.datashape[0])]]
 
 #loads the files for creating the data object.
-    @staticmethod
-    def get_filenames(protein,start_time,end_time):
-        dat_filenames = []
-        if end_time == 0:
-            for fn in glob.iglob("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)):
-                dat_filenames.append(fn)
-        if end_time != 0:
-            for i in np.arange(start_time,end_time,2.5):
-                file_num = round(i/2.5)
-                dat_filenames.append("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-%d.dat"%
-                                     (f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5,file_num))
-        dat_filenames = sorted(dat_filenames)
-        i=0 #pop the first 10% of file names to let things equillibriate a bit
-        # while i<round(len(dat_filenames)/10):
-        #     dat_filenames.pop(0)
-        #     i+=1
-        if (dat_filenames == []):
-            print "File loading error: filename list is empty."
-            print "./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)
-            exit(1)
-        else:
-            return dat_filenames
+def get_filenames(protein,start_time,end_time):
+    dat_filenames = []
+    if end_time == 0:
+        for fn in glob.iglob("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)):
+            dat_filenames.append(fn)
+    if end_time != 0:
+        for i in np.arange(start_time,end_time,2.5):
+            file_num = round(i/2.5)
+            dat_filenames.append("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-%03d.dat"%
+                                 (f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5,file_num))
+    dat_filenames = sorted(dat_filenames)
+    i=0 #pop the first 10% of file names to let things equillibriate a bit
+    # while i<round(len(dat_filenames)/10):
+    #     dat_filenames.pop(0)
+    #     i+=1
+    if (dat_filenames == []):
+        print "File loading error: filename list is empty."
+        print "./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)
+        exit(1)
+    else:
+        return dat_filenames
 
 #function for easier plot name printing. probably should be renamed itself.
 def print_string(plot_name,p):
