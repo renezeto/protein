@@ -425,7 +425,7 @@ void sym_check (double * mem_A){
   //       if (abs(mem_f(xa,y,z) - mem_f(xb,y,z)) > .00000001) {
   //         fprintf(out_file,"Nx*dx = %g\n",Nx*dx);
   //         fprintf(out_file,"xa = %g yi = %g z = %g mem_A = %g\n",xa,y,z,mem_f(xa,y,z));//[xi*Ny*Nz+ya*Nz+zi]);
-  //         fprintf(out_file,"xb = %g yi = %g z = %g mem_A = %g\n",xb,y,z,em_f(xb,y,z));//[xi*Ny*Nz+ya*Nz+zi]);
+  //         fprintf(out_file,"xb = %g yi = %g z = %g mem_A = %g\n",xb,y,z,mem_f(xb,y,z));//[xi*Ny*Nz+ya*Nz+zi]);
   //       }
   //       //fprintf(out_file,"No! ");
   //     }
@@ -530,7 +530,7 @@ int main (int argc, char *argv[]) {
        printf("Printing all 501 data files.\n");
      }
      if (strcmp(argv[i],"-debug")==0) {
-       dx = .15;
+       dx = .05;
        debug_flag = 1;
        sprintf(debug_flag_str,"debug-");
        printf("=============================================\nDebug mode. dx=.15 um^3, tot_time=250s\n=============================================\n");
@@ -596,12 +596,12 @@ int main (int argc, char *argv[]) {
    //fixed simulation parameters
    tot_time = 4000; //sec
    if (debug_flag==1) {
-     tot_time = 11;
+     tot_time = 15;
    }
    time_step = .1*dx*dx/difD;//sec
    iter = int(tot_time/time_step);//this will give us triangle data in about two days and randst in four days?
    printout_iterations = int(0.5/time_step);
-   printf("%d\n",printout_iterations);//approximately 5 seconds between each printout
+   printf("printout iterations = %d\n",printout_iterations);//approximately 5 seconds between each printout
    double dV = dx*dx*dx;
 
    //open out file to begin recording info about simulation
@@ -611,10 +611,10 @@ int main (int argc, char *argv[]) {
    delete[] out_file_name;
 
    //random stuff that needs to be contained
-   fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
-   for (int i=0;i<3*starting_num_guassians;i++){
-     guass[i]=0;
-   }
+   // fprintf(out_file,"Nx=%d\nNy=%d\nNz=%d\nX=%f\nY=%f\nZ=%f\n",Nx,Ny,Nz,(Nx*dx),(Ny*dx),(Nz*dx));
+   // for (int i=0;i<3*starting_num_guassians;i++){
+   //   guass[i]=0;
+   // }
 
    //In the following, for every set of three numbers, the 1st is y and he 2nd is z and the 3rd is quassian width
    double guass99[] = {2.0,2.2,.5,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.5};
@@ -838,8 +838,6 @@ int main (int argc, char *argv[]) {
   //End of trimming the grid code
   //attempt at making the p shape an exception to trimming
 
-   bool *insideArr = new bool[Nx*Ny*Nz];
-   set_insideArr(insideArr);
 
   //begin membrane printing - need to change this to mem_f instead of 1's and 0's
   printf("HELLLLOOOOOOO %s\n",mem_f_shape.c_str());
@@ -847,7 +845,7 @@ int main (int argc, char *argv[]) {
   sprintf(outfilename,"data/shape-%s/%s%s%smembrane-%s-%4.02f-%4.02f-%4.02f-%4.02f-%4.02f.dat",mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor);
   FILE *out = fopen((const char *)outfilename,"w");
   if (out==0){
-    printf ("couldn't print outfile\n");
+    printf ("couldn't print outfile = %s\n",outfilename);
     //exit();
   }
   //  double inmarker; unused
@@ -869,8 +867,13 @@ int main (int argc, char *argv[]) {
   fclose(out);
   printf("\nMembrane file printed.\n");
 
-  printf("Got Here!\n");
-  fflush(stdout);
+  // printf("Got Here!\n");
+  // fflush(stdout);
+
+  bool *insideArr = new bool[Nx*Ny*Nz];
+  set_insideArr(insideArr);
+  // printf("One Got Here!\n");
+  // fflush(stdout);
 
 
   //global arrays for storing simulation data
@@ -905,6 +908,9 @@ int main (int argc, char *argv[]) {
   protein* NflD_plot = new protein;
   protein* NflE_plot = new protein;
 
+  // printf("Two Got Here!\n");
+  // fflush(stdout);
+
   protein* proteinList[numProteins] = { nATP_plot, nADP_plot, nE_plot, ND_plot, NDE_plot, NflD_plot, NflE_plot };
   double* accessGlobals[numProteins] = { nATP, nADP, nE, ND, NDE, NflD, NflE };
 
@@ -912,6 +918,9 @@ int main (int argc, char *argv[]) {
 
   printf("Ny*Nz*sizeof(double) = %lu",Ny*Nz*sizeof(double));
   printf("iter*sizeof(double) = %lu",iter*sizeof(double));
+
+  printf("Three Got Here!\n");
+  fflush(stdout);
 
   //initialize things
   for (int pNum=0; pNum<numProteins; pNum++) {
@@ -949,6 +958,9 @@ int main (int argc, char *argv[]) {
     // memset(proteinList[pNum]->ymax,0,iter*sizeof(int));
     // memset(proteinList[pNum]->zmax,0,iter*sizeof(int));
   }
+
+  printf("Four Got Here!\n");
+  fflush(stdout);
 
   sprintf(proteinList[0]->name,"D_nATP");
   sprintf(proteinList[1]->name,"D_nADP");
@@ -1075,6 +1087,9 @@ int main (int argc, char *argv[]) {
   //fflush(out_file);
   printf("density set.\n");
 
+  printf("Five Got Here!\n");
+  fflush(stdout);
+
 
   //Starting the Sections file set up
 
@@ -1165,6 +1180,8 @@ int main (int argc, char *argv[]) {
     //fflush(stdout);
   }
 
+  printf("Six Got Here!\n");
+  fflush(stdout);
 
   double vert_div = 0;
   double vert_div_two = 0;
@@ -1300,12 +1317,19 @@ int main (int argc, char *argv[]) {
     //fflush(stdout);
   }
 
+  printf("Seven Got Here!\n");
+  fflush(stdout);
+
+
   //begin simulation
   for (int i=0;i<iter;i++){
     get_J(difD, nATP, nADP, nE, JxATP, JyATP,
           JzATP, JxADP, JyADP, JzADP, JxE, JyE, JzE);
     get_next_density(mem_A, insideArr, nATP, nADP, nE, ND, NDE, NflD, NflE, JxATP, JyATP, JzATP,
                      JxADP, JyADP, JzADP, JxE, JyE, JzE);
+    // printf("Eight Got Here!\n");
+    // fflush(stdout);
+
     if (i%print_denominator==0) {
       printf("Finished sim loop # i=%d, We're %1.2f percent done\n",i,double(100*i/iter));
     }
@@ -1324,6 +1348,9 @@ int main (int argc, char *argv[]) {
           }
         }
       }
+
+      // printf("Nine Got Here!\n");
+      // fflush(stdout);
 
       //box plot ...
       if (i%print_denominator==0) {
@@ -1404,6 +1431,8 @@ int main (int argc, char *argv[]) {
           }
         }
       }
+      // printf("Ten Got Here!\n");
+      // fflush(stdout);
 
       //arrow plot
       double storemaxval = 0;
@@ -1435,6 +1464,8 @@ int main (int argc, char *argv[]) {
       }
     }
 
+    // printf("Eleven Got Here!\n");
+    // fflush(stdout);
 
     //begin file printing
     if ((dump_flag == 1) && (i%printout_iterations == 0)) {
@@ -1473,6 +1504,9 @@ int main (int argc, char *argv[]) {
       }
       //end nATP printing
 
+      // printf("Twelve Got Here!\n");
+      // fflush(stdout);
+
       //nE printing
       char *outfilenameE = new char[1000];
       sprintf(outfilenameE, "data/shape-%s/%s%s%snE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor,k);
@@ -1504,6 +1538,8 @@ int main (int argc, char *argv[]) {
       }
       //end nE printing
 
+      // printf("Thirteen Got Here!\n");
+      // fflush(stdout);
 
       //nADP printing
       char *outfilenameADP = new char[1000];
@@ -1536,6 +1572,9 @@ int main (int argc, char *argv[]) {
       }
       //end nADP printing
 
+      // printf("Fourteen Got Here!\n");
+      // fflush(stdout);
+
       //begin ND printing
       char *outfilenameD = new char[1000];
       sprintf(outfilenameD, "data/shape-%s/%s%s%sND-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor,k);
@@ -1567,6 +1606,9 @@ int main (int argc, char *argv[]) {
       }
       //end ND printing
 
+      // printf("Fifteen Got Here!\n");
+      // fflush(stdout);
+
       //begin NDE printing
       char *outfilenameDE = new char[1000];
       sprintf(outfilenameDE, "data/shape-%s/%s%s%sNDE-%s-%03.2f-%03.2f-%03.2f-%03.2f-%03.2f-%03d.dat", mem_f_shape.c_str(),debug_flag_str,hires_flag_str,slice_flag_str,mem_f_shape.c_str(),A,B,C,D,density_factor,k);
@@ -1597,6 +1639,9 @@ int main (int argc, char *argv[]) {
         fclose(NDEfile);
       }
       //end NDE printing
+
+      // printf("Sixteen Got Here!\n");
+      // fflush(stdout);
 
       //begin NflE printing
       char *outfilenameflE = new char[1000];
@@ -1635,6 +1680,9 @@ int main (int argc, char *argv[]) {
       FILE *NflDfile = fopen((const char *)outfilenameflD,"w");
       delete[] outfilenameflD;
 
+      // printf("Seventeen Got Here!\n");
+      // fflush(stdout);
+
       if (slice_flag==1) {
         for (int a=0;a<Ny;a++){
           for (int b=0;b<Nz;b++){
@@ -1662,6 +1710,9 @@ int main (int argc, char *argv[]) {
       k++;
       //fflush(out_file);
     }
+
+    // printf("Eightteen Got Here!\n");
+    // fflush(stdout);
 
     time_step = .1*dx*dx/difD;//sec
     int plot_denominator = 100000;
@@ -1739,6 +1790,9 @@ int main (int argc, char *argv[]) {
         }
       }
       fclose(box_plot);
+
+      // printf("Nineteen Got Here!\n");
+      // fflush(stdout);
 
       for (int pNum=0; pNum<numProteins; pNum++) {
         char *avename = new char[1024];
@@ -1821,6 +1875,9 @@ int main (int argc, char *argv[]) {
         delete[] avename;
       }
 
+      // printf("Twenty Got Here!\n");
+      // fflush(stdout);
+
       for (int pNum=0; pNum<numProteins; pNum++) {
 
         //time map
@@ -1837,14 +1894,19 @@ int main (int argc, char *argv[]) {
       }
     }
 
+    // printf("TwentyOne Got Here!\n");
+    // fflush(stdout);
+
     for (int pNum=0; pNum<numProteins; pNum++) {
+      // printf("Hello??? Get here?\n");
+      // fflush(stdout);
       //arrow plot
       //filter local maxima in time
       if (i%printout_iterations == 0) {
         int* time_maxima_y = new int[iter];
         int* time_maxima_z = new int[iter];
         double* time_maxima_value = new double[iter];
-        printf("We're in the arrow printout loop now!!!\n");
+        //printf("We're in the arrow printout loop now!!!\n");
         for (int p=1; p<(i-(.5/time_step)); p++) {
           double max_value = 0;
           int max_k = 0;
@@ -1865,24 +1927,42 @@ int main (int argc, char *argv[]) {
             time_maxima_value[p] = 0;
           }
         }
+        // printf("TwentyThree Got Here!\n");
+        // fflush(stdout);
         //print to file
         char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
         FILE* arrowfile = fopen(arrowname,"w");
         delete[] arrowname;
+        // printf("TwentyFour Got Here!\n");
+        // fflush(stdout);
         for (int p=1; p<(i-1); p++) {
           if ((time_maxima_y[p] != 0) && (time_maxima_z[p] != 0)) {
             fprintf(arrowfile,"%d\t%d\t%g\t%g\n",time_maxima_y[p],time_maxima_z[p],p*time_step,time_maxima_value[p]);
           }
         }
         fclose(arrowfile);
+        // printf("TwentyFive Got Here!\n");
+        // fflush(stdout);
         delete[] time_maxima_y;
+        // printf("TwentySix Got Here!\n");
+        // fflush(stdout);
         delete[] time_maxima_z;
+        // printf("TwentySeven Got Here! i = %d iter = %d\n",i,iter);
+        // fflush(stdout);
         delete[] time_maxima_value;
       }
+      // printf("Now TwentySeven Got Here! i = %d iter = %d\n",i,iter);
+      // fflush(stdout);
     }
+    // printf("A lot Got Here!\n");
+    // fflush(stdout);
   }
   //end file printing
   //end simulation
+
+  printf("Twelve Got Here!\n");
+  fflush(stdout);
+
 
   for (int pNum=0; pNum<numProteins; pNum++) {
     delete[] proteinList[pNum]->sum;
@@ -1912,7 +1992,8 @@ int main (int argc, char *argv[]) {
 
   //printing plot information
 
-
+  printf("Thirteen Got Here!\n");
+  fflush(stdout);
 
   //printing to the project directory so we have a shortlist of what we've done.
   char *fname = new char[1024];
@@ -1952,6 +2033,8 @@ int main (int argc, char *argv[]) {
     delete[] proteinList[pNum]->name;
     delete proteinList[pNum];
   }
+  printf("Fourteen Got Here!\n");
+  fflush(stdout);
 
   return 0;
 }
