@@ -601,6 +601,7 @@ int main (int argc, char *argv[]) {
    time_step = .1*dx*dx/difD;//sec
    iter = int(tot_time/time_step);//this will give us triangle data in about two days and randst in four days?
    printout_iterations = int(0.5/time_step);
+   int print_denominator = 1000; //This dictates how often (in iterations) you add a line to the box, time, and ave plots
    printf("printout iterations = %d\n",printout_iterations);//approximately 5 seconds between each printout
    double dV = dx*dx*dx;
 
@@ -914,8 +915,6 @@ int main (int argc, char *argv[]) {
   protein* proteinList[numProteins] = { nATP_plot, nADP_plot, nE_plot, ND_plot, NDE_plot, NflD_plot, NflE_plot };
   double* accessGlobals[numProteins] = { nATP, nADP, nE, ND, NDE, NflD, NflE };
 
-  int print_denominator = 1000;
-
   printf("Ny*Nz*sizeof(double) = %lu",Ny*Nz*sizeof(double));
   printf("iter*sizeof(double) = %lu",iter*sizeof(double));
 
@@ -924,39 +923,38 @@ int main (int argc, char *argv[]) {
 
   //initialize things
   for (int pNum=0; pNum<numProteins; pNum++) {
+    int total_print_iter = iter/print_denominator+2;
     proteinList[pNum]->sum = new double[Ny*Nz];
     proteinList[pNum]->name = new char[1024];
 
-    proteinList[pNum]->numLeft = new double[iter];
-    proteinList[pNum]->numMid = new double[iter];
-    proteinList[pNum]->numRight = new double[iter];
+    proteinList[pNum]->numLeft = new double[total_print_iter];
+    proteinList[pNum]->numMid = new double[total_print_iter];
+    proteinList[pNum]->numRight = new double[total_print_iter];
 
-    proteinList[pNum]->numRightUp = new double[iter];
-    proteinList[pNum]->numRightDown = new double[iter];
-    proteinList[pNum]->numLeftUp = new double[iter];
-    proteinList[pNum]->numLeftDown = new double[iter];
+    proteinList[pNum]->numRightUp = new double[total_print_iter];
+    proteinList[pNum]->numRightDown = new double[total_print_iter];
+    proteinList[pNum]->numLeftUp = new double[total_print_iter];
+    proteinList[pNum]->numLeftDown = new double[total_print_iter];
 
-    proteinList[pNum]->maxval = new double[iter];
-    proteinList[pNum]->ymax = new int[iter];
-    proteinList[pNum]->zmax = new int[iter];
+    proteinList[pNum]->maxval = new double[total_print_iter];
+    proteinList[pNum]->ymax = new int[total_print_iter];
+    proteinList[pNum]->zmax = new int[total_print_iter];
 
-    // makes for a nice valgrind but crashes rene's computer
-    // :(
-    // memset(proteinList[pNum]->sum,0,Ny*Nz*sizeof(double));
-    // memset(proteinList[pNum]->name,'\0',1024*sizeof(char));
+    bzero(proteinList[pNum]->sum,Ny*Nz*sizeof(double));
+    bzero(proteinList[pNum]->name,1024*sizeof(char));
 
-    // memset(proteinList[pNum]->numLeft,0,iter*sizeof(double));
-    // memset(proteinList[pNum]->numMid,0,iter*sizeof(double));
-    // memset(proteinList[pNum]->numRight,0,iter*sizeof(double));
+    bzero(proteinList[pNum]->numLeft,total_print_iter*sizeof(double));
+    bzero(proteinList[pNum]->numMid,total_print_iter*sizeof(double));
+    bzero(proteinList[pNum]->numRight,total_print_iter*sizeof(double));
 
-    // memset(proteinList[pNum]->numRightUp,0,iter*sizeof(double));
-    // memset(proteinList[pNum]->numRightDown,0,iter*sizeof(double));
-    // memset(proteinList[pNum]->numLeftUp,0,iter*sizeof(double));
-    // memset(proteinList[pNum]->numLeftDown,0,iter*sizeof(double));
+    bzero(proteinList[pNum]->numRightUp,total_print_iter*sizeof(double));
+    bzero(proteinList[pNum]->numRightDown,total_print_iter*sizeof(double));
+    bzero(proteinList[pNum]->numLeftUp,total_print_iter*sizeof(double));
+    bzero(proteinList[pNum]->numLeftDown,total_print_iter*sizeof(double));
 
-    // memset(proteinList[pNum]->maxval,0,iter*sizeof(double));
-    // memset(proteinList[pNum]->ymax,0,iter*sizeof(int));
-    // memset(proteinList[pNum]->zmax,0,iter*sizeof(int));
+    bzero(proteinList[pNum]->maxval,total_print_iter*sizeof(double));
+    bzero(proteinList[pNum]->ymax,total_print_iter*sizeof(int));
+    bzero(proteinList[pNum]->zmax,total_print_iter*sizeof(int));
   }
 
   printf("Four Got Here!\n");
