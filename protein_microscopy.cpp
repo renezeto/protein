@@ -800,14 +800,14 @@ int main (int argc, char *argv[]) {
      }
    }
    printf("max xi=%d\tyi=%d\tzi=%d\t min xi=%d\tyi=%d\tzi=%d\t\n",max_xi,max_yi,max_zi,min_xi,min_yi,min_zi);
-   int new_Nx = max_xi-min_xi+2;
-   int new_Ny = max_yi-min_yi+2;
-   int new_Nz = max_zi-min_zi+2;
+   int new_Nx = max_xi-min_xi+3;
+   int new_Ny = max_yi-min_yi+3;
+   int new_Nz = max_zi-min_zi+3;
    double *mem_A = new double[new_Ny*new_Nz*new_Nz];
-   for(int xi=min_xi;xi<Nx;xi++){
-     for(int yi=min_yi;yi<Ny;yi++){
-       for(int zi=min_zi;zi<Nz;zi++){
-         mem_A[(xi-min_xi+1)*new_Ny*new_Nz+(yi-min_yi+1)*new_Nz+(zi-min_zi+1)] = first_mem_A[xi*Ny*Nz+yi*Nz+zi];
+   for(int xi=0;xi<new_Nx;xi++){
+     for(int yi=0;yi<new_Ny;yi++){
+       for(int zi=0;zi<new_Nz;zi++){
+         mem_A[xi*new_Ny*new_Nz+yi*new_Nz+zi] = first_mem_A[(xi+min_xi-1)*Ny*Nz+(yi+min_yi-1)*Nz+(zi+min_zi-1)];
        }
      }
    }
