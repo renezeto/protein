@@ -10,9 +10,9 @@
 *protein_microscopy*
 *catalog.txt*
 *.png
-
+*.pdf
 *.gif
-
+*.dat
 
 # for latex:
 *.aux

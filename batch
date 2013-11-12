@@ -132,6 +132,7 @@ def runPlots(commands,options):
                     print 'Error running plot, exit code', p.poll()
                     exit(1)
                 runningProcesses.remove(p)
+        time.sleep(0.5)
     return 0
 
 #starts the movie .gif generation for jobs matching commands and options (with -dump present in jobs file). works the same as runSim and runPlots
