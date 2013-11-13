@@ -129,106 +129,86 @@ has not been observed in real cells. \cite{halatek2012highly}
 
 \section{Model and Methods}
 We implement the model of Huang \emph{et al.}  for the behavior of the
-MinD and MinE proteins inside the cell~\cite{huang2003dynamic}.  This
-model is defined by a set of five reaction-diffusion equations:
+MinD and MinE proteins inside the cell~\cite{huang2003dynamic}.
+Figure~\ref{fig:reactions} shows the reaction process.  The
+cytoplasmic MinD:ADP complex undergoes nucleotide exchange and is
+changed into the MinD:ATP complex.  This will naturally diffuse
+towards and attach to the cell membrane.  A cytoplasmic MinE will
+attach to the wall bound MinD:ATP complex and after a time will
+activate ATP hydrolosis.  This breaks up the complex, releasing MinE,
+phosphate, and MinD:ADP back into the cell.  The MinD:ADP will undergo
+nucleotide exchange and begin again the cyclic process.  There is a
+mechanism for MinD:ATP clustering that is shown in
+Equation~\ref{fig:FourthPDE}.  When brushing up against the cell
+membrane, the MinD:ATP attachement rate increases linearly with the
+density of MinD:ATP already attached.  This model is defined by a set of
+five reaction-diffusion equations:
 
 \begin{multline}
-  \frac{\partial n_{D:ADP}}{\partial t} = D_D\nabla^2n_{D:ADP}-\sigma_D^{ADP\rightarrow ATP}n_{D:ADP}\\
-  +\delta(r-R)\sigma_{de}n_{de}\hspace{3.4cm}
+  \frac{\partial \rho_{D:ADP}}{\partial t} = \mathcal{D}_D\nabla^2\rho_{D:ADP}-k_D^{ADP\rightarrow ATP}\rho_{D:ADP}\\
+  +\delta(d_w)k_{de}\sigma_{DE}\hspace{3.4cm}
 \end{multline}
 \begin{multline}
-  \frac{\partial n_{D:ATP}}{\partial t} = D_D\nabla^2n_{D:ATP}+\sigma_D^{ADP\rightarrow ATP}n_{D:ADP}\\
-  -\sigma(r-R)[\sigma_D+\sigma_{dD}(n_d+n_{de})]n_{D:ATP}
+  \frac{\partial \rho_{D:ATP}}{\partial t} = \mathcal{D}_D\nabla^2\rho_{D:ATP}+k_D^{ADP\rightarrow ATP}\rho_{D:ADP}\\
+  -\delta(d_w)[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP}
 \end{multline}
 \begin{multline}
-  \frac{\partial n_E}{\partial t} = D_E\nabla^2n_E+\delta(r-R)\sigma_{de}n_{de}\\
-  -\delta(r-R)\sigma_E n_d n_E\hspace{3.3cm}
+  \frac{\partial \rho_E}{\partial t} = \mathcal{D}_E\nabla^2\rho_E+\delta(d_w)k_{de}\sigma_{DE}
+  -\delta(d_w)k_E \sigma_D \rho_E
 \end{multline}
 \begin{multline}
-  \frac{\partial n_d}{\partial t} = -\sigma_En_dn_E(R)\\
-  +[\sigma_D+\sigma_{dD}(n_d+n_{de})]n_{D:ATP}(R)\hspace{.9cm}
+  \frac{\partial \sigma_d}{\partial t} = -k_E\rho_d\rho_E
+  +[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP}
+  \label{fig:FourthPDE}
 \end{multline}
 \begin{multline}
-  \frac{\partial n_{de}}{\partial t} = -\sigma_{de}n_{de}+\sigma_En_dn_E(R)\hspace{3cm}
+  \frac{\partial \sigma_{DE}}{\partial t} = -k_{de}\sigma_{DE}+k_E\sigma_D\rho_E\hspace{3cm}
+  \label{fig:FifthPDE}
 \end{multline}
 
+Where $\rho$ is cytoplasmic protein density ($\mu m^{-3}$), $\sigma$
+is membrane bound density ($\mu m^{-2}$), $\mathcal{D}_D$ and
+$\mathcal{D}_{E}$ th diffusions constants for MinD and MinE,
+respectively, $k_D^{\textrm{ADP $\rightarrow$ ATP}}$ the rate of
+conversion from MinD:ADP to the MinD:ATP complex, $k_D$ the rate of
+MinD:ATP attachement to the membrane when no protein is already
+attached there, $k_{dD}$ the increase of this rate when MinD:ATP is
+present on the membrane, $k_{de}$ the rate of hydrolisis of the
+MinD:MinE:ATP complex, $k_E$ the rate of cytoplasmic MinE binding to
+membrane bound MinD:ATP complex, and $d_w$ is the distance from the
+point in space to the closest wall (which will always be
+perpendicular to this distance).  $\delta(d_w)$ has units of
+$\mu m^{-1}$ and will be zero everywhere except at the wall.
+Equations \ref{fig:FourthPDE} and \ref{fig:FifthPDE} will only be
+relevent at the membrane because the membrane bound density values
+will have no meaning in the cytoplasm where there is no membrane.
 
-These equations define the rates of diffusion and reaction shown in
-Figure~\ref{fig:reactions}.  \davidsays{Add more text here, describing
-  the system and the reactants.  In particular, we want to state that
-  MinD:ADP binds ATP (or is hydrolyzed?... check!) to form MinD:ATP,
-  which then gets stuck to the cell membrane, which is more likely
-  when there is already MinD:ATP bound to the membrane.  The MinE then
-  binds to the membrane-bound MinD:ATP.  Finally the whole complex can
-  fall off the membrane, at which stage you end up with MinD:ADP and
-  are ready to start over.  This is also where we define our
-  terminology for the volume and surface densities.}
+Our diffusion and reaction rates are shown below.  We are interested
+primarily with the effect of cellular shape on the protein
+oscillations, so we follow Huang's work\cite{huang2003dynamic} and do
+not deviate from these values.  Huang's simulations use total MinD and
+MinE concentrations of $1,000/\mu m$ and $350/\mu m$, respectively, in
+a cylindrical cell of radius $0.5\mu m$, and in our (non-cylindrical)
+cells we use the same number of proteins per unit volume.
 
-
-The reaction shown in Figure~\ref{fig:reactions} is cyclical so we can
-begin our observations at any stage in the cycle (which is presented
-for the natural cell shape in Fig.~\ref{image-p} below).  We consider
-first MinD:ATP floating freely in the cytoplasm.  The protein will not
-react with any other floating protein, and it will not spontenously
-shift back into the MinD:ADP stage of the cycle.  It will diffuse
-until it attaches to a cell membrane.  This is will happen most
-rapidly in regions of high curvature, where diffusion is more likely
-to lead to an encounter with a wall.  This effect is made more
-pronounced by the MinD:ATP tendency to attract and cluster on the
-membrane, as reflected in Equation~\ref{eq:d-on-wall}, which shows
-that when adjacent to the membrane, the rate of binding to the
-membrane is porportional to the amount of MinD already bound to the
-wall.  Initially, then, there is a strong tendency of MinD to cluster
-on the polar regions of the cell, where the curvature is highest.
-
-We next see the formation of MinE `rings' on the membranes of the
-polar caps.  As the freely diffusing MinE enters the cap portion it
-begins to encounter concentrated membrane bound MinD.  The MinE binds
-to this MinD and remians for a time on the walls in compound form.
-When it is released, it can diffuse naturally outward or inward
-towards the cell.  If it diffuses inward, there is less cross
-sectional wall for it to bump into and also less concentrated MinD:ATP
-to react with.  If it diffuses outward, the curvature of the cell wall
-cuases there to be a greater chance that it will encounter the cell
-membrane (for the same reason outlined for the MinD:ATP above) and if
-there is MinD:ATP bound there, there is a chance that it will bind to
-that protein and react again.  If it does diffuse in this directin, it
-will likely react with MinD:ATP before getting very far into the
-encap.  Thus after dettaching from the membrane at the edge of the
-MinD:ATP encap cluster, the MinE is most likely to travel a small
-distance further into the polar region and then attach and react again
-with MinD:ATP protein there.  This process results in the observed
-qualitative 'encroaching MinE ring' behavoir that releases MinD:ADP
-back into the cytoplasm.  This MinD:ADP will diffuse for a time before
-spontanosly uindergowing hydrolysis \fixme{is this right?} and
-reaching the MinD:ATP state that can bind to the membrane again.
-There is a strong chance that it has by this time diffused out of the
-polar region and is on its way to the opposite polar region of the
-cell.  If it hasn't then it will reattach to the MinD:ATP on the cell
-wall deeper into the endcap and will eventually be converged upon by
-the MinE ring, only to be released again in MinD:ADP form.
-
-Overall this process results in an extremely robust oscillatory
-behavoir of polar selection and oscillation in a wide variety of cell
-shapes.
+\begin{gather*}
+  \mathcal{D}_D = \mathcal{D}_{E} = 2.5\micron^2/\text{sec}\\
+  k_D^{\textrm{ADP $\rightarrow$ ATP}} = 1/\textrm{sec,  }
+  k_D = 0.025 \micron /\textrm{sec}\\
+  k_{dD} = 0.0015 \micron^3/ \textrm{sec,  }
+  k_{de} = 0.7/\textrm{sec}\\
+  k_E = 0.093 \micron^3 /\textrm{sec}.
+\end{gather*}
 
 
-
- A 3d grid is constructed in cartesian
-coordinates with a grid spacing of .05\micron. We define our cell
-shapes and solve the reaction-diffusion equations numerically to
-observe the time evolution of the MinD and MinE concentrations inside
-the cell.
+A 3d grid is constructed in cartesian coordinates with a grid spacing
+of .05\micron. We define our cell shapes and solve the
+reaction-diffusion equations numerically to observe the time evolution
+of the MinD and MinE concentrations inside the cell.
 
 We start our cells with the MinD and MinE concentrations that are
 reported as wild type concentrations by Huang et al . We as well use the same reaction
 diffusion constants and and reaction rates,
-\begin{gather*} %format better
-  \mathcal{D}_D = \mathcal{D}_{E}  = 2.5 \micron^2/\text{sec}, \\
-  \sigma_D^{\textrm{ADP $\rightarrow$ ATP}}  = 1/\textrm{sec},  \sigma_D = 0.025 \micron /\textrm{sec}, \\
-  \sigma_{dD}  = 0.0015 \micron^3/ \textrm{sec}, \\
-  \sigma_{de}  = 0.7/\textrm{sec}, \sigma_E = 0.093 \micron^3 /\textrm{sec}.
-\end{gather*}
 
 \section{Cell shapes}
 
@@ -286,6 +266,53 @@ protein concentrations in the cell over time.
 \section{Specific Results}
 
 \subsection{Pill Shape}
+
+The reaction shown in Figure~\ref{fig:reactions} is cyclical so we can
+begin our observations at any stage in the cycle (which is presented
+for the natural cell shape in Fig.~\ref{image-p} below).  We consider
+first MinD:ATP floating freely in the cytoplasm.  The protein will not
+react with any other floating protein, and it will not spontenously
+shift back into the MinD:ADP stage of the cycle.  It will diffuse
+until it attaches to a cell membrane.  This is will happen most
+rapidly in regions of high curvature, where diffusion is more likely
+to lead to an encounter with a wall.  This effect is made more
+pronounced by the MinD:ATP tendency to attract and cluster on the
+membrane, as reflected in Equation~\ref{eq:d-on-wall}, which shows
+that when adjacent to the membrane, the rate of binding to the
+membrane is porportional to the amount of MinD already bound to the
+wall.  Initially, then, there is a strong tendency of MinD to cluster
+on the polar regions of the cell, where the curvature is highest.
+
+We next see the formation of MinE `rings' on the membranes of the
+polar caps.  As the freely diffusing MinE enters the cap portion it
+begins to encounter concentrated membrane bound MinD.  The MinE binds
+to this MinD and remians for a time on the walls in compound form.
+When it is released, it can diffuse naturally outward or inward
+towards the cell.  If it diffuses inward, there is less cross
+sectional wall for it to bump into and also less concentrated MinD:ATP
+to react with.  If it diffuses outward, the curvature of the cell wall
+cuases there to be a greater chance that it will encounter the cell
+membrane (for the same reason outlined for the MinD:ATP above) and if
+there is MinD:ATP bound there, there is a chance that it will bind to
+that protein and react again.  If it does diffuse in this directin, it
+will likely react with MinD:ATP before getting very far into the
+encap.  Thus after dettaching from the membrane at the edge of the
+MinD:ATP encap cluster, the MinE is most likely to travel a small
+distance further into the polar region and then attach and react again
+with MinD:ATP protein there.  This process results in the observed
+qualitative 'encroaching MinE ring' behavoir that releases MinD:ADP
+back into the cytoplasm.  This MinD:ADP will diffuse for a time before
+spontanosly uindergowing hydrolysis \fixme{is this right?} and
+reaching the MinD:ATP state that can bind to the membrane again.
+There is a strong chance that it has by this time diffused out of the
+polar region and is on its way to the opposite polar region of the
+cell.  If it hasn't then it will reattach to the MinD:ATP on the cell
+wall deeper into the endcap and will eventually be converged upon by
+the MinE ring, only to be released again in MinD:ADP form.
+
+Overall this process results in an extremely robust oscillatory
+behavoir of polar selection and oscillation in a wide variety of cell
+shapes.
 
 \begin{figure*}
   \includegraphics[width=\textwidth]{../data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf}
