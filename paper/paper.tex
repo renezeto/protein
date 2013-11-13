@@ -1,5 +1,4 @@
 \documentclass[letterpaper,twocolumn,amsmath,amssymb,pre]{revtex4-1}
-
 \usepackage{graphicx}% Include figure files
 \usepackage{color}
 
@@ -132,9 +131,28 @@ has not been observed in real cells. \cite{halatek2012highly}
 We implement the model of Huang \emph{et al.}  for the behavior of the
 MinD and MinE proteins inside the cell~\cite{huang2003dynamic}.  This
 model is defined by a set of five reaction-diffusion equations:
-\begin{align}
-  \frac{\partial n_{?}}{\partial t} &= \text{\davidsays{Actual differential equations here.}}
-\end{align}
+
+\begin{multline}
+  \frac{\partial n_{D:ADP}}{\partial t} = D_D\nabla^2n_{D:ADP}-\sigma_D^{ADP\rightarrow ATP}n_{D:ADP}\\
+  +\delta(r-R)\sigma_{de}n_{de}\hspace{3.4cm}
+\end{multline}
+\begin{multline}
+  \frac{\partial n_{D:ATP}}{\partial t} = D_D\nabla^2n_{D:ATP}+\sigma_D^{ADP\rightarrow ATP}n_{D:ADP}\\
+  -\sigma(r-R)[\sigma_D+\sigma_{dD}(n_d+n_{de})]n_{D:ATP}
+\end{multline}
+\begin{multline}
+  \frac{\partial n_E}{\partial t} = D_E\nabla^2n_E+\delta(r-R)\sigma_{de}n_{de}\\
+  -\delta(r-R)\sigma_E n_d n_E\hspace{3.3cm}
+\end{multline}
+\begin{multline}
+  \frac{\partial n_d}{\partial t} = -\sigma_En_dn_E(R)\\
+  +[\sigma_D+\sigma_{dD}(n_d+n_{de})]n_{D:ATP}(R)\hspace{.9cm}
+\end{multline}
+\begin{multline}
+  \frac{\partial n_{de}}{\partial t} = -\sigma_{de}n_{de}+\sigma_En_dn_E(R)\hspace{3cm}
+\end{multline}
+
+
 These equations define the rates of diffusion and reaction shown in
 Figure~\ref{fig:reactions}.  \davidsays{Add more text here, describing
   the system and the reactants.  In particular, we want to state that
@@ -460,7 +478,7 @@ For these three sizess and shapes there is not sign that the
 oscillation patterns once they are set will break down.
 
 \begin{figure}
-  \includegraphics[width=\columnwidth]{../data/shape-triangle/plots/box-plot_D--triangle-25-601-601-601-1500}
+%%  \includegraphics[width=\columnwidth]{../data/shape-triangle/plots/box-plot_D--triangle-25-600-600-600-1500}
   \caption{Total protein fluctuation of an equilateral triangle with
     larger dimensions (each side is roughly $6\micron$.  The vertical
     axis shows stacked the total number of proteins that are of four
