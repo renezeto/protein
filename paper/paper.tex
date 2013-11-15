@@ -139,7 +139,7 @@ activate ATP hydrolosis.  This breaks up the complex, releasing MinE,
 phosphate, and MinD:ADP back into the cell.  The MinD:ADP will undergo
 nucleotide exchange and begin again the cyclic process.  There is a
 mechanism for MinD:ATP clustering that is shown in
-Equation~\ref{fig:FourthPDE}.  When brushing up against the cell
+Equation~\ref{eq:d-on-wall}.  When brushing up against the cell
 membrane, the MinD:ATP attachement rate increases linearly with the
 density of MinD:ATP already attached.  This model is defined by a set of
 five reaction-diffusion equations:
@@ -159,11 +159,11 @@ five reaction-diffusion equations:
 \begin{multline}
   \frac{\partial \sigma_d}{\partial t} = -k_E\rho_d\rho_E
   +[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP}
-  \label{fig:FourthPDE}
+  \label{eq:d-on-wall}
 \end{multline}
 \begin{multline}
   \frac{\partial \sigma_{DE}}{\partial t} = -k_{de}\sigma_{DE}+k_E\sigma_D\rho_E\hspace{3cm}
-  \label{fig:FifthPDE}
+  \label{eq:FifthPDE}
 \end{multline}
 
 Where $\rho$ is cytoplasmic protein density ($\mu m^{-3}$), $\sigma$
@@ -179,7 +179,7 @@ membrane bound MinD:ATP complex, and $d_w$ is the distance from the
 point in space to the closest wall (which will always be
 perpendicular to this distance).  $\delta(d_w)$ has units of
 $\mu m^{-1}$ and will be zero everywhere except at the wall.
-Equations \ref{fig:FourthPDE} and \ref{fig:FifthPDE} will only be
+Equations \ref{eq:d-on-wall} and \ref{eq:FifthPDE} will only be
 relevent at the membrane because the membrane bound density values
 will have no meaning in the cytoplasm where there is no membrane.
 
@@ -316,18 +316,19 @@ shapes.
 
 \begin{figure*}
   \includegraphics[width=\textwidth]{../data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf}
-  \caption{Frames from an animation showing a series of contour plots
-    of the concentration of proteins in different stages over time.
-    The density of proteins are integrated along the axis normal to
-    the page. The frames occur 2.5 seconds apart. \fixme{this looks
-      assymetric! That's a big problem.} \davidsays{I like this plot,
-      but would rather see it improved in a few ways.  I noticed the
-      implementation combines together bitmaps.  Nicer would be to use
-      subplots within matplotlib, so we output the plot directly as a
-      pdf.  Then we could also arrange things so there is much less
-      vertical white space.  It'd be nicer to have labels at the left
-      and a time axis at the bottom, with no labels by each image.  I
-      know this will take a while, so it's not yet a high priority.}}
+  \caption{Images of the concentration of each species in a natural
+    pill-shaped bacterium as a function of time, with darker regions
+    indicating higher concentration.  Frames from an animation showing
+    a series of contour plots of the concentration of proteins in
+    different stages over time.  The order of frames is such that
+    individual MinD proteins begin at the bottom of the plot (in the
+    MinD:ATP state in the cytoplasm), and progress upward until they
+    reach the MinE:MinD:ATP membrane-bound complex.  At that point,
+    they will spontaneously dissociate into cytoplasmic MinE (the top
+    row) and the starting state of cytoplasmic MinD:ADP.  The
+    densities plotted are integrated along the axis orthogonal to the
+    page, and the color scale is chosen separately for each species
+    with black as the maximum value over space and time.}
   \label{image-p}
 \end{figure*}
 
