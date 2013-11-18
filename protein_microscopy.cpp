@@ -617,6 +617,9 @@ int main (int argc, char *argv[]) {
    //   guass[i]=0;
    // }
 
+   printf("Simulation arguments: %s %g %g %g %g %g\n",mem_f_shape.c_str(),A,B,C,D,density_factor);
+   fflush(stdout);
+
    //In the following, for every set of three numbers, the 1st is y and he 2nd is z and the 3rd is quassian width
    double guass99[] = {2.0,2.2,.5,3,3,.50,4.0,3.6,.50,3,4.2,.50,2.0,5,.5};
    double guass98[] = {2.0,2.0,.3,3,3,.6,4.2,3.4,.3,4.6,4.6,.6,3.4,5.6,.6};
@@ -922,6 +925,7 @@ int main (int argc, char *argv[]) {
   fflush(stdout);
 
   //initialize things
+  int arrow_iter = 2000;
   for (int pNum=0; pNum<numProteins; pNum++) {
     int total_print_iter = iter/print_denominator+2;
     proteinList[pNum]->sum = new double[Ny*Nz];
@@ -936,9 +940,9 @@ int main (int argc, char *argv[]) {
     proteinList[pNum]->numLeftUp = new double[total_print_iter];
     proteinList[pNum]->numLeftDown = new double[total_print_iter];
 
-    proteinList[pNum]->maxval = new double[total_print_iter];
-    proteinList[pNum]->ymax = new int[total_print_iter];
-    proteinList[pNum]->zmax = new int[total_print_iter];
+    proteinList[pNum]->maxval = new double[arrow_iter];
+    proteinList[pNum]->ymax = new int[arrow_iter];
+    proteinList[pNum]->zmax = new int[arrow_iter];
 
     bzero(proteinList[pNum]->sum,Ny*Nz*sizeof(double));
     bzero(proteinList[pNum]->name,1024*sizeof(char));
@@ -952,9 +956,9 @@ int main (int argc, char *argv[]) {
     bzero(proteinList[pNum]->numLeftUp,total_print_iter*sizeof(double));
     bzero(proteinList[pNum]->numLeftDown,total_print_iter*sizeof(double));
 
-    bzero(proteinList[pNum]->maxval,total_print_iter*sizeof(double));
-    bzero(proteinList[pNum]->ymax,total_print_iter*sizeof(int));
-    bzero(proteinList[pNum]->zmax,total_print_iter*sizeof(int));
+    bzero(proteinList[pNum]->maxval,arrow_iter*sizeof(double));
+    bzero(proteinList[pNum]->ymax,arrow_iter*sizeof(int));
+    bzero(proteinList[pNum]->zmax,arrow_iter*sizeof(int));
   }
 
   printf("Four Got Here!\n");
@@ -1433,29 +1437,31 @@ int main (int argc, char *argv[]) {
       // fflush(stdout);
 
       //arrow plot
-      double storemaxval = 0;
-      double currentval;
-      for (int a=0; a<Ny; a++) {
-        for (int b=0; b<Nz; b++) {
-          if (slice_flag==0) {
-            currentval=0;
-            for (int c=0; c<Nx; c++) {
-              currentval += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+      if (i<arrow_iter) {
+        double storemaxval = 0;
+        double currentval;
+        for (int a=0; a<Ny; a++) {
+          for (int b=0; b<Nz; b++) {
+            if (slice_flag==0) {
+              currentval=0;
+              for (int c=0; c<Nx; c++) {
+                currentval += accessGlobals[pNum][c*Ny*Nz+a*Nz+b];
+              }
+              if (currentval > storemaxval) {
+                storemaxval = currentval;
+                proteinList[pNum]->maxval[i] = storemaxval;
+                proteinList[pNum]->ymax[i] = a;
+                proteinList[pNum]->zmax[i] = b;
+              }
             }
-            if (currentval > storemaxval) {
-              storemaxval = currentval;
-              proteinList[pNum]->maxval[i] = storemaxval;
-              proteinList[pNum]->ymax[i] = a;
-              proteinList[pNum]->zmax[i] = b;
-            }
-          }
-          else {
-            currentval = accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
-            if (currentval > storemaxval) {
-              storemaxval = currentval;
-              proteinList[pNum]->maxval[i] = storemaxval;
-              proteinList[pNum]->ymax[i] = a;
-              proteinList[pNum]->zmax[i] = b;
+            else {
+              currentval = accessGlobals[pNum][int(Nx/2)*Ny*Nz+a*Nz+b];
+              if (currentval > storemaxval) {
+                storemaxval = currentval;
+                proteinList[pNum]->maxval[i] = storemaxval;
+                proteinList[pNum]->ymax[i] = a;
+                proteinList[pNum]->zmax[i] = b;
+              }
             }
           }
         }
@@ -1900,54 +1906,56 @@ int main (int argc, char *argv[]) {
       // fflush(stdout);
       //arrow plot
       //filter local maxima in time
-      if (i%printout_iterations == 0) {
-        int* time_maxima_y = new int[iter];
-        int* time_maxima_z = new int[iter];
-        double* time_maxima_value = new double[iter];
-        //printf("We're in the arrow printout loop now!!!\n");
-        for (int p=1; p<(i-(.5/time_step)); p++) {
-          double max_value = 0;
-          int max_k = 0;
-          for (int k = int(p-(.5/time_step)); k<(p+(.5/time_step)); k++){
-            if (proteinList[pNum]->maxval[k] > max_value) {
-              max_value = proteinList[pNum]->maxval[k];
-              max_k = k;
+      if (i<arrow_iter) {
+        if (i%printout_iterations == 0) {
+          int* time_maxima_y = new int[arrow_iter];
+          int* time_maxima_z = new int[arrow_iter];
+          double* time_maxima_value = new double[arrow_iter];
+          //printf("We're in the arrow printout loop now!!!\n");
+          for (int p=1; p<(i-(.5/time_step)); p++) {
+            double max_value = 0;
+            int max_k = 0;
+            for (int k = int(p-(.5/time_step)); k<(p+(.5/time_step)); k++){
+              if (proteinList[pNum]->maxval[k] > max_value) {
+                max_value = proteinList[pNum]->maxval[k];
+                max_k = k;
+              }
+            }
+            if( max_k == p) {
+              time_maxima_y[p] = proteinList[pNum]->ymax[p];
+              time_maxima_z[p] = proteinList[pNum]->zmax[p];
+              time_maxima_value[p] = proteinList[pNum]->maxval[p];
+            }
+            else {
+              time_maxima_y[p] = 0;
+              time_maxima_z[p] = 0;
+              time_maxima_value[p] = 0;
             }
           }
-          if( max_k == p) {
-            time_maxima_y[p] = proteinList[pNum]->ymax[p];
-            time_maxima_z[p] = proteinList[pNum]->zmax[p];
-            time_maxima_value[p] = proteinList[pNum]->maxval[p];
+          // printf("TwentyThree Got Here!\n");
+          // fflush(stdout);
+          //print to file
+          char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
+          FILE* arrowfile = fopen(arrowname,"w");
+          delete[] arrowname;
+          // printf("TwentyFour Got Here!\n");
+          // fflush(stdout);
+          for (int p=1; p<(i-1); p++) {
+            if ((time_maxima_y[p] != 0) && (time_maxima_z[p] != 0)) {
+              fprintf(arrowfile,"%d\t%d\t%g\t%g\n",time_maxima_y[p],time_maxima_z[p],p*time_step,time_maxima_value[p]);
+            }
           }
-          else {
-            time_maxima_y[p] = 0;
-            time_maxima_z[p] = 0;
-            time_maxima_value[p] = 0;
-          }
+          fclose(arrowfile);
+          // printf("TwentyFive Got Here!\n");
+          // fflush(stdout);
+          delete[] time_maxima_y;
+          // printf("TwentySix Got Here!\n");
+          // fflush(stdout);
+          delete[] time_maxima_z;
+          // printf("TwentySeven Got Here! i = %d iter = %d\n",i,iter);
+          // fflush(stdout);
+          delete[] time_maxima_value;
         }
-        // printf("TwentyThree Got Here!\n");
-        // fflush(stdout);
-        //print to file
-        char *arrowname = print_filename("arrow-plot",proteinList[pNum]->name);
-        FILE* arrowfile = fopen(arrowname,"w");
-        delete[] arrowname;
-        // printf("TwentyFour Got Here!\n");
-        // fflush(stdout);
-        for (int p=1; p<(i-1); p++) {
-          if ((time_maxima_y[p] != 0) && (time_maxima_z[p] != 0)) {
-            fprintf(arrowfile,"%d\t%d\t%g\t%g\n",time_maxima_y[p],time_maxima_z[p],p*time_step,time_maxima_value[p]);
-          }
-        }
-        fclose(arrowfile);
-        // printf("TwentyFive Got Here!\n");
-        // fflush(stdout);
-        delete[] time_maxima_y;
-        // printf("TwentySix Got Here!\n");
-        // fflush(stdout);
-        delete[] time_maxima_z;
-        // printf("TwentySeven Got Here! i = %d iter = %d\n",i,iter);
-        // fflush(stdout);
-        delete[] time_maxima_value;
       }
       // printf("Now TwentySeven Got Here! i = %d iter = %d\n",i,iter);
       // fflush(stdout);
