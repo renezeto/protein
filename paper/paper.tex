@@ -8,6 +8,7 @@
 
 \newcommand{\fixme}[1]{\red{[#1]}}
 \newcommand{\davidsays}[1]{{\color{red} [\green{David:} \emph{#1}]}}
+\newcommand{\renesays}[1]{{\color{red} [\green{Rene:} \emph{#1}]}}
 
 \newcommand\micron{\ensuremath{\mu\text{m}}}
 
@@ -17,7 +18,7 @@
 
 \author{Jeff B. Schulte}
 \affiliation{Department of Physics, Oregon State University}
-\author{Rene WHAT. Zeto}
+\author{Rene W. Zeto}
 \affiliation{Department of Physics, Oregon State University}
 \author{David Roundy}
 \affiliation{Department of Physics, Oregon State University}
@@ -42,52 +43,57 @@
 \maketitle
 
 \section{Introduction}
-It is vital that during the process of bacterial cell division a cell
+It is vital that during the process of bacterial cell division, a cell
 avoid minicelling, or splitting into daughter cells with lopsided
-volumes.  During this process a long FtsZ polymer chain develops on
-the cell wall in the center region of the cell that dictates the plane
-of division~\cite{adams2009bacterial,
-  lutkenhaus2007assembly}. Previous experimental studies have shown
-that the MinC protein, known to inhibit the FtZ
-polymer\cite{shen2010examination}, exhibits a pole to pole oscillatory
-behavoir in conjunction with the MinD and MinE proteins, while the
-oscillating MinE tends to be more localized in the center of the
-cell~\cite{hu1999topological, fu2001mine, shapiro2009and, yu1999ftsz,
-  raskin1999rapid}. The MinC protein will then have a higher time
-averaged concentration in the cell poles as opposed to the center
-region of the cell, aiding in prohibiting the FtZ from developing in
-the wrong region.
+volumes.  A long FtsZ polymer chain develops on the cell wall, in the
+center region of the cell, the region which dictates the plane of
+division~\cite{adams2009bacterial, lutkenhaus2007assembly}. Previous
+experimental studies have shown that the MinC protein, known to
+inhibit the FtZ polymer\cite{shen2010examination}, exhibits pole to
+pole oscillatory behavior in conjunction with the MinD and MinE
+proteins, while the oscillating MinE tends to be more localized in the
+center of the cell~\cite{hu1999topological, fu2001mine,
+  shapiro2009and, yu1999ftsz, raskin1999rapid}. The MinC protein will
+then have a higher time averaged concentration in the cell poles, as
+opposed to the center region of the cell, aiding in prohibiting the
+FtZ from developing in the wrong region.
 
-It is vital for the mechanism by which the cell accurately divides to
-be robust and indeed it has been shown to
-be\cite{touhami2006temperature}.  Studies have shown that the
-oscillations can effectively find poles in abberent cell
-shapes~\cite{corbin2002exploring} \cite{juarez2010changes}.  Varma et
-al. have studied three pronged connected tube shapes, both
-experimentally and in simulation\cite{varma2008min} and have shown
-that even in these oscillations develop in regular patterns. However,
-Mannik et al. have shown that there are limits to this
-robustness. Forcing cells into flattened, irregular cell shapes
-adversly effects the Min system's ability to maintain their regular
-oscillatory behavior \fixme{this link doesn't work =
-  cite{mannik2012robustness}} \cite{mannik2010bacteria}
-\cite{mannik2009bacterial}.  We follow the experimental work of Mannik
-et and use Huang's mean field differential equation reaction model to
-explore the model's ability to find regular oscillatory behavoir in a
-series of abberent shapes.  \davidsays{This paragraph could use some
-  work, and should reference Mannik early, and emphasize his research.
-  First paragraph sets the stage for why our work is important by
-  introducing the MinD system.  Second paragraph should explain why we
-  are studying the Min system in funny cell shapes.}
+The cell division process must be able to prevent minicelling, even
+under irregular conditions. Studies have shown that it is capable of
+performing this task for fairly perturbed cell
+shapes\cite{touhami2006temperature}. Mannik et al. have done some
+early experimental work showing regular oscillations of cell division
+systems in bacteria that were physically forced into unusual
+shapes. Varma et al. studied one particular example of a perturbed
+shape, a three-pronged tube, and found both experimental and
+simulation results\cite{varma2008min} supporting the idea that certain
+systems inside the cell begin to undergo oscillations inside the
+cell. These oscillations seem to seek out the extreme poles in the
+cell shape\cite{corbin2002exploring} \cite{juarez2010changes}, and
+effectively prevent minicelling in most cases. However, Mannik et
+al. have also shown that there are limitations to this
+mechanism\cite{mannik2010bacteria} \cite{mannik2009bacterial}. One
+instance of this behavior is observable when the cell has been forced
+into a flattened, irregular shape. Oscillations in this sort of cell
+shape are far from the regular sorts of oscillations seen in the
+computational work done by Huang et al\cite{huang2003dynamic}. We seek
+to apply a computational model to explore the more extreme or
+irregular cell shapes, in order to determine the limits of the steady
+cell oscillations seen by Mannik et al.
+
+%is this necessary? was in old paragraph.
+%\fixme{this link doesn't work =
+%  cite{mannik2012robustness}} \cite{mannik2010bacteria}
+%\cite{mannik2009bacterial}
 
 A significant amount of work has been done to develop protein reaction
 and diffusion models that exhibit accurate macroscopic dynamics of the
 MinD protein system. Early models involved free proteins that affect
-eachothers' rates of diffusion and membrane attachement but do not
+each others' rates of diffusion and membrane attachment, but do not
 combine into compound states~\cite{meinhardt2001pattern}.  In 2003
 Huang improved upon this work with a simple model based on MinD-MinE
-combination, ATPase hydrolysis, and MinD membrane attechent that when
-simulated exhibits accurate MinD oscillations in cylindrical
+combination, ATPase hydrolysis, and MinD membrane attachment that when
+simulated, exhibits accurate MinD oscillations in cylindrical
 cells~\cite{huang2003dynamic}. In this model cytoplasmic MinD is more
 likely to attach to the membrane when MinD is already clustered there
 (following observed non-linear attachement of minD on the cell
@@ -100,14 +106,14 @@ studies have been made as well of models which rely on MinD mobility
 and attraction on the cell membrane~\cite{kruse2002dynamic,
   howard2005cellular}.  Variations of the Huang 2003 model that
 stochasticly account for variations of molecular interaction
-\cite{fange2006noise} and as well monte-carlo simulations that
-implement stochastic version of Huang's mean filed reaction rates
-confirm the major results obtained by Huang's model and more
-successfully predict experimentally observed oscillations in round
-cell phenotypes~\cite{drew2005polymerization, fange2006noise,
+\cite{fange2006noise} and monte-carlo simulations that implement this
+stochastic version of Huang's mean field reaction rates confirm the
+major results obtained by Huang's model, and more successfully predict
+experimentally observed oscillations in round cell
+phenotypes~\cite{drew2005polymerization, fange2006noise,
   huang2004min}. Biochemical models of broader scope have also been
 used to study the MinD system and show consistent
-results.\cite{arjunan2010new}.  However, in general the results of the
+results.\cite{arjunan2010new}.  However, in general, the results of the
 stochastic and monte-carlo simulations are similar to those given by
 Huang's mean field results.
 
@@ -146,27 +152,27 @@ five reaction-diffusion equations:
 
 \begin{multline}
   \frac{\partial \rho_{D:ADP}}{\partial t} = \mathcal{D}_D\nabla^2\rho_{D:ADP}-k_D^{ADP\rightarrow ATP}\rho_{D:ADP}\\
-  +\delta(d_w)k_{de}\sigma_{DE}\hspace{3.4cm}
+  +\delta(d_w)k_{de}\sigma_{DE},\hspace{3.4cm}
 \end{multline}
 \begin{multline}
   \frac{\partial \rho_{D:ATP}}{\partial t} = \mathcal{D}_D\nabla^2\rho_{D:ATP}+k_D^{ADP\rightarrow ATP}\rho_{D:ADP}\\
-  -\delta(d_w)[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP}
+  -\delta(d_w)[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP},
 \end{multline}
 \begin{multline}
   \frac{\partial \rho_E}{\partial t} = \mathcal{D}_E\nabla^2\rho_E+\delta(d_w)k_{de}\sigma_{DE}
-  -\delta(d_w)k_E \sigma_D \rho_E
+  -\delta(d_w)k_E \sigma_D \rho_E,
 \end{multline}
 \begin{multline}
   \frac{\partial \sigma_d}{\partial t} = -k_E\rho_d\rho_E
-  +[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP}
+  +[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP},
   \label{eq:d-on-wall}
 \end{multline}
 \begin{multline}
   \frac{\partial \sigma_{DE}}{\partial t} = -k_{de}\sigma_{DE}+k_E\sigma_D\rho_E\hspace{3cm}
-  \label{eq:FifthPDE}
+  \label{eq:FifthPDE},
 \end{multline}
 
-Where $\rho$ is cytoplasmic protein density ($\mu m^{-3}$), $\sigma$
+where $\rho$ is cytoplasmic protein density ($\mu m^{-3}$), $\sigma$
 is membrane bound density ($\mu m^{-2}$), $\mathcal{D}_D$ and
 $\mathcal{D}_{E}$ th diffusions constants for MinD and MinE,
 respectively, $k_D^{\textrm{ADP $\rightarrow$ ATP}}$ the rate of
@@ -200,15 +206,15 @@ cells we use the same number of proteins per unit volume.
   k_E = 0.093 \micron^3 /\textrm{sec}.
 \end{gather*}
 
-
-A 3d grid is constructed in cartesian coordinates with a grid spacing
-of .05\micron. We define our cell shapes and solve the
-reaction-diffusion equations numerically to observe the time evolution
-of the MinD and MinE concentrations inside the cell.
-
 We start our cells with the MinD and MinE concentrations that are
-reported as wild type concentrations by Huang et al . We as well use the same reaction
-diffusion constants and and reaction rates,
+reported as wild type concentrations by Huang et al. These
+concentration values are 1273 $\mu m^{-3}$ and 445 $\mu m^{-3}$,
+respectively. A 3d grid is then constructed in cartesian coordinates,
+with a grid spacing of .05\micron. We define our cell shapes and solve
+the reaction-diffusion equations numerically to observe the time
+evolution of the MinD and MinE concentrations inside the
+cell. \renesays{This last sentence sweeps a lot under the rug. How
+  much more detail should be given to the computational method?}
 
 \section{Cell shapes}
 
