@@ -19,7 +19,7 @@ start_time = float(sys.argv[7])
 end_time = float(sys.argv[8])
 
 
-dump_time_step = 2.5
+dump_time_step = 0.5
 
 #computes the global maximum over a set of two dimensional arrays (stored as files)
 def timemax(protein):

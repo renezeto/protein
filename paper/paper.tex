@@ -195,7 +195,6 @@ and $350/\mu m$, respectively, in a cylindrical cell of radius $0.5\mu
 m$, and in our (non-cylindrical) cells we use the same number of
 proteins per unit volume.  These concentration values are 1273 $\mu
 m^{-3}$ and 445 $\mu m^{-3}$, respectively.
-
 \begin{gather*}
   \mathcal{D}_D = \mathcal{D}_{E} = 2.5\micron^2/\text{sec}\\
   k_D^{\textrm{ADP $\rightarrow$ ATP}} = 1/\textrm{sec,  }
@@ -204,13 +203,11 @@ m^{-3}$ and 445 $\mu m^{-3}$, respectively.
   k_{de} = 0.7/\textrm{sec}\\
   k_E = 0.093 \micron^3 /\textrm{sec}.
 \end{gather*}
-
-A 3d grid is then constructed in cartesian coordinates, with a grid
+A 3D grid is then constructed in cartesian coordinates, with a grid
 spacing of .05\micron. We define our cell shapes and solve the
-reaction-diffusion equations numerically to observe the time evolution
-of the MinD and MinE concentrations inside the cell. \renesays{This
-  last sentence sweeps a lot under the rug. How much more detail
-  should be given to the computational method?}
+reaction-diffusion partial differential equations numerically to
+observe the time evolution of the MinD and MinE concentrations inside
+the cell.
 
 The reactions shown in Figure~\ref{fig:reactions} are cyclical so we
 can begin our observations at any stage in the cycle (which is
@@ -324,18 +321,18 @@ volumes are very close to $3\micron^3$. \jeffsays{I'm not sure how
   \label{image-p}
 \end{figure*}
 
-We begin with the naturally occuring pill shape.  We peice this shape
-together as two hemispherical endcaps attached on either end of a
-cylinder.  This shape follows the early simulations of Huang \emph{et
-  al.} but differs in that we have added the end caps for a more
-natural shape, expecting similar results.  We test cells of radius
-$.5\micron$ and of lengths $2\micron$, $3\micron$, and $5\micron$
-between both tips of the end caps. In all these models we observe
-quick establishement (within a few periods) of extremely regular
-oscillatory behavoir that lasts indefinitely, with periods that
-closely agree with the results of Huang \emph{et al.}
-Table~\ref{tab:pill-periods} shows the periods of oscillations
-at different cell lengths.
+We begin with the naturally occuring pill cell shape.  We peice this
+shape together as two hemispherical endcaps attached on either end of
+a cylinder.  This shape follows the early simulations of Huang
+\emph{et al.} but differs in that we have added the end caps for a
+more natural shape, expecting similar results.  We test cells of
+radius $.5\micron$ and of lengths $2\micron$, $3\micron$, and
+$5\micron$ measured from the tip of one end cap to the top of the
+other. In each case, we observe quick establishement (within a few
+periods) of extremely regular oscillatory behavoir that lasts
+indefinitely.  The period increases with cell length, as shown in
+Table~\ref{tab:pill-periods}, in agreement with the results of Huang
+\emph{et al.}.
 
 \begin{table}
   \begin{tabular}{|r|c|c|c|l|}
@@ -345,40 +342,54 @@ at different cell lengths.
     Period(sec) & sim & 33 & 38 & 48 \\ \cline{2-2}
     \hline
   \end{tabular}
-  \caption{Period According to Pill Length}\label{tab:pill-period}
+  \caption{Period of oscillation according to length of cell for
+    pill-shaped cells.}\label{tab:pill-periods}
 \end{table}
 
 This simple model is a good starting point for observing in detail the
 dynamic interaction between the different stages of protein that lead
 to their qualitatively distinct behavoir. Figure \ref{image-p} shows
 the process in a series of frames taken from simulation animations.
-Each frame is 2.5 seconds ahead of the last.
+Each frame is 2.5 seconds ahead of the last, and each image shows a
+the concentration of a given state of protein summed over the
+coordinate orthogonal to the page.  The color scale for each protein
+state is set according to the maximum density observed.
 
-Consider Figure \ref{image-p}.  In the beginning, the cytoplasmic
-nATP is roughly evenly distributed throughout the cell.  There is nADP
-concentrated in the left pole and it will transform into nATP.  At 2.5
-seconds we see membrane bound MinD:ATP form on the right side of the
-cell.  It avoids the left side because there is a concentration of
-cytoplasmic MinE on the left side and compared to the right side,
-which is empty of MinE, MinD:ATP attaching to the wall on the left has
-no time to collect and cluster before reacting.  One can see how as
-the MinE spreads out rightward, the the clustered membrane bound
-MinD:ATP stays just at the edge of it, always to the right.  Where the
-two meet there is at every time step a spike in membrane bound
-MinD-MinE:ATP, resulting from the MinE reaction with the MinD on the
-wall.  One can see from roughly 5 seconds to 17.5 seconds the
-cytoplasmic MinE chases in a way the MinD towards the right, reacting
-with it as it clusters on the wall.  Upon reaching the right side, the
-MinD is in a way trapped, and the MinE now concentrated in that pole
-will react until the MinD has diffused back towards the other side and
-there is no more membrane bound MinD:ATP to react with.  The cycle
-then begins again.
+In the beginning, the cytoplasmic MinD:ATP is roughly evenly
+distributed throughout the cell with close to its peak density.  There
+is a high concentration of MinD on the membrane (in both its
+membrane-bound states) at the lower end of the cell, and there is also
+cytoplasmic MinD:ADP concentrated in the lower end, which has recently
+left the cell membrane.   There is relatively little cytoplasimic
+MinE, as it is primarily bound to the lower end of the membrane.
 
+After ??? seconds, very little MinD remains bound to the membrane, and
+there is a high concentration of cytoplasmic MinE in the lower half of
+the cell.  In the mean time MinD has begun binding in significant
+quantities to the upper half of the cell membrane, resulting in a
+diminishing of the concentration of cytoplasmic MinD:ATP in the upper
+half of the cell.  At this stage, we begin to see the formation of the
+``MinE ring'' in the center of the cell---visible here in the plot of
+the concentration of membrane-bound MinE:MinD:ATP as two lines
+representing a cross section of the ring.  This ring forms as the
+cytoplasmic MinE reacts with the membrane-bound MinD:ATP, and leads to
+the removal of MinD from the membrane.
 
+From ??? seconds to ??? seconds, we see the MinE ring progress
+upwards, as the cytoplasmic MinE diffuses in that direction,
+progressively removing the membrane-bound MinD from eventually all but
+the very top of the cell membrane.  During this process, the MinD:ATP
+bound to the top of the cell membrane is attracting increasing
+quantities of MinD:ATP from the cytoplasm.  At ??? seconds, the cell
+is in the mirror image state from which it started, and the period is
+half-complete.  The second half of the period is a mirror image of the
+process just observed, as MinD is driven from the membrane at the top
+of the cell, begins binding to the lower half of the cell and a MinE
+ring pushes it back down to lower end of the cell.
 
 \begin{figure}
-  %%\includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-400-50-0-0-1500}
-  \includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-200-50-0-0-1500}
+  \includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-400-50-0-0-1500}
+  %\includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-200-50-0-0-1500}
   \caption{Total protein fluctuation in the right, middle, and left
     parts of a 5$\micron$ by 1$\micron$ pill shaped cell (above) and a
     3$\micron$ by 1$\micron$ pill shaped cell (below).  The vertical axis shows
@@ -392,19 +403,21 @@ then begins again.
   \label{box-p}
 \end{figure}
 
-Figure \ref{box-p} is a plot of the total fraction of
-MinD found in each stage of the cycle in each of three sections of the
-cell (we have split the pill into two polar sections and one center
-section) over time.  One complete oscillation period is shown, in
-which one of the poles begins and ends at a maximum density
-concentration and the other a minimum density concentration.  Looking
-at the evolution of the latter, we see an initial high concentration
-of cytoplasmic MinD:ATP, as the this protein diffuses into the polar
-region, followed by a dip in this and large spike in membrane bound
-MinD:ATP, as the protein clusters onto the polar cell wall, followed
-by a spike in the memebrane bound MinE:MinD:ATP stage of protein,
-together with a slight rise in cytoplasmic MinD:ADP as the MinD
-dettaches from the wall.
+\davidsays{We should make Fig. \ref{box-p} and Fig. \ref{image-p} plot
+  for precisely the same times, that will make it way easier to read
+  the two plots.}  While Fig.~\ref{image-p} is helpful for visualizing
+the process occuring in the Min system, it is does not show the
+relative number of proteins in each state.  To visualize this
+information, we plot in Fig.~\ref{box-p} the fraction of MinD found in
+each stage of the cycle in each of three sections of the cell---top,
+middle and bottom---as a function of time over one period.  The time
+axis is the same as in Fig.~\ref{image-p}.  Looking at the evolution
+of the latter, we see an initial high concentration of cytoplasmic
+MinD:ATP, as the this protein diffuses into the polar region, followed
+by a dip in this and large spike in membrane bound MinD:ATP, as the
+protein clusters onto the polar cell wall, followed by a spike in the
+memebrane bound MinE:MinD:ATP stage of protein, together with a slight
+rise in cytoplasmic MinD:ADP as the MinD dettaches from the wall.
 
 results for pill shaped cell of length
 $5\mu$ and radius $.5\mu$.  The plot shows both the transerence
@@ -776,13 +789,13 @@ the smallest corner?  \fixme{There isn't enough data to see properly
 
 \section{Interpretation of Data}
 \section{Conclusion}
-\section*{Appendix}
 \bibliography{paper}
 
 
 
+\end{document}
 
-
+\section*{Appendix}
 
 \section{Below are NOTES for the Writing}
 

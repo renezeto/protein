@@ -58,13 +58,14 @@ class data(object):
 
 #loads the files for creating the data object.
 def get_filenames(protein,start_time,end_time):
+    dump_time_step = 0.5 # seconds
     dat_filenames = []
     if end_time == 0:
         for fn in glob.iglob("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-*.dat"%(f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5)):
             dat_filenames.append(fn)
     if end_time != 0:
-        for i in np.arange(start_time,end_time,2.5):
-            file_num = round(i/2.5)
+        for i in np.arange(start_time,end_time,dump_time_step):
+            file_num = round(i/dump_time_step)
             dat_filenames.append("./data/shape-%s/%s%s%s%s-%s-%s-%s-%s-%s-%s-%03d.dat"%
                                  (f_shape,debug_str,hires_str,slice_str,protein,f_shape,f_param1,f_param2,f_param3,f_param4,f_param5,file_num))
     dat_filenames = sorted(dat_filenames)

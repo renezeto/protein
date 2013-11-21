@@ -46,7 +46,7 @@ data/shape-p/plots/time-map-compare-p-40-30-0-0-150.pdf: pyplots/time_map.py
 
 data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf: pyplots/image_plot.py
 	mkdir -p data/shape-p/plots
-	python $< p 4.00 0.50 0.00 0.00 15.00 60.00 290.00
+	python $< p 4.00 0.50 0.00 0.00 15.00 25.00 55.00
 
 #arrow plots
 #box plots

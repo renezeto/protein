@@ -140,8 +140,8 @@ def main():
             if "E_" in proteinType:
                 plotNameList_E += ["%s-%s"%(box,proteinType)]
 
-    print ""
-    print "plotNameList before ", plotNameList_D, "\n"
+    #print ""
+    #print "plotNameList before ", plotNameList_D, "\n"
     new_plotNameList_D = [0]*len(plotNameList_D)
     P_Ord = [3,0,2,1,7,4,6,5,11,8,10,9]
     if load.f_param4 == '97.00':
@@ -152,7 +152,7 @@ def main():
         new_plotNameList_D[i] = plotNameList_D[P_Ord[i]]
     for i in range(len(plotNameList_D)):
         plotNameList_D[i] = new_plotNameList_D[i]
-    print "plotNameList after ",plotNameList_D,"\n"
+    #print "plotNameList after ",plotNameList_D,"\n"
     plotProteinLabels = ['MinD:ATP (cyto)','MinD:ATP (mem)','MinE:MinD:ATP','MinD:ADP (cyto)']
 
 
@@ -176,6 +176,17 @@ def main():
     start = int(tot_time*start_time_as_frac_of_ten/10.0/box_time_step)
     end = int(tot_time*end_time_as_frac_of_ten/10.0/box_time_step)
     (start, end) = find_period(plotCurveList_D[3])
+
+    # print useful coordination data
+    period = timeAxis[end-1] - timeAxis[start]
+    print 'period is', period
+    firsttime = timeAxis[start]
+    while firsttime > period:
+        firsttime -= period
+    print 'early start time is', firsttime
+    # now offset time so it starts at zero
+    timeAxis = timeAxis - timeAxis[start]
+
     if load.f_param4 == '97.00' or (load.f_shape == 'triangle' and load.f_param3 == '6.01'):
         if load.f_param4 == '97.00':
             start_time_as_frac_of_ten = 0
@@ -185,7 +196,6 @@ def main():
             end_time_as_frac_of_ten = 9.00
         start = int(tot_time*start_time_as_frac_of_ten/10.0/box_time_step)
         end = int(tot_time*end_time_as_frac_of_ten/10.0/box_time_step)
-
 
     #print set(plotCurveList_D[1]).union(set(plotCurveList_D[2]))
 
@@ -266,7 +276,7 @@ def main():
         if load.f_param4 == '96.00':
             #rightup = 2, rightdown = 1, leftup = 4, leftdown = 3
             mycolors = ['g','r','c','m']
-        print mycolors
+        #print mycolors
         # here we rotate so that the order of sections will match the
         # box plot.
         xdir, ydir = xweighted - xmean, yweighted - ymean
@@ -296,7 +306,7 @@ def main():
                 frameon=False
                 ))
     plot_sections(sectionax, sectiondata)
-    section_names = ['Left Section','Center Section','Right Section']
+    section_names = ['Bottom Section','Center Section','Top Section']
     if load.f_param4 == '97.00':
         section_names = ['Lower Section','Middle Left Section','Middle Right Section','Upper Section']
 #        section_names = ['rightup','mid','left','rightdown']
@@ -308,6 +318,7 @@ def main():
     text_adjust = -.2*box_time_step*(end-start)
     j=0
     k=0
+
     for i in range(len(plotCurveList_D[:,0])):
         if i%(numProteinTypes_D)==0:
             j+=1
@@ -347,7 +358,7 @@ def main():
                              plotCurveList_D[i, start:end],
                              alpha=alphaScale_D[k],facecolor=colorScale[j])
             k+=1
-    bax.set_xlim(box_time_step*start,box_time_step*end)
+    bax.set_xlim(timeAxis[start],timeAxis[end-1])
     bax.get_yaxis().set_visible(False)
     bax.set_ylim(0, 1)
     bax.set_title("MinD protein counts over time")
@@ -390,7 +401,7 @@ def main():
             bax.fill_between(timeAxis[start:end],plotCurveList_E[i-1][start:end],plotCurveList_E[i][start:end],alpha=alphaScale_E[k],facecolor=colorScale[j])
         #print "i is ",i," || k is", k," || j is",j
         k+=1
-    bax.set_xlim(box_time_step*start,box_time_step*end)
+    bax.set_xlim(timeAxis[start],timeAxis[end-1])
     bax.set_ylim(0, 1)
     bax.set_title("MinE protein counts over time")
     bax.set_xlabel("Time (s)")
