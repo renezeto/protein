@@ -9,6 +9,7 @@
 \newcommand{\fixme}[1]{\red{[#1]}}
 \newcommand{\davidsays}[1]{{\color{red} [\green{David:} \emph{#1}]}}
 \newcommand{\renesays}[1]{{\color{red} [\blue{Rene:} \emph{#1}]}}
+\newcommand{\jeffsays}[1]{{\color{red} [\blue{Jeff:} \emph{#1}]}}
 
 \newcommand\micron{\ensuremath{\mu\text{m}}}
 
@@ -143,12 +144,8 @@ towards and attach to the cell membrane.  A cytoplasmic MinE will
 attach to the wall bound MinD:ATP complex and after a time will
 activate ATP hydrolosis.  This breaks up the complex, releasing MinE,
 phosphate, and MinD:ADP back into the cell.  The MinD:ADP will undergo
-nucleotide exchange and begin again the cyclic process.  There is a
-mechanism for MinD:ATP clustering that is shown in
-Equation~\ref{eq:d-on-wall}.  When brushing up against the cell
-membrane, the MinD:ATP attachement rate increases linearly with the
-density of MinD:ATP already attached.  This model is defined by a set of
-five reaction-diffusion equations:
+nucleotide exchange and begin again the cyclic process.  This model is
+defined by a set of five reaction-diffusion equations:
 
 \begin{multline}
   \frac{\partial \rho_{D:ADP}}{\partial t} = \mathcal{D}_D\nabla^2\rho_{D:ADP}-k_D^{ADP\rightarrow ATP}\rho_{D:ADP}\\
@@ -156,20 +153,20 @@ five reaction-diffusion equations:
 \end{multline}
 \begin{multline}
   \frac{\partial \rho_{D:ATP}}{\partial t} = \mathcal{D}_D\nabla^2\rho_{D:ATP}+k_D^{ADP\rightarrow ATP}\rho_{D:ADP}\\
-  -\delta(d_w)[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP},
+  -\delta(d_w)[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP}
 \end{multline}
 \begin{multline}
   \frac{\partial \rho_E}{\partial t} = \mathcal{D}_E\nabla^2\rho_E+\delta(d_w)k_{de}\sigma_{DE}
-  -\delta(d_w)k_E \sigma_D \rho_E,
+  -\delta(d_w)k_E \sigma_D \rho_E
 \end{multline}
 \begin{multline}
   \frac{\partial \sigma_d}{\partial t} = -k_E\rho_d\rho_E
-  +[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP},
+  +[k_D+k_{dD}(\sigma_D+\sigma_{DE})]\rho_{D:ATP}
   \label{eq:d-on-wall}
 \end{multline}
 \begin{multline}
   \frac{\partial \sigma_{DE}}{\partial t} = -k_{de}\sigma_{DE}+k_E\sigma_D\rho_E\hspace{3cm}
-  \label{eq:FifthPDE},
+  \label{eq:FifthPDE}
 \end{multline}
 
 where $\rho$ is cytoplasmic protein density ($\mu m^{-3}$), $\sigma$
@@ -190,12 +187,14 @@ relevent at the membrane because the membrane bound density values
 will have no meaning in the cytoplasm where there is no membrane.
 
 Our diffusion and reaction rates are shown below.  We are interested
-primarily with the effect of cellular shape on the protein
+primarily in the effect of cellular shape on the protein
 oscillations, so we follow Huang's work\cite{huang2003dynamic} and do
-not deviate from these values.  Huang's simulations use total MinD and
-MinE concentrations of $1,000/\mu m$ and $350/\mu m$, respectively, in
-a cylindrical cell of radius $0.5\mu m$, and in our (non-cylindrical)
-cells we use the same number of proteins per unit volume.
+not deviate from the wild type values used in that work.  Huang's
+simulations use total MinD and MinE concentrations of $1,000/\mu m$
+and $350/\mu m$, respectively, in a cylindrical cell of radius $0.5\mu
+m$, and in our (non-cylindrical) cells we use the same number of
+proteins per unit volume.  These concentration values are 1273 $\mu
+m^{-3}$ and 445 $\mu m^{-3}$, respectively.
 
 \begin{gather*}
   \mathcal{D}_D = \mathcal{D}_{E} = 2.5\micron^2/\text{sec}\\
@@ -206,83 +205,24 @@ cells we use the same number of proteins per unit volume.
   k_E = 0.093 \micron^3 /\textrm{sec}.
 \end{gather*}
 
-We start our cells with the MinD and MinE concentrations that are
-reported as wild type concentrations by Huang et al. These
-concentration values are 1273 $\mu m^{-3}$ and 445 $\mu m^{-3}$,
-respectively. A 3d grid is then constructed in cartesian coordinates,
-with a grid spacing of .05\micron. We define our cell shapes and solve
-the reaction-diffusion equations numerically to observe the time
-evolution of the MinD and MinE concentrations inside the
-cell. \renesays{This last sentence sweeps a lot under the rug. How
-  much more detail should be given to the computational method?}
+A 3d grid is then constructed in cartesian coordinates, with a grid
+spacing of .05\micron. We define our cell shapes and solve the
+reaction-diffusion equations numerically to observe the time evolution
+of the MinD and MinE concentrations inside the cell. \renesays{This
+  last sentence sweeps a lot under the rug. How much more detail
+  should be given to the computational method?}
 
-\section{Cell shapes}
-
-In order to address the limits at which the stability of the
-oscillations of the Min system break down, as observed by Mannik
-\emph{et al.}~\cite{mannik2012robustness}, we model the Min system in
-a variety of cell shapes.  We begin with natural pill-shaped cells,
-and the proceed to examine a number of flattened pancake-like shapes,
-which reflect the experiment of Mannik \emph{et al.}, in which
-bacteria were confined within a thin slit~\cite{mannik2012robustness}.
-Our pill shapes differ from those of Huang \emph{et al.} in that they
-are cylinders with hemisphere endcaps instead of pure cylindridrical
-shapes.  Our
-cylinderidrical radius is $0.50\micron$ and the lengths of our cells
-(measured between the tips of the endcaps) are $5\micron$, $4\micron$, $3\micron$,
-and $2.5\micron$.
-
-With our flattened cell shapes we mean to study cells that are
-parrallel to those lodged into crevices by Mannik so we give them
-height of $0.25\micron$ \cite{mannik2012robustness}.  Viewed from the top
-down the cells will have the shapes described below and viewed from
-the side they have at their edges a semicircular protrusion (one may
-imagine the edges of a pancake).
-
-Our first group of (three) flattened cell shapes are triangular.  One
-of them is equilateral, one has a 3-4-5 right angle shape, and the
-last is iscoscolese.
-
-Our second group of (four) flattened cells are our own creations,
-designed to investigate different patterns of protein oscillation
-behavoir.
-
-The cell shapes and the sections that we split them into in our data
-analysis are shown in Figure \fixme{We need a big figure with all of this!!}.
-
-Kubitschek has shown in multiple experiments that at the time of cell
-division cells have a volume that is within a range of roughly
-$1\micron^3$ to $2\micron^3$~\cite{kubitschek1990cell,
-  kubitschek1968linear}.  We follow Huang's
-simulations\cite{huang2003dynamic} and Mannik's experiments
-\fixme{this link doesn't work = cite{mannik2012robustness}} and model
-cells that are slightly larger than this range.  Amoung our flattened
-cells the two dimensional length scales are tuned so that every total
-cell volume is very close to $3\micron^3$.  \fixme{should we just
-  leave it to the reader to figure out for themselves what our pill
-  shape volumes are?}
-
-
-To interpret the results, we generated several different plot views of
-the printed simulation data. These plots included a time averaged view
-of the protein densities in the cell; a plot tracking the location of
-protein concentrations that were global maxima in space and local maxima in
-time; and an animated view that showed the actual dispersion of
-protein concentrations in the cell over time.
-\section{Specific Results}
-
-\subsection{Pill Shape}
-
-The reaction shown in Figure~\ref{fig:reactions} is cyclical so we can
-begin our observations at any stage in the cycle (which is presented
-for the natural cell shape in Fig.~\ref{image-p} below).  We consider
-first MinD:ATP floating freely in the cytoplasm.  The protein will not
-react with any other floating protein, and it will not spontenously
-shift back into the MinD:ADP stage of the cycle.  It will diffuse
-until it attaches to a cell membrane.  This is will happen most
-rapidly in regions of high curvature, where diffusion is more likely
-to lead to an encounter with a wall.  This effect is made more
-pronounced by the MinD:ATP tendency to attract and cluster on the
+The reactions shown in Figure~\ref{fig:reactions} are cyclical so we
+can begin our observations at any stage in the cycle (which is
+presented for the natural, pill shapes cell in Fig.~\ref{image-p}
+below).  We consider first MinD:ATP floating freely in the cytoplasm.
+The protein will not react with any other floating protein, and it
+will not spontenously shift back into the MinD:ADP stage of the cycle.
+It will diffuse until it attaches to a cell membrane.  This will
+happen most rapidly in cytoplasmic regions that are close to membrane
+regions of high curvature, where diffusion in a random direction is
+more likely to lead to an encounter with a wall.  This effect is made
+more pronounced by the MinD:ATP tendency to attract and cluster on the
 membrane, as reflected in Equation~\ref{eq:d-on-wall}, which shows
 that when adjacent to the membrane, the rate of binding to the
 membrane is porportional to the amount of MinD already bound to the
@@ -292,33 +232,79 @@ on the polar regions of the cell, where the curvature is highest.
 We next see the formation of MinE `rings' on the membranes of the
 polar caps.  As the freely diffusing MinE enters the cap portion it
 begins to encounter concentrated membrane bound MinD.  The MinE binds
-to this MinD and remians for a time on the walls in compound form.
-When it is released, it can diffuse naturally outward or inward
-towards the cell.  If it diffuses inward, there is less cross
-sectional wall for it to bump into and also less concentrated MinD:ATP
-to react with.  If it diffuses outward, the curvature of the cell wall
-cuases there to be a greater chance that it will encounter the cell
-membrane (for the same reason outlined for the MinD:ATP above) and if
-there is MinD:ATP bound there, there is a chance that it will bind to
-that protein and react again.  If it does diffuse in this directin, it
-will likely react with MinD:ATP before getting very far into the
-encap.  Thus after dettaching from the membrane at the edge of the
-MinD:ATP encap cluster, the MinE is most likely to travel a small
-distance further into the polar region and then attach and react again
-with MinD:ATP protein there.  This process results in the observed
-qualitative 'encroaching MinE ring' behavoir that releases MinD:ADP
-back into the cytoplasm.  This MinD:ADP will diffuse for a time before
-spontanosly uindergowing hydrolysis \fixme{is this right?} and
-reaching the MinD:ATP state that can bind to the membrane again.
-There is a strong chance that it has by this time diffused out of the
-polar region and is on its way to the opposite polar region of the
-cell.  If it hasn't then it will reattach to the MinD:ATP on the cell
-wall deeper into the endcap and will eventually be converged upon by
-the MinE ring, only to be released again in MinD:ADP form.
+to this MinD and remains for a time on the walls in compound form.
+When it is released, it has the two options of diffusing naturally
+outward or inward towards the cell.  If it diffuses inward, there is
+less cross sectional wall for it to bump into and also less
+concentrated MinD:ATP to react with.  If it diffuses outward, the
+curvature of the cell wall cuases there to be a greater probability
+per unit time that it will encounter the cell membrane (for the same
+reason outlined for the MinD:ATP above) where there is more membrane
+bound MinD:ATP. If it does diffuse in this directin, it will likely
+react with MinD:ATP before getting very far into the encap.  This
+process results in the observed qualitative 'encroaching MinE ring'
+behavoir that releases MinD:ADP back into the cytoplasm.  This
+MinD:ADP will diffuse for a time before spontanosly undergowing
+nucleotide exchange and reaching the MinD:ATP state that
+can bind to the membrane again.  There is a strong chance that it has
+by this time diffused out of the polar region and is on its way to the
+opposite polar region of the cell.  If it hasn't then it will reattach
+to the MinD:ATP on the cell wall deeper into the endcap and will
+eventually be converged upon by the MinE ring, only to be released
+again in MinD:ADP form.
 
-Overall this process results in an extremely robust oscillatory
+Overall this process results in extremely robust oscillatory
 behavoir of polar selection and oscillation in a wide variety of cell
 shapes.
+
+\section{Cell shapes}
+
+We mean to investigate the geometric limits of the Min system
+oscillations, as observed by Mannik \emph{et
+  al.}~\cite{mannik2012robustness}, so we model the Min system in a
+variety of cell shapes.  We begin with naturally occuring pill-shaped
+cells and then proceed to examine a number of flattened pancake-like
+shapes, which reflect the experiment of Mannik \emph{et al.}, in which
+bacteria were confined within a thin slit~\cite{mannik2012robustness}.
+Our pill shapes differ from those of Huang \emph{et al.} in that they
+are cylinders with hemisphere endcaps instead of pure cylindrical
+shapes.  Our cylinderidrical radius is $0.5\micron$ and the lengths
+of our cells (measured between the tips of the endcaps) are
+$5\micron$, $4\micron$, $3\micron$, and $2.5\micron$.
+
+With our flattened cell shapes we mean to study cells that are
+parrallel to those lodged into crevices by Mannik so we give them
+height of $0.25\micron$ \cite{mannik2012robustness}.  Viewed from the top
+down the cells will have the shapes described below and viewed from
+the side they have at their edges a semicircular protrusion (one may
+imagine the edges of a pancake).
+
+Our first group of (three) flattened cell shapes are triangular when
+viewed from above.  One of them is equilateral, one has a 3-4-5 right
+angle shape, and the last is iscoscolese.
+
+Our second group of (two) flattened cells are designed to replicate
+those published by Mannik, in order to compare the results of the
+simulation model with the experimental results in that work.
+
+Our third group of (three) flattened cells are our own creations,
+designed to investigate different patterns of protein oscillation
+behavoir.
+
+Kubitschek has shown in multiple experiments that at the time of cell
+division cells have a volume that is within a range of roughly
+$1\micron^3$ to $2\micron^3$~\cite{kubitschek1990cell,
+  kubitschek1968linear}.  We follow Huang's
+simulations\cite{huang2003dynamic} and Mannik's experiments and model
+cells that are slightly larger than this range.  Amoung our flattened
+cells the two dimensional length scales are tuned so that total cell
+volumes are very close to $3\micron^3$. \jeffsays{I'm not sure how
+  true this is.  We should go through and check.  There've been a few
+  implementations of printouts reporting volume in the cpp}
+\section{Specific Results}
+
+\subsection{Pill Shape}
+
 
 \begin{figure*}
   \includegraphics[width=\textwidth]{../data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf}
