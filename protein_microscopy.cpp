@@ -602,6 +602,8 @@ int main (int argc, char *argv[]) {
    iter = int(tot_time/time_step);//this will give us triangle data in about two days and randst in four days?
    printout_iterations = int(0.5/time_step);
    int print_denominator = 1000; //This dictates how often (in iterations) you add a line to the box, time, and ave plots
+   int total_arrow_time = 1000;
+   int arrow_iter = int(total_arrow_time/time_step);//this tells us how many seconds we'll do the arrow plots for
    printf("printout iterations = %d\n",printout_iterations);//approximately 5 seconds between each printout
    double dV = dx*dx*dx;
 
@@ -925,7 +927,6 @@ int main (int argc, char *argv[]) {
   fflush(stdout);
 
   //initialize things
-  int arrow_iter = 2000;
   for (int pNum=0; pNum<numProteins; pNum++) {
     int total_print_iter = iter/print_denominator+2;
     proteinList[pNum]->sum = new double[Ny*Nz];
