@@ -44,9 +44,10 @@ data/shape-p/plots/time-map-compare-p-40-20-0-0-150.pdf: pyplots/time_map.py
 data/shape-p/plots/time-map-compare-p-40-30-0-0-150.pdf: pyplots/time_map.py
 	python pyplots/time_map.py p 4.00 3.00 0.00 0.00 15.00
 
+# start time 29.501, period 45.002
 data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf: pyplots/image_plot.py
 	mkdir -p data/shape-p/plots
-	python $< p 4.00 0.50 0.00 0.00 15.00 25.00 55.00
+	python $< p 4.00 0.50 0.00 0.00 15.00 29.00 75.00
 
 #arrow plots
 #box plots
