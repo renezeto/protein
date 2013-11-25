@@ -15,7 +15,7 @@ ALL_FIGURES = \
 	data/shape-p/plots/box-plot_D--p-200-50-0-0-1500.pdf
 
 paper/paper.pdf: paper/paper.tex \
-		paper/reactions.pdf data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf \
+		paper/reactions.pdf data/shape-p/plots/image-plot--p-300-50-0-0-1500.pdf \
 		${ALL_FIGURES}
 	echo ${ALL_FIGURES}
 	cd paper && pdflatex paper.tex && bibtex paper && pdflatex paper.tex && pdflatex paper.tex
@@ -45,9 +45,9 @@ data/shape-p/plots/time-map-compare-p-40-30-0-0-150.pdf: pyplots/time_map.py
 	python pyplots/time_map.py p 4.00 3.00 0.00 0.00 15.00
 
 # start time 29.501, period 45.002
-data/shape-p/plots/image-plot--p-400-50-0-0-1500.pdf: pyplots/image_plot.py
+data/shape-p/plots/image-plot--p-300-50-0-0-1500.pdf: pyplots/image_plot.py
 	mkdir -p data/shape-p/plots
-	python $< p 4.00 0.50 0.00 0.00 15.00 29.00 75.00
+	python $< p 3.00 0.50 0.00 0.00 15.00 266.00 304.00
 
 #arrow plots
 #box plots

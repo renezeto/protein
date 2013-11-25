@@ -53,8 +53,7 @@ def stackData(plotList):
     #parse the input
     tempList = []
     for proteinData in plotList:
-        splitString = proteinData.split('-')
-        (protein, boxName) = (splitString[0], splitString[1])
+        protein, boxName = proteinData.split('-')
         tempList += [returnData(boxName,protein)]
 
     #"stack" the lists
@@ -72,6 +71,7 @@ def find_period(f):
       period.  If we cannot find the period accurately, just return
       the entire range.
     """
+    f = -f
     # first we look at the fft to get a guess at the period (probably
     # not *too* accurate or too bad).
     fk = np.fft.fft(f)
@@ -175,15 +175,18 @@ def main():
     tot_time = len(plotCurveList_D[0])*box_time_step
     start = int(tot_time*start_time_as_frac_of_ten/10.0/box_time_step)
     end = int(tot_time*end_time_as_frac_of_ten/10.0/box_time_step)
-    (start, end) = find_period(plotCurveList_D[3])
+    (start, end) = find_period(plotCurveList_D[len(plotCurveList_D)-2])
+    (start, end) = find_period(np.array(returnData(boxList[len(boxList)-1], 'D_ND')))
 
     # print useful coordination data
     period = timeAxis[end-1] - timeAxis[start]
     print 'period is', period
     firsttime = timeAxis[start]
-    while firsttime > period:
+    while firsttime > 9*period:
         firsttime -= period
     print 'early start time is', firsttime
+    print 'and end time is ',firsttime+period
+    print 'and file numbers are', firsttime*2, 'and', (firsttime+period)*2
     # now offset time so it starts at zero
     timeAxis = timeAxis - timeAxis[start]
 
@@ -199,32 +202,7 @@ def main():
 
     #print set(plotCurveList_D[1]).union(set(plotCurveList_D[2]))
 
-    arrow_start = start+int(0.05*(end-start))
-    arrow_x = [arrow_start]*len(plotCurveList_D)
-    for i in range(arrow_start,arrow_start + int((end-start)/100)):
-            if ((plotCurveList_D[0][arrow_x[0]]-0) < (plotCurveList_D[0][i]-0)):
-                arrow_x[0] = i
-    for type in range(1,len(plotCurveList_D)):
-        for i in range(arrow_start,arrow_start + int((end-start)/100)):
-            if ((plotCurveList_D[type][arrow_x[type]]-plotCurveList_D[type-1][arrow_x[type]]) < (plotCurveList_D[type][i]-plotCurveList_D[type-1][i])):
-                arrow_x[type] = i
-
-    # arrow_x = [100]*len(plotCurveList_D)
-    # print len(plotCurveList_D)
-    # for type in range(len(plotCurveList_D)):
-    #     for i in range(start,end):
-    #         if ((plotCurveList_D[type][i]-plotCurveList_D[type][i-1])>.1):
-    #             arrow_x[type] = i
-    #             break
-    #             #print type,i
-    # print arrow_x
-
-
-    # arrow_start, arrow_end = find_period(plotCurveList_D[3])
-    # arrow_x = start + int(.25*(arrow_end - arrow_start))
-    # print arrow_x
-
-    #get num on each plot
+       #get num on each plot
     for proteinType in proteinTypeList:
         if "D_" in proteinType:
             numProteinTypes_D += 1
@@ -330,8 +308,8 @@ def main():
             y_text_label = i*.8/len(plotCurveList_D[:,0]) + .1*np.floor(i/numProteinTypes_D)
             if load.f_param4 == '97.00' or load.f_param4 == '96.00':
                 y_text_label = i*.8/len(plotCurveList_D[:,0]) + .07*np.floor(i/numProteinTypes_D)
-            y_label = (plotCurveList_D[i, arrow_x[i]])/2.0
-            bax.annotate('%s'%plotProteinLabels[i],xy=(arrow_x[i]*box_time_step,y_label),xytext=(start*box_time_step+text_adjust,y_text_label),
+            y_label = (plotCurveList_D[i, start+int(1/box_time_step)])/2.0
+            bax.annotate('%s'%plotProteinLabels[i],xy=(1,y_label),xytext=(text_adjust,y_text_label),
                          fontsize=7,
                          fontproperties=font,
                          arrowprops=dict(facecolor='black',shrink=0.05, width=.3, headwidth=5.))
@@ -344,10 +322,10 @@ def main():
                      plotCurveList_D[i,start:end],
                      color=colorScale[j],alpha=alphaScale_D[k])
             y_text_label = i*.8/len(plotCurveList_D[:,0]) + .1*np.floor(i/numProteinTypes_D)
-            y_label = (plotCurveList_D[i, arrow_x[i]] + plotCurveList_D[i-1, arrow_x[i]])/2.0
+            y_label = (plotCurveList_D[i, start+int(1/box_time_step)] + plotCurveList_D[i-1, start+int(1/box_time_step)])/2.0
             if load.f_param4 == '97.00' or load.f_param4 == '96.00':
                 y_text_label = i*.8/len(plotCurveList_D[:,0]) + .07*np.floor(i/numProteinTypes_D)
-            bax.annotate('%s'%plotProteinLabels[i%numProteinTypes_D],xy=(arrow_x[i]*box_time_step,y_label),xytext=(start*box_time_step+text_adjust,y_text_label),
+            bax.annotate('%s'%plotProteinLabels[i%numProteinTypes_D],xy=(1,y_label),xytext=(text_adjust,y_text_label),
                          fontsize=7,
                          fontproperties=font,
                          arrowprops=dict(facecolor='black',shrink=0.05, width=.3, headwidth=5.))

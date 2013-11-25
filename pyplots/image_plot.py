@@ -65,11 +65,11 @@ for i in range(len(proteins)):
     for k in kvals:
         page = proteins[i].dataset[k]
         page[page>maxval] = maxval
-        plt.contourf(Y+k*dY, Z+i*dZ, page, cmap=plt.cm.hot_r, levels=mylevels)
+        plt.contourf(Y+k*dY, proteins[0].datashape[1]-Z+i*dZ, page, cmap=plt.cm.hot_r, levels=mylevels)
 plt.axes().get_yaxis().set_ticks([(i+0.5)*dZ for i in range(len(proteinList))])
 plt.axes().get_yaxis().set_ticklabels(proteinLabels)
-plt.axes().get_xaxis().set_ticks([(0.5+k)*dY for k in kvals[::5*skip_times]])
-plt.axes().get_xaxis().set_ticklabels([int(k*dump_time_step) for k in kvals[::5*skip_times]])
+plt.axes().get_xaxis().set_ticks([(0.5+k)*dY for k in kvals[::int(2.5*skip_times)]])
+plt.axes().get_xaxis().set_ticklabels([int(k*dump_time_step) for k in kvals[::int(2.5*skip_times)]])
 plt.axes().set_aspect('equal')
 plt.axes().get_yaxis().set_ticks_position('none')
 plt.axes().get_xaxis().set_ticks_position('none')
