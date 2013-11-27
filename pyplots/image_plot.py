@@ -30,7 +30,7 @@ def timemin(protein):
     return min([v.min() for v in protein])
 
 proteinList = ["nADP","nATP","ND","NDE","nE"]
-proteinLabels = ["MinD:ADP (ctyo)",
+proteinLabels = ["MinD:ADP (cyto)",
                  "MinD:ATP (cyto)",
                  "MinD:ATP (mem)",
                  "MinE:MinD:ATP (mem)",

@@ -12,7 +12,7 @@ clean: rm -f protein_microscopy paper/paper.pdf
 sim: protein_microscopy
 
 ALL_FIGURES = \
-	data/shape-p/plots/box-plot_D--p-200-50-0-0-1500.pdf
+	data/shape-p/plots/box-plot_D--p-300-50-0-0-1500.pdf
 
 paper/paper.pdf: paper/paper.tex \
 		paper/reactions.pdf data/shape-p/plots/image-plot--p-300-50-0-0-1500.pdf \

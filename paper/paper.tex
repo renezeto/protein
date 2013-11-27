@@ -307,7 +307,8 @@ volumes are very close to $3\micron^3$. \jeffsays{I'm not sure how
   \includegraphics[width=\textwidth]{../data/shape-p/plots/image-plot--p-300-50-0-0-1500.pdf}
   \caption{Images of the concentration of each species in a natural
     pill-shaped bacterium as a function of time, with darker regions
-    indicating higher concentration.  Frames from an animation showing
+    indicating higher concentration.  The cells pictured are
+    $4\micron$ in length, measured from end to end.  Frames from an animation showing
     a series of contour plots of the concentration of proteins in
     different stages over time.  The order of frames is such that
     individual MinD proteins begin at the bottom of the plot (in the
@@ -355,57 +356,46 @@ the concentration of a given state of protein summed over the
 coordinate orthogonal to the page.  The color scale for each protein
 state is set according to the maximum density observed.
 
-In the beginning, the cytoplasmic MinD:ATP is roughly evenly
-distributed throughout the cell with close to its peak density.  There
-is a high concentration of MinD on the membrane (in both its
-membrane-bound states) at the lower end of the cell, and there is also
-cytoplasmic MinD:ADP concentrated in the lower end, which has recently
-left the cell membrane.   There is relatively little cytoplasimic
-MinE, as it is primarily bound to the lower end of the membrane.
+At $t=0$ in Figs.~\ref{image-p}~and~\ref{box-p}, the cytoplasmic MinE
+is concentrated in the lower portion of the cell, and is diffusing
+upward.  The MinD protein is initially concentrated on the membrane in
+the upper portion of the cell.  At the boundary between the
+cytoplasmic MinE and the membrane-bound MinD, there is a ring of the
+membrane-bound MinE:MinD complex, which is moving towards the upper
+end of the cell, removing the MinD from the membrane as it goes.  The
+MinD is removed from the membrane in its MinD:ADP form, which begins
+to accumulate at the upper end of the cell, peaking peaking at around
+10 seconds.
 
-After ??? seconds, very little MinD remains bound to the membrane, and
-there is a high concentration of cytoplasmic MinE in the lower half of
-the cell.  In the mean time MinD has begun binding in significant
-quantities to the upper half of the cell membrane, resulting in a
-diminishing of the concentration of cytoplasmic MinD:ATP in the upper
-half of the cell.  At this stage, we begin to see the formation of the
-``MinE ring'' in the center of the cell---visible here in the plot of
-the concentration of membrane-bound MinE:MinD:ATP as two lines
-representing a cross section of the ring.  This ring forms as the
-cytoplasmic MinE reacts with the membrane-bound MinD:ATP, and leads to
-the removal of MinD from the membrane.
-
-From ??? seconds to ??? seconds, we see the MinE ring progress
-upwards, as the cytoplasmic MinE diffuses in that direction,
-progressively removing the membrane-bound MinD from eventually all but
-the very top of the cell membrane.  During this process, the MinD:ATP
-bound to the top of the cell membrane is attracting increasing
-quantities of MinD:ATP from the cytoplasm.  At ??? seconds, the cell
-is in the mirror image state from which it started, and the period is
-half-complete.  The second half of the period is a mirror image of the
-process just observed, as MinD is driven from the membrane at the top
-of the cell, begins binding to the lower half of the cell and a MinE
-ring pushes it back down to lower end of the cell.
+At 15 seconds, the membrane-bound MinD:ATP has been essentially
+removed from the top end of the cell, and MinD:ATP has begun to bind
+to the membrane in the the lower half of the cell.  At this stage,
+there is a high concentration of cytoplasmic MinE at the top of the
+cell, and by 16 seconds we begin to see the formation of a MinE ring
+just below the center of the cell.  At 18 seconds, the cell has
+reached its original state, with MinD:ATP bound to the membrane on the
+lower third of the cell, a high concentration of cytoplasmic MinE in
+the upper half of the cell, and a MinE ring pushing on the
+membrane-bound MinD:ATP.
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-300-50-0-0-1500}
-  %\includegraphics[width=\columnwidth]{../data/shape-p/plots/box-plot_D--p-200-50-0-0-1500}
   \caption{Total protein fluctuation in the right, middle, and left
-    parts of a 5$\micron$ by 1$\micron$ pill shaped cell (above) and a
-    3$\micron$ by 1$\micron$ pill shaped cell (below).  The vertical axis shows
-    stacked the total number of proteins that are of four different
-    compound stages and in the right section of the cell (bottom four
-    colors), in the middle of the cell (middle four colors) and in the
-    left section of the cell (top four colors). The different forms of
-    protein changes while the total number of MinD protein in the cell
-    remains constant, shown by the fact that the very top line is
-    horizontal.}
+    parts of a natural pill shaped cell.  The cell is the same as is
+    shown in Fig.~\ref{image-p}.  The time axis is also identical to
+    that shown in Fig.~\ref{image-p}, and shows one period of the
+    oscillation after the system has settled down.  The vertical axis
+    shows stacked the total number of proteins that are of four
+    different compound stages and in the right section of the cell
+    (bottom four colors), in the middle of the cell (middle four
+    colors) and in the left section of the cell (top four colors). The
+    different forms of protein changes while the total number of MinD
+    protein in the cell remains constant, shown by the fact that the
+    very top line is horizontal.}
   \label{box-p}
 \end{figure}
 
-\davidsays{We should make Fig. \ref{box-p} and Fig. \ref{image-p} plot
-  for precisely the same times, that will make it way easier to read
-  the two plots.}  While Fig.~\ref{image-p} is helpful for visualizing
+While Fig.~\ref{image-p} is helpful for visualizing
 the process occuring in the Min system, it is does not show the
 relative number of proteins in each state.  To visualize this
 information, we plot in Fig.~\ref{box-p} the fraction of MinD found in
@@ -434,11 +424,7 @@ The pattern during each period clearly shows the cycle of proteins
 rections, as well as the very regular nature of the pole to pole
 protein oscillations.
 
-\fixme{our 5 length cells are labeled as 4 cells in the file labels,
-  since 4 is the length of the cylinder. In the text I'll refer to the
-  5 length cells (file says 4) as 5 length cells.  What huang's paper
-  calls 4 length cells will be labeled by our files as 3 length cells,
-  but will be refered in our text as 4 length cells}.  We can see a
+We can see a
 clear difference in period between the $5\mu$, $4\mu$, and $2\mu$
 length cells.  The oscillation periods for our $4\mu$ show excellent
 agreement with the simulations of Huang et all
